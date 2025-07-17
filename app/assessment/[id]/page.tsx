@@ -1,13 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, use } from "react"
 import { CheckCircle, Clock, HelpCircle, AlertTriangle, Target, ChevronLeft, ChevronRight, Home } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Progress } from "@/components/ui/progress"
-import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import { CodeEditor } from "@/components/code-editor"
 import Link from "next/link"
@@ -52,7 +51,8 @@ const problems = [
   },
 ]
 
-export default function Assessment() {
+export default function Assessment({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
   const [currentProblem, setCurrentProblem] = useState(0)
   const [code, setCode] = useState(`function twoSum(nums, target) {
     // Your solution here
@@ -135,7 +135,6 @@ export default function Assessment() {
       {/* Header */}
       <header className="shrink-0 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="flex h-16 items-center gap-4 px-6">
-          <SidebarTrigger />
           <div className="flex flex-1 items-center justify-between">
             <div>
               <Breadcrumb>
@@ -151,61 +150,18 @@ export default function Assessment() {
                     <ChevronRight className="h-4 w-4" />
                   </BreadcrumbSeparator>
                   <BreadcrumbItem>
-                    <BreadcrumbPage>Assessment</BreadcrumbPage>
+                    <BreadcrumbPage>Full-Stack JavaScript Challenge</BreadcrumbPage>
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
-              <h1 className="text-xl font-bold">Full-Stack JavaScript Challenge</h1>
-              <p className="text-sm text-muted-foreground">
-                Problem {currentProblem + 1} of {problems.length} • {passedTests}/{totalVisibleTests} visible tests
-                passed
-              </p>
             </div>
 
-            {/* Problem Navigation */}
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentProblem(Math.max(0, currentProblem - 1))}
-                disabled={currentProblem === 0}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              {problems.map((_, index) => (
-                <Button
-                  key={index}
-                  variant={index === currentProblem ? "default" : "outline"}
-                  size="sm"
-                  className="h-8 w-8 p-0"
-                  onClick={() => setCurrentProblem(index)}
-                >
-                  {index === 0 && passedTests === totalVisibleTests ? <CheckCircle className="h-4 w-4" /> : index + 1}
-                </Button>
-              ))}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentProblem(Math.min(problems.length - 1, currentProblem + 1))}
-                disabled={currentProblem === problems.length - 1}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-
-            {/* Timer and User Profile */}
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Clock className={`h-4 w-4 ${getTimeColor()}`} />
-                <span className={`font-mono text-lg font-medium ${getTimeColor()}`}>{formatTime(timeLeft)}</span>
-                {timeLeft < 300 && <AlertTriangle className="h-4 w-4 text-red-500 animate-pulse" />}
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Alex Chen</p>
-                  <p className="text-xs text-muted-foreground">Software Engineer</p>
-                </div>
+            {/* User Profile */}
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600" />
+              <div className="flex-1">
+                <p className="text-sm font-medium">Alex Chen</p>
+                <p className="text-xs text-muted-foreground">Software Engineer</p>
               </div>
             </div>
           </div>
@@ -308,6 +264,9 @@ export default function Assessment() {
             onCodeChange={setCode}
             onRun={runCode}
             isRunning={isRunning}
+            timeLeft={timeLeft}
+            formatTime={formatTime}
+            getTimeColor={getTimeColor}
           />
         </div>
 
@@ -397,7 +356,7 @@ export default function Assessment() {
                 Get Hint ({hintsUsed}/3)
               </Button>
               <Button asChild className="w-full">
-                <Link href="/results">Submit Solution</Link>
+                <Link href={`/results/${id}`}>Submit Solution</Link>
               </Button>
             </div>
           </div>

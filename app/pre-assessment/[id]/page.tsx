@@ -1,16 +1,18 @@
 "use client"
 
-import { useState } from "react"
-import { CheckCircle, AlertCircle, Monitor, Wifi, Clock, Star, Home, ChevronRight } from "lucide-react"
+import { useState, use } from "react"
+import { CheckCircle, AlertCircle, Monitor, Wifi, Clock, Star, Home, ChevronRight, LogOut, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
 
-export default function PreAssessment({ params }: { params: { id: string } }) {
+export default function PreAssessment({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
   const [systemChecks, setSystemChecks] = useState({
     browser: true,
     internet: true,
@@ -31,7 +33,6 @@ export default function PreAssessment({ params }: { params: { id: string } }) {
       {/* Header */}
       <header className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="flex h-16 items-center gap-4 px-6">
-          <SidebarTrigger />
           <div className="flex-1">
             <Breadcrumb>
               <BreadcrumbList>
@@ -50,16 +51,26 @@ export default function PreAssessment({ params }: { params: { id: string } }) {
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
-            <h1 className="text-2xl font-bold">Pre-Assessment Setup</h1>
-            <p className="text-sm text-muted-foreground">Configure your environment before starting</p>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600" />
-            <div className="flex-1">
-              <p className="text-sm font-medium">Alex Chen</p>
-              <p className="text-xs text-muted-foreground">Software Engineer</p>
-            </div>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 rounded-full p-0">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback>AC</AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>
+                <User className="mr-2 h-4 w-4" />
+                <span>Profile</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Logout</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 
@@ -178,7 +189,7 @@ export default function PreAssessment({ params }: { params: { id: string } }) {
                     className="flex-1"
                     disabled={!systemChecks.browser || !systemChecks.internet}
                   >
-                    <Link href="/assessment">Begin Assessment</Link>
+                    <Link href={`/assessment/${id}`}>Begin Assessment</Link>
                   </Button>
                 </div>
               </div>

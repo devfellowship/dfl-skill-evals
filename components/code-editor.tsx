@@ -1,11 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Play, Square, Save, RotateCcw, Maximize2 } from "lucide-react"
+import { Play, Square, Save, RotateCcw, Maximize2, Clock, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 
 interface CodeEditorProps {
@@ -14,6 +13,9 @@ interface CodeEditorProps {
   onCodeChange: (code: string) => void
   onRun: () => void
   isRunning: boolean
+  timeLeft?: number
+  formatTime?: (seconds: number) => string
+  getTimeColor?: () => string
 }
 
 const languages = [
@@ -31,10 +33,9 @@ const themes = [
   { value: "high-contrast", label: "High Contrast" },
 ]
 
-export function CodeEditor({ initialCode, language, onCodeChange, onRun, isRunning }: CodeEditorProps) {
+export function CodeEditor({ initialCode, language, onCodeChange, onRun, isRunning, timeLeft, formatTime, getTimeColor }: CodeEditorProps) {
   const [code, setCode] = useState(initialCode)
-  const [selectedLanguage, setSelectedLanguage] = useState(language)
-  const [selectedTheme, setSelectedTheme] = useState("dark")
+  const [selectedTheme] = useState("dark")
   const [lastSaved, setLastSaved] = useState<Date>(new Date())
   const [isFullscreen, setIsFullscreen] = useState(false)
 
@@ -58,11 +59,11 @@ export function CodeEditor({ initialCode, language, onCodeChange, onRun, isRunni
     onCodeChange(code)
   }
 
-  const formatTime = (date: Date) => {
+  const formatSaveTime = (date: Date) => {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
   }
 
-  const currentLanguage = languages.find((lang) => lang.value === selectedLanguage)
+  const currentLanguage = languages.find((lang) => lang.value === language)
 
   return (
     <div className={`flex flex-col h-full ${isFullscreen ? "fixed inset-0 z-50 bg-background" : ""}`}>
@@ -71,46 +72,29 @@ export function CodeEditor({ initialCode, language, onCodeChange, onRun, isRunni
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
-                <SelectTrigger className="w-32">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {languages.map((lang) => (
-                    <SelectItem key={lang.value} value={lang.value}>
-                      {lang.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
               <Badge variant="outline" className="text-xs">
                 .{currentLanguage?.extension}
               </Badge>
-            </div>
-
-            <Separator orientation="vertical" className="h-4" />
-
-            <div className="flex items-center gap-2">
-              <Select value={selectedTheme} onValueChange={setSelectedTheme}>
-                <SelectTrigger className="w-32">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {themes.map((theme) => (
-                    <SelectItem key={theme.value} value={theme.value}>
-                      {theme.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <span className="text-sm font-medium">{currentLanguage?.label}</span>
             </div>
 
             <Separator orientation="vertical" className="h-4" />
 
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <div className="h-2 w-2 rounded-full bg-green-500" />
-              Auto-saved at {formatTime(lastSaved)}
+              Auto-saved at {formatSaveTime(lastSaved)}
             </div>
+
+            {timeLeft !== undefined && formatTime && getTimeColor && (
+              <>
+                <Separator orientation="vertical" className="h-4" />
+                <div className="flex items-center gap-2">
+                  <Clock className={`h-4 w-4 ${getTimeColor()}`} />
+                  <span className={`font-mono text-sm font-medium ${getTimeColor()}`}>{formatTime(timeLeft)}</span>
+                  {timeLeft < 300 && <AlertTriangle className="h-4 w-4 text-red-500 animate-pulse" />}
+                </div>
+              </>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -187,7 +171,7 @@ export function CodeEditor({ initialCode, language, onCodeChange, onRun, isRunni
             <span>Language: {currentLanguage?.label}</span>
           </div>
           <div className="flex items-center gap-2">
-            <span>Theme: {selectedTheme}</span>
+            <span>Theme: Dark</span>
             <div className="flex items-center gap-1">
               <div className="h-2 w-2 rounded-full bg-green-500" />
               <span>Ready</span>

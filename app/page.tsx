@@ -1,12 +1,11 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Clock, Users, Star, Play, TrendingUp, Award, Filter } from "lucide-react"
+import { Clock, Users, Star, Play, TrendingUp, Award, Filter, BarChart3 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { SidebarTrigger } from "@/components/ui/sidebar"
 import { AdvancedSearch, type SearchFilters, type Assessment } from "@/components/advanced-search"
 import Link from "next/link"
 
@@ -207,15 +206,7 @@ export default function AssessmentLibrary() {
     <div className="flex h-screen flex-col bg-background">
       {/* Header */}
       <header className="shrink-0 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="flex h-16 items-center gap-4 px-6">
-          <SidebarTrigger />
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold">Assessment Library</h1>
-            <p className="text-sm text-muted-foreground">
-              {filteredAndSortedAssessments.length} assessments available
-              {activeFiltersCount > 0 && ` • ${activeFiltersCount} filters active`}
-            </p>
-          </div>
+        <div className="flex h-16 items-center justify-end gap-4 px-6">
           <div className="flex items-center gap-3">
             <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600" />
             <div className="flex-1">
@@ -228,14 +219,14 @@ export default function AssessmentLibrary() {
 
       {/* Search and Filters */}
       <div className="shrink-0 border-b border-border/40 bg-background/50 p-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center">
-          <AdvancedSearch
-            onSearch={handleSearch}
-            currentQuery={searchQuery}
-            currentFilters={searchFilters}
-            assessments={assessments}
-          />
-          <div className="flex gap-2">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center">
+            <AdvancedSearch
+              onSearch={handleSearch}
+              currentQuery={searchQuery}
+              currentFilters={searchFilters}
+              assessments={assessments}
+            />
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="Sort by" />
@@ -251,6 +242,12 @@ export default function AssessmentLibrary() {
               </SelectContent>
             </Select>
           </div>
+          <Button variant="outline" asChild className="bg-transparent text-white">
+            <Link href="/dashboard">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Dashboard
+            </Link>
+          </Button>
         </div>
 
         {/* Active Filters Display */}
