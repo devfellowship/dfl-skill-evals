@@ -7,9 +7,9 @@ import { ThemeProvider } from "@/components/theme-provider"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "TechAssess - Technical Assessment Platform",
-  description: "Simplicity is the ultimate sophistication",
-    generator: 'v0.dev'
+  title: "devshaper - Shape Your Dev Skills",
+  description: "Master your coding abilities with real-world technical assessments. Practice algorithms, system design, and full-stack development in a professional environment designed for developers, by developers.",
+  generator: 'v0.dev'
 }
 
 export default function RootLayout({

@@ -47,7 +47,7 @@ export default function PreAssessment({ params }: { params: Promise<{ id: string
                   <ChevronRight className="h-4 w-4" />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Pre-Assessment</BreadcrumbPage>
+                  <BreadcrumbPage>{assessment.title}</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
