@@ -1,11 +1,13 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Clock, Users, Star, Play, TrendingUp, Award, Filter, BarChart3 } from "lucide-react"
+import { Clock, Users, Star, Play, TrendingUp, Award, Filter, BarChart3, LogOut, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { AdvancedSearch, type SearchFilters, type Assessment } from "@/components/advanced-search"
 import Link from "next/link"
 
@@ -207,13 +209,25 @@ export default function AssessmentLibrary() {
       {/* Header */}
       <header className="shrink-0 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="flex h-16 items-center justify-end gap-4 px-6">
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600" />
-            <div className="flex-1">
-              <p className="text-sm font-medium">Alex Chen</p>
-              <p className="text-xs text-muted-foreground">Software Engineer</p>
-            </div>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 rounded-full p-0">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback>AC</AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>
+                <User className="mr-2 h-4 w-4" />
+                <span>Profile</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Logout</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 
@@ -242,12 +256,6 @@ export default function AssessmentLibrary() {
               </SelectContent>
             </Select>
           </div>
-          <Button variant="outline" asChild className="bg-transparent text-white">
-            <Link href="/dashboard">
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Dashboard
-            </Link>
-          </Button>
         </div>
 
         {/* Active Filters Display */}

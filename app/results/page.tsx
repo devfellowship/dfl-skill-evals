@@ -311,9 +311,9 @@ export default function Results() {
               </Link>
             </Button>
             <Button asChild>
-              <Link href="/dashboard">
+              <Link href="/">
                 <ArrowRight className="h-4 w-4 mr-2" />
-                View Dashboard
+                Go to Homepage
               </Link>
             </Button>
           </div>

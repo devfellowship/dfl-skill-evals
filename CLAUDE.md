@@ -31,7 +31,6 @@ This project uses **pnpm** as the package manager, not npm or yarn. Always use p
 ### Project Structure
 - `app/` - Next.js App Router pages and layouts
   - `assessment/` - Assessment taking interface
-  - `dashboard/` - Main dashboard
   - `pre-assessment/[id]/` - Pre-assessment setup
   - `results/` - Assessment results
 - `components/` - Reusable React components
