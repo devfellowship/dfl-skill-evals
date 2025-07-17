@@ -216,6 +216,13 @@ export default function AssessmentLibrary() {
               {activeFiltersCount > 0 && ` • ${activeFiltersCount} filters active`}
             </p>
           </div>
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600" />
+            <div className="flex-1">
+              <p className="text-sm font-medium">Alex Chen</p>
+              <p className="text-xs text-muted-foreground">Software Engineer</p>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -320,7 +327,7 @@ export default function AssessmentLibrary() {
       {/* Assessment Grid */}
       <div className="flex-1 overflow-auto p-6">
         {filteredAndSortedAssessments.length > 0 ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filteredAndSortedAssessments.map((assessment) => (
               <Card
                 key={assessment.id}
@@ -331,29 +338,13 @@ export default function AssessmentLibrary() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <CardTitle className="text-lg">{assessment.title}</CardTitle>
-                        {assessment.trending && (
-                          <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
-                            <TrendingUp className="h-3 w-3 mr-1" />
-                            Trending
-                          </Badge>
-                        )}
                       </div>
                       <CardDescription className="mt-1 line-clamp-2">{assessment.description}</CardDescription>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span className="text-sm font-medium">{assessment.rating}</span>
                     </div>
                   </div>
                 </CardHeader>
 
-                <CardContent className="space-y-4">
-                  {/* Category */}
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs">
-                      {assessment.category}
-                    </Badge>
-                  </div>
+                <CardContent className="space-y-3">
 
                   {/* Skills */}
                   <div className="flex flex-wrap gap-1">
@@ -364,41 +355,31 @@ export default function AssessmentLibrary() {
                     ))}
                   </div>
 
-                  {/* Difficulty */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">Difficulty:</span>
+                  {/* Difficulty and Duration */}
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="flex gap-1">
-                        {[1, 2, 3, 4, 5].map((level) => (
-                          <div
-                            key={level}
-                            className={`h-2 w-2 rounded-full ${
-                              level <= assessment.difficulty
-                                ? difficultyColors[assessment.difficulty as keyof typeof difficultyColors]
-                                : "bg-muted"
-                            }`}
-                          />
-                        ))}
+                      <span className="text-sm text-muted-foreground">Difficulty:</span>
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-1">
+                          {[1, 2, 3, 4, 5].map((level) => (
+                            <div
+                              key={level}
+                              className={`h-2 w-2 rounded-full ${
+                                level <= assessment.difficulty
+                                  ? difficultyColors[assessment.difficulty as keyof typeof difficultyColors]
+                                  : "bg-muted"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {difficultyLabels[assessment.difficulty as keyof typeof difficultyLabels]}
+                        </span>
                       </div>
-                      <span className="text-xs text-muted-foreground">
-                        {difficultyLabels[assessment.difficulty as keyof typeof difficultyLabels]}
-                      </span>
                     </div>
-                  </div>
-
-                  {/* Stats */}
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
                       <Clock className="h-4 w-4" />
                       {assessment.duration}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Users className="h-4 w-4" />
-                      {assessment.participants.toLocaleString()}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Award className="h-4 w-4" />
-                      {assessment.problems} problems
                     </div>
                   </div>
                 </CardContent>

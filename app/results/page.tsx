@@ -1,11 +1,12 @@
 "use client"
 
-import { Trophy, Clock, Target, TrendingUp, Code, CheckCircle, XCircle, ArrowRight, RotateCcw } from "lucide-react"
+import { Trophy, Clock, Target, TrendingUp, Code, CheckCircle, XCircle, ArrowRight, RotateCcw, Home, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import Link from "next/link"
 
 const results = {
@@ -77,16 +78,40 @@ export default function Results() {
         <div className="flex h-16 items-center gap-4 px-6">
           <SidebarTrigger />
           <div className="flex-1">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href="/">
+                      <Home className="h-4 w-4" />
+                    </Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                  <ChevronRight className="h-4 w-4" />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Results</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
             <h1 className="text-2xl font-bold">Assessment Results</h1>
             <p className="text-sm text-muted-foreground">Full-Stack JavaScript Challenge • Completed</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-4">
             <Button variant="outline" asChild>
               <Link href="/assessment">
                 <RotateCcw className="h-4 w-4 mr-2" />
                 Retake Assessment
               </Link>
             </Button>
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600" />
+              <div className="flex-1">
+                <p className="text-sm font-medium">Alex Chen</p>
+                <p className="text-xs text-muted-foreground">Software Engineer</p>
+              </div>
+            </div>
           </div>
         </div>
       </header>

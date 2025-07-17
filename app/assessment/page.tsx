@@ -1,13 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { CheckCircle, Clock, HelpCircle, AlertTriangle, Target, ChevronLeft, ChevronRight } from "lucide-react"
+import { CheckCircle, Clock, HelpCircle, AlertTriangle, Target, ChevronLeft, ChevronRight, Home } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Progress } from "@/components/ui/progress"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import { CodeEditor } from "@/components/code-editor"
 import Link from "next/link"
 
@@ -137,6 +138,23 @@ export default function Assessment() {
           <SidebarTrigger />
           <div className="flex flex-1 items-center justify-between">
             <div>
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink asChild>
+                      <Link href="/">
+                        <Home className="h-4 w-4" />
+                      </Link>
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator>
+                    <ChevronRight className="h-4 w-4" />
+                  </BreadcrumbSeparator>
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Assessment</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
               <h1 className="text-xl font-bold">Full-Stack JavaScript Challenge</h1>
               <p className="text-sm text-muted-foreground">
                 Problem {currentProblem + 1} of {problems.length} • {passedTests}/{totalVisibleTests} visible tests
@@ -175,11 +193,20 @@ export default function Assessment() {
               </Button>
             </div>
 
-            {/* Timer */}
-            <div className="flex items-center gap-2">
-              <Clock className={`h-4 w-4 ${getTimeColor()}`} />
-              <span className={`font-mono text-lg font-medium ${getTimeColor()}`}>{formatTime(timeLeft)}</span>
-              {timeLeft < 300 && <AlertTriangle className="h-4 w-4 text-red-500 animate-pulse" />}
+            {/* Timer and User Profile */}
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Clock className={`h-4 w-4 ${getTimeColor()}`} />
+                <span className={`font-mono text-lg font-medium ${getTimeColor()}`}>{formatTime(timeLeft)}</span>
+                {timeLeft < 300 && <AlertTriangle className="h-4 w-4 text-red-500 animate-pulse" />}
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Alex Chen</p>
+                  <p className="text-xs text-muted-foreground">Software Engineer</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

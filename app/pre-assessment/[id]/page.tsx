@@ -1,22 +1,19 @@
 "use client"
 
 import { useState } from "react"
-import { CheckCircle, AlertCircle, Monitor, Wifi, Camera, Clock, Code, Users, Star } from "lucide-react"
+import { CheckCircle, AlertCircle, Monitor, Wifi, Clock, Star, Home, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import Link from "next/link"
 
 export default function PreAssessment({ params }: { params: { id: string } }) {
-  const [selectedLanguage, setSelectedLanguage] = useState("javascript")
-  const [selectedTheme, setSelectedTheme] = useState("dark")
   const [systemChecks, setSystemChecks] = useState({
     browser: true,
     internet: true,
-    camera: false,
   })
 
   const assessment = {
@@ -25,25 +22,9 @@ export default function PreAssessment({ params }: { params: { id: string } }) {
     skills: ["React", "Node.js", "MongoDB", "REST APIs"],
     difficulty: 4,
     duration: "90 min",
-    problems: 5,
-    participants: 1247,
     rating: 4.8,
   }
 
-  const languages = [
-    { value: "javascript", label: "JavaScript" },
-    { value: "typescript", label: "TypeScript" },
-    { value: "python", label: "Python" },
-    { value: "java", label: "Java" },
-    { value: "cpp", label: "C++" },
-    { value: "go", label: "Go" },
-  ]
-
-  const themes = [
-    { value: "dark", label: "Dark Theme" },
-    { value: "light", label: "Light Theme" },
-    { value: "high-contrast", label: "High Contrast" },
-  ]
 
   return (
     <div className="flex h-screen flex-col">
@@ -52,8 +33,32 @@ export default function PreAssessment({ params }: { params: { id: string } }) {
         <div className="flex h-16 items-center gap-4 px-6">
           <SidebarTrigger />
           <div className="flex-1">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href="/">
+                      <Home className="h-4 w-4" />
+                    </Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                  <ChevronRight className="h-4 w-4" />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Pre-Assessment</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
             <h1 className="text-2xl font-bold">Pre-Assessment Setup</h1>
             <p className="text-sm text-muted-foreground">Configure your environment before starting</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600" />
+            <div className="flex-1">
+              <p className="text-sm font-medium">Alex Chen</p>
+              <p className="text-xs text-muted-foreground">Software Engineer</p>
+            </div>
           </div>
         </div>
       </header>
@@ -101,20 +106,6 @@ export default function PreAssessment({ params }: { params: { id: string } }) {
                         <span className="font-medium">{assessment.duration}</span>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Problems</span>
-                      <div className="flex items-center gap-1">
-                        <Code className="h-4 w-4" />
-                        <span className="font-medium">{assessment.problems}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Participants</span>
-                      <div className="flex items-center gap-1">
-                        <Users className="h-4 w-4" />
-                        <span className="font-medium">{assessment.participants.toLocaleString()}</span>
-                      </div>
-                    </div>
                   </div>
 
                   <Separator />
@@ -142,49 +133,6 @@ export default function PreAssessment({ params }: { params: { id: string } }) {
             {/* Environment Setup - Right Side */}
             <div className="lg:col-span-3">
               <div className="space-y-6">
-                {/* Language Selection */}
-                <Card className="border-border/40">
-                  <CardHeader>
-                    <CardTitle className="text-lg">Programming Language</CardTitle>
-                    <CardDescription>Choose your preferred language for coding problems</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {languages.map((lang) => (
-                          <SelectItem key={lang.value} value={lang.value}>
-                            {lang.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </CardContent>
-                </Card>
-
-                {/* Theme Selection */}
-                <Card className="border-border/40">
-                  <CardHeader>
-                    <CardTitle className="text-lg">IDE Theme</CardTitle>
-                    <CardDescription>Select your preferred coding environment theme</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Select value={selectedTheme} onValueChange={setSelectedTheme}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {themes.map((theme) => (
-                          <SelectItem key={theme.value} value={theme.value}>
-                            {theme.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </CardContent>
-                </Card>
 
                 {/* System Check */}
                 <Card className="border-border/40">
@@ -217,19 +165,6 @@ export default function PreAssessment({ params }: { params: { id: string } }) {
                       )}
                     </div>
 
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Camera className="h-5 w-5 text-muted-foreground" />
-                        <span>Screen Recording Consent</span>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSystemChecks((prev) => ({ ...prev, camera: !prev.camera }))}
-                      >
-                        {systemChecks.camera ? "Granted" : "Grant"}
-                      </Button>
-                    </div>
                   </CardContent>
                 </Card>
 
@@ -241,7 +176,7 @@ export default function PreAssessment({ params }: { params: { id: string } }) {
                   <Button
                     asChild
                     className="flex-1"
-                    disabled={!systemChecks.browser || !systemChecks.internet || !systemChecks.camera}
+                    disabled={!systemChecks.browser || !systemChecks.internet}
                   >
                     <Link href="/assessment">Begin Assessment</Link>
                   </Button>
