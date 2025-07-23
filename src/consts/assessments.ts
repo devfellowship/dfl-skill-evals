@@ -14,6 +14,7 @@ export const mockAssessments: Assessment[] = [
     rating: 4.8,
     category: "Full-Stack",
     trending: true,
+    image: "https://techdicas.net.br/wp-content/uploads/2024/12/full-stack.webp",
   },
   {
     id: 2,

@@ -1,14 +1,12 @@
-import * as React from "react"
+import React from "react"
 import Link from "next/link"
-import { Play, TrendingUp } from "lucide-react"
-import { Card } from "../../atoms/Card/Card"
-import { Button } from "../../atoms/Button/Button"
-import { Badge } from "../../atoms/Badge/Badge"
-import { DifficultyIndicator } from "../../molecules/DifficultyIndicator"
-import { SkillTags } from "../../molecules/SkillTags"
-import { AssessmentMeta } from "../../molecules/AssessmentMeta"
+import { ArrowRight, Clock, Code, Star, Users } from "lucide-react"
+import { Button } from "@/components/atoms/Button/Button"
+import { Badge } from "@/components/atoms/Badge/Badge"
+import { Card, CardContent } from "@/components/ui/card"
+import { DifficultyIndicator } from "@/components/molecules/DifficultyIndicator/DifficultyIndicator"
 import type { Assessment } from "@/types"
-import { cn } from "@/lib/utils"
+import { formatParticipants } from "@/lib/utils"
 
 interface AssessmentCardProps {
   assessment: Assessment
@@ -20,65 +18,91 @@ export const AssessmentCard = React.forwardRef<
   AssessmentCardProps
 >(({ assessment, className, ...props }, ref) => {
   return (
-    <Card
-      ref={ref}
-      className={cn(
-        "group cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02]",
-        className
-      )}
-      {...props}
-    >
-      {/* Header */}
-      <div className="p-6 pb-4">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <h3 className="text-lg font-semibold line-clamp-1 group-hover:text-primary transition-colors">
-                {assessment.title}
-              </h3>
-              {assessment.trending && (
-                <Badge variant="secondary" className="bg-primary/10 text-primary">
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  Trending
-                </Badge>
-              )}
+    <Card className="group overflow-hidden border border-border/50 bg-background transition-all duration-200 hover:border-border hover:shadow-md">
+      <CardContent className="p-0">
+        <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-primary/5 to-primary/10">
+          {assessment.image ? (
+            <img 
+              src={assessment.image} 
+              alt={assessment.title}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center">
+                <Code className="mx-auto h-8 w-8 text-primary/60 mb-2" />
+                <p className="text-sm font-medium text-muted-foreground">
+                  {assessment.category}
+                </p>
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+          )}
+          {assessment.trending && (
+            <div className="absolute top-3 right-3">
+              <Badge variant="secondary" className="bg-orange-100 text-orange-700 text-xs">
+                Trending
+              </Badge>
+            </div>
+          )}
+        </div>
+
+        <div className="p-4 space-y-3">
+          <div>
+            <h3 className="font-semibold text-lg leading-tight group-hover:text-primary transition-colors">
+              {assessment.title}
+            </h3>
+            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
               {assessment.description}
             </p>
           </div>
+
+          <div className="flex flex-wrap gap-1">
+            {assessment.skills.slice(0, 3).map((skill) => (
+              <Badge key={skill} variant="outline" className="text-xs">
+                {skill}
+              </Badge>
+            ))}
+            {assessment.skills.length > 3 && (
+              <Badge variant="outline" className="text-xs">
+                +{assessment.skills.length - 3} more
+              </Badge>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <DifficultyIndicator difficulty={assessment.difficulty} />
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <div className="flex items-center gap-3">
+                <span className="flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  {assessment.duration}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Users className="h-3 w-3" />
+                  {formatParticipants(assessment.participants)}
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                <span>{assessment.rating}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-2">
+            <Button
+              asChild
+              className="w-full"
+              variant="outline"
+            >
+              <Link href={`/pre-assessment/${assessment.id}`}>
+                Start Assessment
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
         </div>
-
-        {/* Skills */}
-        <SkillTags skills={assessment.skills} maxVisible={3} />
-      </div>
-
-      {/* Content */}
-      <div className="px-6 pb-4 space-y-3">
-        {/* Difficulty */}
-        <DifficultyIndicator difficulty={assessment.difficulty} />
-        
-        {/* Meta information */}
-        <AssessmentMeta
-          duration={assessment.duration}
-          participants={assessment.participants}
-          rating={assessment.rating}
-          problems={assessment.problems}
-        />
-      </div>
-
-      {/* Footer */}
-      <div className="p-6 pt-0">
-        <Button
-          asChild
-          className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all"
-        >
-          <Link href={`/pre-assessment/${assessment.id}`}>
-            <Play className="mr-2 h-4 w-4" />
-            Start Assessment
-          </Link>
-        </Button>
-      </div>
+      </CardContent>
     </Card>
   )
 }) 

@@ -10,6 +10,8 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 import { Avatar, AvatarFallback } from "@/components/atoms/Avatar/Avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
+import { mockAssessments } from "@/consts"
+import { BREADCRUMB_LABELS, UI_MESSAGES } from "@/consts/ui"
 
 export default function PreAssessment({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -18,19 +20,10 @@ export default function PreAssessment({ params }: { params: Promise<{ id: string
     internet: true,
   })
 
-  const assessment = {
-    title: "Full-Stack JavaScript Challenge",
-    description: "Test your React, Node.js, and database skills with real-world scenarios",
-    skills: ["React", "Node.js", "MongoDB", "REST APIs"],
-    difficulty: 4,
-    duration: "90 min",
-    rating: 4.8,
-  }
-
+  const assessment = mockAssessments.find(a => a.id === parseInt(id)) || mockAssessments[0]
 
   return (
     <div className="flex h-screen flex-col">
-      {/* Header */}
       <header className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="flex h-16 items-center gap-4 px-6">
           <div className="flex-1">
@@ -47,7 +40,7 @@ export default function PreAssessment({ params }: { params: Promise<{ id: string
                   <ChevronRight className="h-4 w-4" />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                  <BreadcrumbPage>{assessment.title}</BreadcrumbPage>
+                  <BreadcrumbPage>{BREADCRUMB_LABELS.PRE_ASSESSMENT}</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
@@ -75,9 +68,13 @@ export default function PreAssessment({ params }: { params: Promise<{ id: string
       </header>
 
       <div className="flex-1 overflow-auto p-6">
+        <div className="text-center py-12">
+          <h1 className="text-2xl font-semibold text-primary mb-2">{assessment.title}</h1>
+          <p className="text-muted-foreground">{UI_MESSAGES.PRE_ASSESSMENT.SUBTITLE}</p>
+        </div>
+        
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-6 lg:grid-cols-5">
-            {/* Assessment Overview - Left Side */}
             <div className="lg:col-span-2">
               <Card className="border-border/40">
                 <CardHeader>
@@ -94,7 +91,6 @@ export default function PreAssessment({ params }: { params: Promise<{ id: string
                 </CardHeader>
 
                 <CardContent className="space-y-6">
-                  {/* Skills */}
                   <div>
                     <h4 className="mb-2 font-medium">Skills Tested</h4>
                     <div className="flex flex-wrap gap-2">
@@ -108,7 +104,6 @@ export default function PreAssessment({ params }: { params: Promise<{ id: string
 
                   <Separator />
 
-                  {/* Assessment Details */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">Duration</span>
@@ -121,7 +116,6 @@ export default function PreAssessment({ params }: { params: Promise<{ id: string
 
                   <Separator />
 
-                  {/* Difficulty */}
                   <div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">Difficulty</span>
@@ -141,21 +135,18 @@ export default function PreAssessment({ params }: { params: Promise<{ id: string
               </Card>
             </div>
 
-            {/* Environment Setup - Right Side */}
             <div className="lg:col-span-3">
               <div className="space-y-6">
-
-                {/* System Check */}
                 <Card className="border-border/40">
                   <CardHeader>
-                    <CardTitle className="text-lg">System Check</CardTitle>
-                    <CardDescription>Ensure your system is ready for the assessment</CardDescription>
+                    <CardTitle className="text-lg">{UI_MESSAGES.SYSTEM_CHECK.TITLE}</CardTitle>
+                    <CardDescription>{UI_MESSAGES.SYSTEM_CHECK.DESCRIPTION}</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <Monitor className="h-5 w-5 text-muted-foreground" />
-                        <span>Browser Compatibility</span>
+                        <span>{UI_MESSAGES.SYSTEM_CHECK.BROWSER}</span>
                       </div>
                       {systemChecks.browser ? (
                         <CheckCircle className="h-5 w-5 text-green-500" />
@@ -167,7 +158,7 @@ export default function PreAssessment({ params }: { params: Promise<{ id: string
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <Wifi className="h-5 w-5 text-muted-foreground" />
-                        <span>Internet Connection</span>
+                        <span>{UI_MESSAGES.SYSTEM_CHECK.INTERNET}</span>
                       </div>
                       {systemChecks.internet ? (
                         <CheckCircle className="h-5 w-5 text-green-500" />
@@ -175,11 +166,9 @@ export default function PreAssessment({ params }: { params: Promise<{ id: string
                         <AlertCircle className="h-5 w-5 text-red-500" />
                       )}
                     </div>
-
                   </CardContent>
                 </Card>
 
-                {/* Start Button */}
                 <div className="flex gap-4">
                   <Button variant="outline" asChild className="flex-1 bg-transparent">
                     <Link href="/">Cancel</Link>

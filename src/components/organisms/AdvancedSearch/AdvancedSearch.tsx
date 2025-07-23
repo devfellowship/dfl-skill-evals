@@ -1,18 +1,17 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { Search, Filter, X, Clock, Star, Users, TrendingUp } from "lucide-react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Search } from "lucide-react"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/atoms/Input/Input"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
 import { Slider } from "@/components/ui/slider"
-import { Card, CardContent } from "@/components/ui/card"
 import type { Assessment, SearchFilters } from "@/types"
-import { availableSkills, categories, durations } from "@/consts"
+import { availableSkills, categories } from "@/consts"
+import { getDifficultyLabel } from "@/lib/utils"
 
 interface AdvancedSearchProps {
   onSearch: (query: string, filters: SearchFilters) => void
@@ -32,359 +31,295 @@ const difficulties = [
 export function AdvancedSearch({ onSearch, currentQuery, currentFilters, assessments }: AdvancedSearchProps) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState(currentQuery)
-  const [filters, setFilters] = useState<SearchFilters>(currentFilters)
+  const [filters, setFilters] = useState(currentFilters)
   const [searchResults, setSearchResults] = useState<Assessment[]>([])
-  const [recentSearches, setRecentSearches] = useState([
-    "React advanced patterns",
-    "Python algorithms",
-    "System design scalability",
-    "Node.js backend API",
-    "JavaScript fundamentals",
-  ])
+  const [recentSearches, setRecentSearches] = useState<string[]>([])
 
-  // Real-time search as user types
   const performSearch = useCallback(
-    (searchQuery: string, searchFilters: SearchFilters) => {
-      const filtered = assessments.filter((assessment) => {
-        const matchesText =
-          searchQuery === "" ||
-          assessment.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          assessment.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          assessment.skills.some((skill) => skill.toLowerCase().includes(searchQuery.toLowerCase())) ||
-          assessment.category.toLowerCase().includes(searchQuery.toLowerCase())
+    (term: string) => {
+      if (!term.trim()) {
+        setSearchResults([])
+        return
+      }
 
-        const matchesSkills =
-          searchFilters.skills.length === 0 || searchFilters.skills.some((skill) => assessment.skills.includes(skill))
+      const filtered = assessments.filter((assessment) =>
+        assessment.title.toLowerCase().includes(term.toLowerCase()) ||
+        assessment.description.toLowerCase().includes(term.toLowerCase()) ||
+        assessment.skills.some((skill) => skill.toLowerCase().includes(term.toLowerCase())) ||
+        assessment.category.toLowerCase().includes(term.toLowerCase())
+      )
 
-        const matchesDifficulty =
-          searchFilters.difficulties.length === 0 ||
-          searchFilters.difficulties.includes(assessment.difficulty.toString())
-
-        const matchesDuration =
-          searchFilters.durations.length === 0 || searchFilters.durations.includes(assessment.duration)
-
-        const matchesRating = assessment.rating >= searchFilters.minRating
-
-        const matchesCategory =
-          searchFilters.categories.length === 0 || searchFilters.categories.includes(assessment.category)
-
-        const matchesTrending = !searchFilters.trending || assessment.trending
-
-        return (
-          matchesText &&
-          matchesSkills &&
-          matchesDifficulty &&
-          matchesDuration &&
-          matchesRating &&
-          matchesCategory &&
-          matchesTrending
-        )
-      })
-
-      setSearchResults(filtered.slice(0, 5)) // Show top 5 results
+      setSearchResults(filtered.slice(0, 5))
     },
-    [assessments],
+    [assessments]
   )
 
   useEffect(() => {
-    if (open) {
-      performSearch(query, filters)
-    }
-  }, [query, filters, open, performSearch])
+    performSearch(query)
+  }, [query, performSearch])
 
-  const handleSkillToggle = (skill: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      skills: prev.skills.includes(skill) ? prev.skills.filter((s) => s !== skill) : [...prev.skills, skill],
-    }))
-  }
-
-  const handleDifficultyToggle = (difficulty: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      difficulties: prev.difficulties.includes(difficulty)
-        ? prev.difficulties.filter((d) => d !== difficulty)
-        : [...prev.difficulties, difficulty],
-    }))
-  }
-
-  const handleCategoryToggle = (category: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      categories: prev.categories.includes(category)
-        ? prev.categories.filter((c) => c !== category)
-        : [...prev.categories, category],
-    }))
-  }
-
-  const handleSearch = () => {
-    onSearch(query, filters)
+  const handleSearchSubmit = () => {
     if (query.trim()) {
-      setRecentSearches((prev) => [query, ...prev.filter((s) => s !== query)].slice(0, 5))
+      setRecentSearches(prev => {
+        const updated = [query, ...prev.filter(s => s !== query)].slice(0, 5)
+        localStorage.setItem('recentSearches', JSON.stringify(updated))
+        return updated
+      })
+      onSearch(query, filters)
+      setOpen(false)
     }
-    setOpen(false)
   }
 
-  const clearFilters = () => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleSearchSubmit()
+    }
+  }
+
+  const clearAllFilters = () => {
     setFilters({
       skills: [],
       difficulties: [],
       durations: [],
-      minRating: 0,
       categories: [],
+      minRating: 0,
       trending: false,
     })
   }
 
-  const activeFiltersCount =
-    filters.skills.length +
-    filters.difficulties.length +
-    filters.durations.length +
-    filters.categories.length +
-    (filters.minRating > 0 ? 1 : 0) +
+  const activeFiltersCount = filters.skills.length + 
+    filters.difficulties.length + 
+    filters.durations.length + 
+    filters.categories.length + 
+    (filters.minRating > 0 ? 1 : 0) + 
     (filters.trending ? 1 : 0)
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search assessments, skills, or topics..."
-            value={currentQuery}
-            className="pl-10 pr-20 cursor-pointer"
-            readOnly
-          />
+        <Button
+          variant="outline"
+          className="relative w-full max-w-sm justify-start text-sm text-muted-foreground"
+        >
+          <Search className="mr-2 h-4 w-4" />
+          Search assessments...
           {activeFiltersCount > 0 && (
-            <Badge variant="secondary" className="absolute right-12 top-1/2 -translate-y-1/2 h-5 px-1.5 text-xs">
+            <Badge variant="secondary" className="ml-auto h-5 w-5 rounded-full p-0 text-xs">
               {activeFiltersCount}
             </Badge>
           )}
-          <Button variant="ghost" size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0">
-            <Filter className="h-4 w-4" />
-          </Button>
-        </div>
+        </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Search className="h-5 w-5" />
-            Advanced Search & Filters
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="flex-1 overflow-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Search Input & Results */}
-            <div className="lg:col-span-2 space-y-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+      <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+        <div className="flex">
+          <div className="flex-1 flex flex-col min-h-0">
+            <div className="p-6 border-b">
+              <div className="flex items-center gap-2 mb-4">
+                <Search className="h-5 w-5 text-muted-foreground" />
                 <Input
-                  placeholder="Search assessments, skills, or topics..."
+                  placeholder="Search by title, description, skills, or category..."
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  className="pl-10"
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="flex-1"
                   autoFocus
                 />
+                <Button onClick={handleSearchSubmit} disabled={!query.trim()}>
+                  Search
+                </Button>
               </div>
 
-              {/* Recent Searches */}
-              {query === "" && (
+              {recentSearches.length > 0 && !query && (
                 <div>
-                  <h4 className="text-sm font-medium mb-3">Recent Searches</h4>
+                  <h3 className="text-sm font-medium mb-2">Recent Searches</h3>
                   <div className="flex flex-wrap gap-2">
-                    {recentSearches.map((search) => (
-                      <Button
-                        key={search}
+                    {recentSearches.map((search, index) => (
+                      <Badge
+                        key={index}
                         variant="outline"
-                        size="sm"
-                        onClick={() => setQuery(search)}
-                        className="h-8 text-xs hover:bg-primary/10"
+                        className="cursor-pointer hover:bg-accent"
+                        onClick={() => {
+                          setQuery(search)
+                          onSearch(search, filters)
+                          setOpen(false)
+                        }}
                       >
                         {search}
-                      </Button>
+                      </Badge>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Live Search Results */}
-              {query && searchResults.length > 0 && (
+              {searchResults.length > 0 && query && (
                 <div>
-                  <h4 className="text-sm font-medium mb-3">Search Results ({searchResults.length} found)</h4>
-                  <div className="space-y-2">
+                  <h3 className="text-sm font-medium mb-2">Search Results</h3>
+                  <div className="space-y-2 max-h-40 overflow-y-auto">
                     {searchResults.map((assessment) => (
-                      <Card key={assessment.id} className="hover:bg-muted/50 cursor-pointer transition-colors">
-                        <CardContent className="p-3">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <h5 className="font-medium text-sm">{assessment.title}</h5>
-                                {assessment.trending && (
-                                  <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
-                                    <TrendingUp className="h-3 w-3 mr-1" />
-                                    Trending
-                                  </Badge>
-                                )}
-                              </div>
-                              <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
-                                {assessment.description}
-                              </p>
-                              <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                                <div className="flex items-center gap-1">
-                                  <Clock className="h-3 w-3" />
-                                  {assessment.duration}
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Star className="h-3 w-3" />
-                                  {assessment.rating}
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Users className="h-3 w-3" />
-                                  {assessment.participants}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
+                      <div
+                        key={assessment.id}
+                        className="p-2 rounded-md border cursor-pointer hover:bg-accent"
+                        onClick={() => {
+                          onSearch(assessment.title, filters)
+                          setOpen(false)
+                        }}
+                      >
+                        <div className="font-medium text-sm">{assessment.title}</div>
+                        <div className="text-xs text-muted-foreground">{assessment.category}</div>
+                      </div>
                     ))}
                   </div>
                 </div>
               )}
             </div>
+          </div>
 
-            {/* Filters Panel */}
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h4 className="text-sm font-medium">Filters</h4>
+          <div className="w-80 border-l bg-muted/30">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-medium">Filters</h3>
                 {activeFiltersCount > 0 && (
-                  <Button variant="ghost" size="sm" onClick={clearFilters}>
-                    <X className="h-4 w-4 mr-1" />
-                    Clear ({activeFiltersCount})
+                  <Button variant="ghost" size="sm" onClick={clearAllFilters}>
+                    Clear all
                   </Button>
                 )}
               </div>
 
-              {/* Categories */}
-              <div>
-                <Label className="text-sm font-medium">Categories</Label>
-                <div className="mt-2 grid grid-cols-1 gap-2">
-                  {categories.map((category) => (
-                    <div key={category} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`cat-${category}`}
-                        checked={filters.categories.includes(category)}
-                        onCheckedChange={() => handleCategoryToggle(category)}
-                      />
-                      <Label htmlFor={`cat-${category}`} className="text-sm cursor-pointer">
-                        {category}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Skills */}
-              <div>
-                <Label className="text-sm font-medium">Skills & Technologies</Label>
-                <div className="mt-2 grid grid-cols-1 gap-2 max-h-32 overflow-y-auto">
-                  {availableSkills.map((skill) => (
-                    <div key={skill} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`skill-${skill}`}
-                        checked={filters.skills.includes(skill)}
-                        onCheckedChange={() => handleSkillToggle(skill)}
-                      />
-                      <Label htmlFor={`skill-${skill}`} className="text-sm cursor-pointer">
-                        {skill}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Difficulty */}
-              <div>
-                <Label className="text-sm font-medium">Difficulty Level</Label>
-                <div className="mt-2 space-y-2">
-                  {difficulties.map((diff) => (
-                    <div key={diff.value} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`diff-${diff.value}`}
-                        checked={filters.difficulties.includes(diff.value)}
-                        onCheckedChange={() => handleDifficultyToggle(diff.value)}
-                      />
-                      <div className="flex items-center gap-2">
-                        <div className={`h-2 w-2 rounded-full ${diff.color}`} />
-                        <Label htmlFor={`diff-${diff.value}`} className="text-sm cursor-pointer">
-                          {diff.label}
-                        </Label>
+              <div className="space-y-6">
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">Categories</Label>
+                  <div className="space-y-2">
+                    {categories.map((category) => (
+                      <div key={category} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={category}
+                          checked={filters.categories.includes(category)}
+                          onCheckedChange={(checked: boolean) => {
+                            if (checked) {
+                              setFilters(prev => ({
+                                ...prev,
+                                categories: [...prev.categories, category]
+                              }))
+                            } else {
+                              setFilters(prev => ({
+                                ...prev,
+                                categories: prev.categories.filter(c => c !== category)
+                              }))
+                            }
+                          }}
+                        />
+                        <label htmlFor={category} className="text-sm">{category}</label>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              <Separator />
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">Skills</Label>
+                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                    {availableSkills.map((skill) => (
+                      <div key={skill} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={skill}
+                          checked={filters.skills.includes(skill)}
+                          onCheckedChange={(checked: boolean) => {
+                            if (checked) {
+                              setFilters(prev => ({
+                                ...prev,
+                                skills: [...prev.skills, skill]
+                              }))
+                            } else {
+                              setFilters(prev => ({
+                                ...prev,
+                                skills: prev.skills.filter(s => s !== skill)
+                              }))
+                            }
+                          }}
+                        />
+                        <label htmlFor={skill} className="text-sm">{skill}</label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-              {/* Rating */}
-              <div>
-                <Label className="text-sm font-medium">Minimum Rating</Label>
-                <div className="mt-2 space-y-2">
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">Difficulty</Label>
+                  <div className="space-y-2">
+                    {[1, 2, 3, 4, 5].map((difficulty) => (
+                      <div key={difficulty} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`difficulty-${difficulty}`}
+                          checked={filters.difficulties.includes(difficulty.toString())}
+                          onCheckedChange={(checked: boolean) => {
+                            if (checked) {
+                              setFilters(prev => ({
+                                ...prev,
+                                difficulties: [...prev.difficulties, difficulty.toString()]
+                              }))
+                            } else {
+                              setFilters(prev => ({
+                                ...prev,
+                                difficulties: prev.difficulties.filter(d => d !== difficulty.toString())
+                              }))
+                            }
+                          }}
+                        />
+                        <label htmlFor={`difficulty-${difficulty}`} className="text-sm">
+                          {getDifficultyLabel(difficulty)}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">Minimum Rating</Label>
                   <Slider
                     value={[filters.minRating]}
-                    onValueChange={(value) => setFilters((prev) => ({ ...prev, minRating: value[0] }))}
+                    onValueChange={([value]: number[]) => 
+                      setFilters(prev => ({ ...prev, minRating: value }))
+                    }
                     max={5}
                     min={0}
-                    step={0.1}
+                    step={0.5}
                     className="w-full"
                   />
-                  <div className="flex justify-between text-xs text-muted-foreground">
+                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
                     <span>0</span>
-                    <span className="font-medium">{filters.minRating.toFixed(1)} stars</span>
+                    <span>{filters.minRating}</span>
                     <span>5</span>
                   </div>
                 </div>
-              </div>
 
-              <Separator />
-
-              {/* Special Filters */}
-              <div>
-                <Label className="text-sm font-medium">Special Filters</Label>
-                <div className="mt-2 space-y-2">
+                <div>
                   <div className="flex items-center space-x-2">
                     <Checkbox
                       id="trending"
                       checked={filters.trending}
-                      onCheckedChange={(checked) => setFilters((prev) => ({ ...prev, trending: !!checked }))}
+                      onCheckedChange={(checked: boolean) => 
+                        setFilters(prev => ({ ...prev, trending: !!checked }))
+                      }
                     />
-                    <Label htmlFor="trending" className="text-sm cursor-pointer flex items-center gap-1">
-                      <TrendingUp className="h-3 w-3" />
-                      Trending Only
-                    </Label>
+                    <label htmlFor="trending" className="text-sm">Show only trending</label>
                   </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={() => {
+                      onSearch(query, filters)
+                      setOpen(false)
+                    }}
+                    className="flex-1"
+                  >
+                    Apply Filters
+                  </Button>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex gap-3 pt-4 border-t">
-          <Button variant="outline" onClick={() => setOpen(false)} className="flex-1">
-            Cancel
-          </Button>
-          <Button onClick={handleSearch} className="flex-1">
-            Apply Search
-            {activeFiltersCount > 0 && ` (${activeFiltersCount} filters)`}
-          </Button>
         </div>
       </DialogContent>
     </Dialog>

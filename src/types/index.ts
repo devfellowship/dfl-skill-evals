@@ -1,15 +1,13 @@
 // Assessment types
-export type {
-  Assessment,
-  SearchFilters,
-  SortOption,
-  DifficultyLevel,
-  DifficultyConfig,
-} from './assessment'
+export * from './assessment'
+
+// Problem types
+export type { Problem, Example, ProblemDifficulty } from './problems'
+export type { TestCase as ProblemTestCase } from './problems'
+
+// Execution types
+export type { ExecutionRequest, ExecutionResponse, TestResult } from './execution'
+export type { TestCase as ExecutionTestCase } from './execution'
 
 // Navigation types
-export type {
-  MenuItem,
-  MenuSection,
-  User,
-} from './navigation' 
+export * from './navigation' 

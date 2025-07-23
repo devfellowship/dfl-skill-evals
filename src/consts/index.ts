@@ -1,26 +1,17 @@
-// Assessment constants
-export {
-  mockAssessments,
-  difficultyColors,
-  difficultyLabels,
-  availableSkills,
-  categories,
-  durations,
-  sortOptions,
-} from './assessments'
+// Assessment data
+export * from './assessments'
 
-// Navigation constants
-export {
-  mainMenuItems,
-  progressMenuItems,
-  settingsMenuItems,
-  currentUser,
-} from './navigation'
+// Problem data
+export * from './problems'
 
-// Utility functions
-export {
-  getDifficultyColor,
-  getDifficultyLabel,
-  formatParticipants,
-  getProgressFromRating,
-} from './utils' 
+// Result data
+export * from './results'
+
+// UI constants
+export * from './ui'
+
+// Navigation data
+export * from './navigation'
+
+// Utility constants
+export * from './utils' 

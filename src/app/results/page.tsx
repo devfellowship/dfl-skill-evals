@@ -9,72 +9,15 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 import { Avatar, AvatarFallback } from "@/components/atoms/Avatar/Avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
-
-const results = {
-  overallScore: 85,
-  percentile: 78,
-  totalTime: "67 min",
-  problemsCompleted: 4,
-  totalProblems: 5,
-  skillBreakdown: [
-    { skill: "Algorithms", score: 90, maxScore: 100, improvement: "+5" },
-    { skill: "Data Structures", score: 85, maxScore: 100, improvement: "+8" },
-    { skill: "Problem Solving", score: 80, maxScore: 100, improvement: "+3" },
-    { skill: "Code Quality", score: 88, maxScore: 100, improvement: "+12" },
-  ],
-  problemResults: [
-    {
-      title: "Two Sum",
-      status: "completed",
-      score: 100,
-      timeSpent: "8 min",
-      difficulty: "Easy",
-      testsPassed: 3,
-      totalTests: 3,
-    },
-    {
-      title: "Binary Tree Traversal",
-      status: "completed",
-      score: 85,
-      timeSpent: "15 min",
-      difficulty: "Medium",
-      testsPassed: 4,
-      totalTests: 5,
-    },
-    {
-      title: "API Design",
-      status: "completed",
-      score: 90,
-      timeSpent: "22 min",
-      difficulty: "Medium",
-      testsPassed: 5,
-      totalTests: 5,
-    },
-    {
-      title: "Database Query Optimization",
-      status: "completed",
-      score: 75,
-      timeSpent: "18 min",
-      difficulty: "Hard",
-      testsPassed: 3,
-      totalTests: 4,
-    },
-    {
-      title: "System Design",
-      status: "incomplete",
-      score: 0,
-      timeSpent: "4 min",
-      difficulty: "Hard",
-      testsPassed: 0,
-      totalTests: 3,
-    },
-  ],
-}
+import { mockAssessments } from "@/consts"
+import { BREADCRUMB_LABELS, UI_MESSAGES } from "@/consts/ui"
+import { mockResults, type SkillBreakdown, type ProblemResult } from "@/consts/results"
 
 export default function Results() {
+  const assessment = mockAssessments.find(a => a.id === 1) || mockAssessments[0]
+  
   return (
     <div className="flex h-screen flex-col bg-background">
-      {/* Header */}
       <header className="shrink-0 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="flex h-16 items-center gap-4 px-6">
           <div className="flex-1">
@@ -91,12 +34,26 @@ export default function Results() {
                   <ChevronRight className="h-4 w-4" />
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Results</BreadcrumbPage>
+                  <BreadcrumbLink asChild>
+                    <Link href="/pre-assessment/1">{BREADCRUMB_LABELS.PRE_ASSESSMENT}</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                  <ChevronRight className="h-4 w-4" />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href="/assessment/1">{BREADCRUMB_LABELS.ASSESSMENT}</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                  <ChevronRight className="h-4 w-4" />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                  <BreadcrumbPage>{BREADCRUMB_LABELS.RESULTS}</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
-            <h1 className="text-2xl font-bold">Assessment Results</h1>
-            <p className="text-sm text-muted-foreground">Full-Stack JavaScript Challenge • Completed</p>
           </div>
           <div className="flex items-center gap-4">
             <Button variant="outline" asChild>
@@ -129,111 +86,110 @@ export default function Results() {
       </header>
 
       <div className="flex-1 overflow-auto p-6">
+        <div className="text-center py-12 mb-12">
+          <h1 className="text-2xl font-semibold text-primary mb-2">{UI_MESSAGES.RESULTS.TITLE}</h1>
+          <p className="text-lg text-muted-foreground font-medium">{assessment.title}</p>
+        </div>
+        
         <div className="mx-auto max-w-6xl space-y-8">
-          {/* Hero Section - Overall Score */}
-          <div className="text-center">
-            <div className="relative mx-auto mb-6 h-32 w-32">
-              <svg className="h-32 w-32 -rotate-90 transform">
+          <div className="text-center space-y-6">
+            <div className="relative inline-block">
+              <svg className="h-32 w-32 transform -rotate-90" viewBox="0 0 120 120">
                 <circle
-                  cx="64"
-                  cy="64"
+                  cx="60"
+                  cy="60"
                   r="56"
                   stroke="currentColor"
                   strokeWidth="8"
                   fill="transparent"
-                  className="text-muted"
+                  className="text-muted-foreground/20"
                 />
                 <circle
-                  cx="64"
-                  cy="64"
+                  cx="60"
+                  cy="60"
                   r="56"
                   stroke="currentColor"
                   strokeWidth="8"
                   fill="transparent"
                   strokeDasharray={`${2 * Math.PI * 56}`}
-                  strokeDashoffset={`${2 * Math.PI * 56 * (1 - results.overallScore / 100)}`}
+                  strokeDashoffset={`${2 * Math.PI * 56 * (1 - mockResults.overallScore / 100)}`}
                   className="text-primary transition-all duration-1000 ease-out"
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-3xl font-bold">{results.overallScore}</span>
+                <span className="text-3xl font-bold">{mockResults.overallScore}</span>
               </div>
             </div>
             <h2 className="text-3xl font-bold mb-2">Great Performance!</h2>
             <p className="text-lg text-muted-foreground mb-4">
-              You scored better than {results.percentile}% of candidates
+              You scored better than {mockResults.percentile}% of candidates
             </p>
             <div className="flex items-center justify-center gap-6 text-sm">
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
-                <span>Completed in {results.totalTime}</span>
+                <span>Completed in {mockResults.totalTime}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Target className="h-4 w-4" />
                 <span>
-                  {results.problemsCompleted}/{results.totalProblems} Problems
+                  {mockResults.problemsCompleted}/{mockResults.totalProblems} Problems
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Performance Breakdown */}
           <div className="grid gap-6 md:grid-cols-2">
-            {/* Skill Breakdown */}
-            <Card className="border-border/40">
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5" />
-                  Skill Performance
+                  Skill Breakdown
                 </CardTitle>
-                <CardDescription>Your performance across different skill areas</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {results.skillBreakdown.map((skill) => (
+                {mockResults.skillBreakdown.map((skill: SkillBreakdown) => (
                   <div key={skill.skill} className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="font-medium">{skill.skill}</span>
+                      <span className="text-sm font-medium">{skill.skill}</span>
                       <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="text-green-600">
-                          {skill.improvement}
-                        </Badge>
                         <span className="text-sm text-muted-foreground">
                           {skill.score}/{skill.maxScore}
                         </span>
+                        <Badge variant="secondary" className="text-xs">
+                          {skill.improvement}
+                        </Badge>
                       </div>
                     </div>
-                    <Progress value={(skill.score / skill.maxScore) * 100} />
+                    <Progress value={(skill.score / skill.maxScore) * 100} className="h-2" />
                   </div>
                 ))}
               </CardContent>
             </Card>
 
-            {/* Quick Stats */}
-            <Card className="border-border/40">
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Trophy className="h-5 w-5" />
-                  Key Metrics
+                  Quick Stats
                 </CardTitle>
-                <CardDescription>Summary of your assessment performance</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center p-4 rounded-lg bg-muted/50">
-                    <div className="text-2xl font-bold text-primary">{results.overallScore}</div>
+                    <div className="text-2xl font-bold text-primary">{mockResults.overallScore}</div>
                     <div className="text-sm text-muted-foreground">Overall Score</div>
                   </div>
                   <div className="text-center p-4 rounded-lg bg-muted/50">
-                    <div className="text-2xl font-bold text-primary">{results.percentile}%</div>
+                    <div className="text-2xl font-bold text-primary">{mockResults.percentile}%</div>
                     <div className="text-sm text-muted-foreground">Percentile</div>
                   </div>
                   <div className="text-center p-4 rounded-lg bg-muted/50">
-                    <div className="text-2xl font-bold text-primary">{results.totalTime}</div>
+                    <div className="text-2xl font-bold text-primary">{mockResults.totalTime}</div>
                     <div className="text-sm text-muted-foreground">Time Taken</div>
                   </div>
                   <div className="text-center p-4 rounded-lg bg-muted/50">
                     <div className="text-2xl font-bold text-primary">
-                      {results.problemsCompleted}/{results.totalProblems}
+                      {mockResults.problemsCompleted}/{mockResults.totalProblems}
                     </div>
                     <div className="text-sm text-muted-foreground">Completed</div>
                   </div>
@@ -242,59 +198,44 @@ export default function Results() {
             </Card>
           </div>
 
-          {/* Problem-by-Problem Analysis */}
-          <Card className="border-border/40">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Code className="h-5 w-5" />
-                Problem Analysis
+                Problem-by-Problem Analysis
               </CardTitle>
-              <CardDescription>Detailed breakdown of each problem attempt</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {results.problemResults.map((problem, index) => (
+                {mockResults.problemResults.map((problem: ProblemResult, index: number) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-4 rounded-lg border border-border/40 hover:bg-muted/20 transition-colors"
+                    className="flex items-center justify-between p-4 rounded-lg border"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2">
-                        {problem.status === "completed" ? (
-                          <CheckCircle className="h-5 w-5 text-green-500" />
-                        ) : (
-                          <XCircle className="h-5 w-5 text-red-500" />
-                        )}
-                        <span className="font-medium">{problem.title}</span>
-                      </div>
-                      <Badge
-                        variant={
-                          problem.difficulty === "Easy"
-                            ? "secondary"
-                            : problem.difficulty === "Medium"
-                              ? "default"
-                              : "destructive"
-                        }
-                      >
-                        {problem.difficulty}
-                      </Badge>
-                    </div>
-
-                    <div className="flex items-center gap-6 text-sm">
-                      <div className="text-center">
-                        <div className="font-medium">{problem.score}%</div>
-                        <div className="text-muted-foreground">Score</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="font-medium">{problem.timeSpent}</div>
-                        <div className="text-muted-foreground">Time</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="font-medium">
-                          {problem.testsPassed}/{problem.totalTests}
+                      {problem.status === "completed" ? (
+                        <CheckCircle className="h-5 w-5 text-green-500" />
+                      ) : (
+                        <XCircle className="h-5 w-5 text-red-500" />
+                      )}
+                      <div>
+                        <h4 className="font-medium">{problem.title}</h4>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span>{problem.difficulty}</span>
+                          <span>{problem.timeSpent}</span>
+                          <span>
+                            {problem.testsPassed}/{problem.totalTests} tests passed
+                          </span>
                         </div>
-                        <div className="text-muted-foreground">Tests</div>
                       </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-lg font-bold">{problem.score}%</div>
+                      <Badge
+                        variant={problem.status === "completed" ? "secondary" : "destructive"}
+                      >
+                        {problem.status}
+                      </Badge>
                     </div>
                   </div>
                 ))}
@@ -302,18 +243,17 @@ export default function Results() {
             </CardContent>
           </Card>
 
-          {/* Action Buttons */}
-          <div className="flex gap-4 justify-center">
-            <Button variant="outline" asChild>
-              <Link href="/">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" asChild>
+              <Link href="/assessment">
                 <RotateCcw className="h-4 w-4 mr-2" />
                 Take Another Assessment
               </Link>
             </Button>
-            <Button asChild>
+            <Button variant="outline" size="lg" asChild>
               <Link href="/">
                 <ArrowRight className="h-4 w-4 mr-2" />
-                Go to Homepage
+                Back to Dashboard
               </Link>
             </Button>
           </div>

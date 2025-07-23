@@ -10,6 +10,7 @@ export interface Assessment {
   rating: number
   category: string
   trending: boolean
+  image?: string
 }
 
 export interface SearchFilters {
