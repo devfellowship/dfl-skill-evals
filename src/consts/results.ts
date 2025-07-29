@@ -15,7 +15,7 @@ export interface ProblemResult {
   totalTests: number
 }
 
-export interface AssessmentResults {
+export interface ChallengeResults {
   overallScore: number
   percentile: number
   totalTime: string
@@ -25,7 +25,7 @@ export interface AssessmentResults {
   problemResults: ProblemResult[]
 }
 
-export const mockResults: AssessmentResults = {
+export const mockResults: ChallengeResults = {
   overallScore: 85,
   percentile: 78,
   totalTime: "67 min",

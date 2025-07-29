@@ -1,5 +1,5 @@
-// Assessment types
-export * from './assessment'
+// Challenge types
+export * from './challenge'
 
 // Problem types
 export type { Problem, Example, ProblemDifficulty } from './problems'

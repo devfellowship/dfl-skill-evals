@@ -1,5 +1,5 @@
-// Assessment data
-export * from './assessments'
+// Challenge data
+export * from './challenges'
 
 // Problem data
 export * from './problems'

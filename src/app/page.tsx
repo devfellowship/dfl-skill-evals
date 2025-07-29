@@ -6,7 +6,7 @@ import { Button } from "@/components/atoms/Button/Button"
 import { AssessmentGrid } from "@/components/organisms/AssessmentGrid/AssessmentGrid"
 import { Avatar, AvatarFallback } from "@/components/atoms/Avatar/Avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { mockAssessments } from "@/consts"
+import { mockChallenges } from "@/consts"
 import type { SearchFilters } from "@/types"
 
 export default function AssessmentLibrary() {
@@ -27,7 +27,7 @@ export default function AssessmentLibrary() {
   }
 
   const filteredAssessments = useMemo(() => {
-    let filtered = mockAssessments
+    let filtered = mockChallenges
 
     if (searchQuery) {
       filtered = filtered.filter(
@@ -68,7 +68,7 @@ export default function AssessmentLibrary() {
   }, [searchQuery, searchFilters])
 
   const sortedAssessments = useMemo(() => {
-    const sorted = [...filteredAssessments]
+    const sorted = [...(filteredAssessments || [])]
     
     switch (sortBy) {
       case "rating":

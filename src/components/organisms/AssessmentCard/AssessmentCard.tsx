@@ -5,11 +5,11 @@ import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { DifficultyIndicator } from "@/components/molecules/DifficultyIndicator/DifficultyIndicator"
-import type { Assessment } from "@/types"
+import type { Challenge } from "@/types"
 import { formatParticipants } from "@/lib/utils"
 
 interface AssessmentCardProps {
-  assessment: Assessment
+  assessment: Challenge
   className?: string
 }
 
@@ -57,7 +57,7 @@ export const AssessmentCard = React.forwardRef<
           </div>
 
           <div className="flex flex-wrap gap-1">
-            {assessment.skills.slice(0, 3).map((skill) => (
+            {assessment.skills.slice(0, 3).map((skill: string) => (
               <Badge key={skill} variant="outline" className="text-xs">
                 {skill}
               </Badge>
@@ -95,10 +95,10 @@ export const AssessmentCard = React.forwardRef<
               className="w-full"
               variant="outline"
             >
-              <Link href={`/pre-assessment/${assessment.id}`}>
-                Start Assessment
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
+                                             <Link href={`/pre-challenge/${assessment.id}`}>
+                 Start Challenge
+                 <ArrowRight className="ml-2 h-4 w-4" />
+               </Link>
             </Button>
           </div>
         </div>

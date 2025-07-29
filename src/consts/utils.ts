@@ -1,5 +1,5 @@
 import type { DifficultyLevel } from "@/types"
-import { difficultyColors, difficultyLabels } from "./assessments"
+import { difficultyColors, difficultyLabels } from "./challenges"
 
 /**
  * Retorna a cor correspondente ao nível de dificuldade

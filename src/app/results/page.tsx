@@ -9,12 +9,12 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 import { Avatar, AvatarFallback } from "@/components/atoms/Avatar/Avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
-import { mockAssessments } from "@/consts"
+import { mockChallenges } from "@/consts"
 import { BREADCRUMB_LABELS, UI_MESSAGES } from "@/consts/ui"
 import { mockResults, type SkillBreakdown, type ProblemResult } from "@/consts/results"
 
 export default function Results() {
-  const assessment = mockAssessments.find(a => a.id === 1) || mockAssessments[0]
+  const assessment = mockChallenges.find(a => a.id === 1) || mockChallenges[0]
   
   return (
     <div className="flex h-screen flex-col bg-background">
@@ -33,19 +33,19 @@ export default function Results() {
                 <BreadcrumbSeparator>
                   <ChevronRight className="h-4 w-4" />
                 </BreadcrumbSeparator>
-                <BreadcrumbItem>
-                  <BreadcrumbLink asChild>
-                    <Link href="/pre-assessment/1">{BREADCRUMB_LABELS.PRE_ASSESSMENT}</Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
+                                 <BreadcrumbItem>
+                   <BreadcrumbLink asChild>
+                     <Link href="/pre-challenge/1">{BREADCRUMB_LABELS.PRE_CHALLENGE}</Link>
+                   </BreadcrumbLink>
+                 </BreadcrumbItem>
                 <BreadcrumbSeparator>
                   <ChevronRight className="h-4 w-4" />
                 </BreadcrumbSeparator>
-                <BreadcrumbItem>
-                  <BreadcrumbLink asChild>
-                    <Link href="/assessment/1">{BREADCRUMB_LABELS.ASSESSMENT}</Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
+                                 <BreadcrumbItem>
+                   <BreadcrumbLink asChild>
+                     <Link href="/challenge/1">{BREADCRUMB_LABELS.CHALLENGE}</Link>
+                   </BreadcrumbLink>
+                 </BreadcrumbItem>
                 <BreadcrumbSeparator>
                   <ChevronRight className="h-4 w-4" />
                 </BreadcrumbSeparator>
@@ -57,7 +57,7 @@ export default function Results() {
           </div>
           <div className="flex items-center gap-4">
             <Button variant="outline" asChild>
-              <Link href="/assessment">
+              <Link href="/">
                 <RotateCcw className="h-4 w-4 mr-2" />
                 Retake Assessment
               </Link>
@@ -245,7 +245,7 @@ export default function Results() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" asChild>
-              <Link href="/assessment">
+              <Link href="/">
                 <RotateCcw className="h-4 w-4 mr-2" />
                 Take Another Assessment
               </Link>

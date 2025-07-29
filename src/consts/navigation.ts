@@ -21,8 +21,8 @@ export const mainMenuItems: MenuItem[] = [
     icon: Home,
   },
   {
-    title: "Meus Assessments",
-    url: "/my-assessments",
+    title: "Meus Challenges",
+    url: "/my-challenges",
     icon: BookOpen,
   },
   {
@@ -61,8 +61,8 @@ export const progressMenuItems: MenuItem[] = [
 // Menu de configurações
 export const settingsMenuItems: MenuItem[] = [
   {
-    title: "Criar Assessment",
-    url: "/create-assessment",
+    title: "Criar Challenge",
+    url: "/create-challenge",
     icon: PlusCircle,
   },
   {

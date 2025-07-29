@@ -1,10 +1,13 @@
 export const MOBILE_BREAKPOINT = 768
 
-export const ASSESSMENT_TIMER = {
-  DURATION_MINUTES: 90,
-  WARNING_THRESHOLD: 900, // 15 minutes in seconds
-  CRITICAL_THRESHOLD: 300, // 5 minutes in seconds
-} as const
+export const CHALLENGE_TIMER = {
+  DURATION_MINUTES: 60,
+  WARNING_THRESHOLD: 10 * 60,
+  CRITICAL_THRESHOLD: 3 * 60,
+}
+
+export const PRE_CHALLENGE = "Pre-Challenge"
+export const CHALLENGE = "Challenge"
 
 export const EXECUTION_LIMITS = {
   TIMEOUT_MS: 5000,
@@ -13,26 +16,26 @@ export const EXECUTION_LIMITS = {
 
 export const BREADCRUMB_LABELS = {
   HOME: "Dashboard",
-  PRE_ASSESSMENT: "Pre-Assessment", 
-  ASSESSMENT: "Assessment",
+  PRE_CHALLENGE: "Pre-Challenge", 
+  CHALLENGE: "Challenge",
   RESULTS: "Results",
 } as const
 
 export const UI_MESSAGES = {
-  PRE_ASSESSMENT: {
-    SUBTITLE: "Prepare-se para o seu assessment",
+  PRE_CHALLENGE: {
+    SUBTITLE: "Prepare-se para o seu challenge",
   },
-  ASSESSMENT: {
-    SUBTITLE: "Assessment em andamento",
+  CHALLENGE: {
+    SUBTITLE: "Challenge em andamento",
   },
   RESULTS: {
-    TITLE: "Assessment Results",
+    TITLE: "Challenge Results",
   },
   SYSTEM_CHECK: {
     BROWSER: "Browser Compatibility",
     INTERNET: "Internet Connection",
     TITLE: "System Check",
-    DESCRIPTION: "Ensure your system is ready for the assessment",
+    DESCRIPTION: "Ensure your system is ready for the challenge",
   },
 } as const
 
