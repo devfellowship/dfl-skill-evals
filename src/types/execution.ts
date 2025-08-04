@@ -1,17 +1,16 @@
-// Judge0 Language IDs - principais linguagens
+// Importar tipos do Judge0
+import type { Judge0Language, Judge0Submission, Judge0Result } from '../lib/judge0-config'
+
+// Judge0 Language IDs
 export const JUDGE0_LANGUAGES = {
-  JAVASCRIPT: 63,
-  TYPESCRIPT: 74,
-  PYTHON: 71,
-  JAVA: 62,
-  CPP: 54,
-  C: 50,
-  CSHARP: 51,
-  GO: 60,
-  RUST: 73,
+  JAVASCRIPT: 63, // JavaScript (Node.js 12.14.0) - ID correto
+  TYPESCRIPT: 74, // TypeScript (3.7.4) - ID correto
 } as const
 
 export type LanguageId = typeof JUDGE0_LANGUAGES[keyof typeof JUDGE0_LANGUAGES]
+
+// Re-exportar tipos do Judge0 para uso em outros arquivos
+export type { Judge0Language, Judge0Submission, Judge0Result }
 
 export interface TestCase {
   input: string
@@ -42,6 +41,7 @@ export interface ExecutionResponse {
   success: boolean
   testResults: TestResult[]
   compilationError?: string
+  error?: string
   totalExecutionTime: number
 } 
 

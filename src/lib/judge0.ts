@@ -1,35 +1,11 @@
 import type { TestCase, TestResult, LanguageId } from '@/types/execution'
-
-// Judge0 API Configuration
-const JUDGE0_API_URL = process.env.JUDGE0_API_URL || 'http://localhost:2358'
-const JUDGE0_API_KEY = process.env.JUDGE0_API_KEY
+import { executeCode, listAvailableLanguages, testJudge0Connection } from './judge0-config'
+import type { Judge0Result } from './judge0-config'
 
 // Rate limiting map (em produção usar Redis)
 const executionCounts = new Map<string, { count: number; resetTime: number }>()
 const MAX_EXECUTIONS_PER_HOUR = 100
 const HOUR_IN_MS = 60 * 60 * 1000
-
-export interface Judge0Submission {
-  source_code: string
-  language_id: LanguageId
-  stdin?: string
-  expected_output?: string
-  cpu_time_limit?: number
-  memory_limit?: number
-}
-
-export interface Judge0Response {
-  token: string
-  status: {
-    id: number
-    description: string
-  }
-  stdout?: string
-  stderr?: string
-  compile_output?: string
-  time?: string
-  memory?: number
-}
 
 export function checkRateLimit(identifier: string): boolean {
   const now = Date.now()
@@ -58,17 +34,59 @@ export async function executeCodeWithJudge0(
   timeoutMs: number = 5000,
   functionName: string
 ): Promise<TestResult[]> {
+  console.log('🚀 DEBUG JUDGE0 - Iniciando execução...')
+  console.log('📋 Parâmetros:', { codeLength: code.length, testCasesCount: testCases.length, languageId, functionName })
+  
   const results: TestResult[] = []
+  
+  // Verificar conexão com Judge0
+  console.log('🔍 Verificando conexão com Judge0...')
+  const isConnected = await testJudge0Connection()
+  if (!isConnected) {
+    console.error('❌ Judge0 não está disponível')
+    throw new Error('Judge0 não está disponível. Verifique se os containers estão rodando.')
+  }
+  console.log('✅ Conexão com Judge0 estabelecida')
+  
+  // Descobrir ID correto da linguagem
+  console.log('🔍 Descobrindo linguagem...')
+  const languages = await listAvailableLanguages()
+  console.log('📋 Linguagens disponíveis:', languages.length)
+  
+  // Procurar por TypeScript primeiro, depois JavaScript
+  let targetLanguage = languages.find(lang => lang.id === 74) // TypeScript
+  
+  if (!targetLanguage) {
+    targetLanguage = languages.find(lang => lang.id === 63) // JavaScript
+  }
+  
+  if (!targetLanguage) {
+    // Fallback: procurar por nome
+    targetLanguage = languages.find(lang => {
+      const langName = lang.name.toLowerCase()
+      return langName.includes('typescript') || langName.includes('javascript') || langName.includes('node') || langName.includes('js')
+    })
+  }
+  
+  if (!targetLanguage) {
+    console.error(`❌ JavaScript não encontrado no Judge0`)
+    console.log('📋 Linguagens disponíveis:', languages.map(l => `${l.id}: ${l.name}`))
+    throw new Error(`JavaScript não está disponível no Judge0. Linguagens disponíveis: ${languages.map(l => l.name).join(', ')}`)
+  }
+  
+  console.log(`✅ Usando linguagem: ${targetLanguage.name} (ID: ${targetLanguage.id})`)
   
   for (const testCase of testCases) {
     const startTime = Date.now()
     
     try {
-      const result = await executeTestCase(code, testCase, languageId, timeoutMs, functionName)
+      console.log(`🧪 Executando teste: ${testCase.input}`)
+      const result = await executeTestCase(code, testCase, targetLanguage.id, timeoutMs, functionName)
       results.push({
         ...result,
         executionTime: Date.now() - startTime
       })
+      console.log(`✅ Teste concluído: ${result.status}`)
     } catch (error) {
       console.log('❌ ERRO no executeTestCase:', error)
       results.push({
@@ -102,58 +120,51 @@ export async function executeCodeWithJudge0(
 async function executeTestCase(
   code: string,
   testCase: TestCase,
-  languageId: LanguageId,
+  languageId: number,
   timeoutMs: number,
   functionName: string
 ): Promise<Omit<TestResult, 'executionTime'>> {
-  // 1. Tamanho do código original
-  console.log('--- DEBUG SIZE ---');
-  console.log('Tamanho do userCode:', code.length, 'caracteres');
-  // 2. Tamanho do input do teste
-  console.log('Tamanho do testInput:', testCase.input.length, 'caracteres');
-
+  console.log('🧪 DEBUG EXECUTE TEST CASE ---');
+  console.log('Input:', testCase.input);
+  console.log('Expected:', testCase.expectedOutput);
+  console.log('Function:', functionName);
+  console.log('Language ID:', languageId);
+  
   const executableCode = createExecutableCode(code, functionName, testCase.input);
-
-  // 3. Tamanho do código que será enviado ao Judge0
-  console.log('Tamanho do executableCode:', executableCode.length, 'caracteres');
+  console.log('📝 Código executável:');
+  console.log(executableCode);
+  console.log('📏 Tamanho:', executableCode.length, 'caracteres');
 
   const payload = {
     source_code: executableCode,
-    language_id: 63, // JavaScript (Node.js 12.14.0)
-    cpu_time_limit: 3, // 3 segundos
-    wall_time_limit: 3, // 3 segundos (dentro do limite de 150)
+    language_id: languageId,
+    cpu_time_limit: 3,
+    wall_time_limit: 3,
     memory_limit: 128000,
     stack_limit: 128000,
-    max_file_size: 10485760, // 1KB (dentro do limite)
+    max_file_size: 4096,
     enable_per_process_and_thread_time_limit: false,
     enable_per_process_and_thread_memory_limit: false,
     number_of_runs: 1
   };
 
-  // 4. Tamanho total do JSON enviado ao Judge0
-  console.log('Tamanho do payload (JSON):', JSON.stringify(payload).length, 'caracteres');
-  console.log('--- FIM DEBUG SIZE ---');
+  console.log('📦 Payload enviado:');
+  console.log(JSON.stringify(payload, null, 2));
 
-  const response = await fetch(`${JUDGE0_API_URL}/submissions?base64_encoded=false&wait=true`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.log('❌ Judge0 Error Response:', errorText);
-    throw new Error(`Judge0 API error: ${response.status} ${response.statusText}`);
-  }
-
-  const result: Judge0Response = await response.json();
-  return parseJudge0Result(result, testCase);
+  const result: Judge0Result = await executeCode(payload);
+  
+  console.log('📊 Resposta do Judge0:');
+  console.log(JSON.stringify(result, null, 2));
+  
+  const parsedResult = parseJudge0Result(result, testCase);
+  console.log('🎯 Resultado final:', parsedResult);
+  console.log('--- FIM DEBUG EXECUTE TEST CASE ---');
+  
+  return parsedResult;
 }
 
 function parseJudge0Result(
-  result: Judge0Response, 
+  result: Judge0Result, 
   testCase: TestCase
 ): Omit<TestResult, 'executionTime'> {
   console.log('📊 DEBUG JUDGE0 - Response completa:', {
@@ -169,7 +180,7 @@ function parseJudge0Result(
     input: testCase.input,
     expectedOutput: testCase.expectedOutput,
     actualOutput: result.stdout?.trim() || null,
-    memory: result.memory,
+    memory: result.memory ? parseInt(result.memory) : undefined,
   }
   
   // Status codes: https://github.com/judge0/judge0/blob/master/app/models/status.rb
@@ -240,76 +251,69 @@ export function isLanguageSupported(languageId: LanguageId): boolean {
 }
 
 export function getLanguageName(languageId: LanguageId): string {
-  const languageMap: Record<LanguageId, string> = {
-    63: 'JavaScript',
-    74: 'TypeScript',
-    71: 'Python',
-    62: 'Java',
-    54: 'C++',
-    50: 'C',
-    51: 'C#',
-    60: 'Go',
-    73: 'Rust',
+  const languageMap: Record<number, string> = {
+    63: 'JavaScript (Node.js 12.14.0)',
+    74: 'TypeScript (3.7.4)',
+    71: 'Python (3.8.1)',
+    62: 'Java (OpenJDK 13.0.1)',
+    54: 'C++ (GCC 9.2.0)',
+    50: 'C (GCC 9.2.0)',
+    51: 'C# (Mono 6.6.0.161)',
+    60: 'Go (1.13.5)',
+    73: 'Rust (1.40.0)',
   }
   
-  return languageMap[languageId] || 'Unknown'
+  return languageMap[languageId as number] || 'Unknown'
 }
 
 // Helper function to parse test case input
 function parseTestCaseInput(input: string): any[] {
   try {
-    // Remove outer brackets and split by comma, handling nested arrays/objects
     const cleanInput = input.trim()
-    if (cleanInput.startsWith('[') && cleanInput.endsWith(']')) {
-      // It's an array - parse it directly
-      return [JSON.parse(cleanInput)]
-    } else {
-      // It's multiple parameters - split by comma at top level
-      const params = []
-      let current = ''
-      let depth = 0
-      let inString = false
-      let escapeNext = false
+    
+    // Para o caso específico do Two Sum: "[2,7,11,15], 9"
+    // Precisamos dividir por vírgula fora dos colchetes
+    const parts = []
+    let current = ''
+    let depth = 0
+    let inString = false
+    
+    for (let i = 0; i < cleanInput.length; i++) {
+      const char = cleanInput[i]
       
-      for (let i = 0; i < cleanInput.length; i++) {
-        const char = cleanInput[i]
-        
-        if (escapeNext) {
-          current += char
-          escapeNext = false
-          continue
-        }
-        
-        if (char === '\\') {
-          escapeNext = true
-          current += char
-          continue
-        }
-        
-        if (char === '"' && !escapeNext) {
-          inString = !inString
-        }
-        
-        if (!inString) {
-          if (char === '[' || char === '{') depth++
-          if (char === ']' || char === '}') depth--
-          
-          if (char === ',' && depth === 0) {
-            params.push(JSON.parse(current.trim()))
-            current = ''
-            continue
-          }
-        }
-        
-        current += char
+      if (char === '"' && (i === 0 || cleanInput[i-1] !== '\\')) {
+        inString = !inString
       }
       
-      if (current.trim()) {
-        params.push(JSON.parse(current.trim()))
+      if (!inString) {
+        if (char === '[' || char === '{') depth++
+        if (char === ']' || char === '}') depth--
+        
+        if (char === ',' && depth === 0) {
+          parts.push(current.trim())
+          current = ''
+          continue
+        }
       }
       
-      return params
+      current += char
     }
+    
+    if (current.trim()) {
+      parts.push(current.trim())
+    }
+    
+    // Parsear cada parte
+    const result = parts.map(part => {
+      try {
+        return JSON.parse(part)
+      } catch (error) {
+        // Se não conseguir fazer parse como JSON, tratar como string
+        return part.replace(/^"|"$/g, '') // Remove aspas se existirem
+      }
+    })
+    
+    return result
   } catch (error) {
     console.log('Error parsing input:', input, error)
     throw new Error(`Failed to parse test case input: ${input}`)
@@ -321,6 +325,17 @@ function createExecutableCode(userCode: string, functionName: string, testInput:
   const params = parseTestCaseInput(testInput)
   const paramsString = params.map(p => JSON.stringify(p)).join(', ')
   
-  // Código ultra-compacto para evitar erro max_file_size
-  return `${userCode}console.log(JSON.stringify(${functionName}(${paramsString})));`.trim()
-} 
+  // Código TypeScript/JavaScript - remove anotações de tipo
+  const cleanCode = userCode
+    .replace(/:\s*number\[\]/g, '') // Remove number[]
+    .replace(/:\s*number/g, '') // Remove number
+    .replace(/:\s*string/g, '') // Remove string
+    .replace(/:\s*boolean/g, '') // Remove boolean
+    .replace(/:\s*any/g, '') // Remove any
+  
+  return `// Código do usuário
+${cleanCode}
+
+// Teste
+console.log(JSON.stringify(${functionName}(${paramsString})));`
+}

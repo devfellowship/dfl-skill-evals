@@ -16,6 +16,8 @@ import type { ExecutionRequest, ExecutionResponse, TestResult } from "@/types/ex
 import { mockChallenges } from "@/consts"
 import { problems, DEFAULT_CODE_TEMPLATE } from "@/consts/problems"
 import { CHALLENGE_TIMER, EXECUTION_LIMITS, BREADCRUMB_LABELS, UI_MESSAGES, CODE_EXECUTION } from "@/consts/ui"
+import { JUDGE0_LANGUAGES } from '@/types/execution'
+import { testJudge0Connection } from '@/lib/test-judge0-connection'
 
 export default function Assessment({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -51,6 +53,18 @@ export default function Assessment({ params }: { params: Promise<{ id: string }>
     try {
       const problem = problems[currentProblem]
       
+      // Teste de conectividade primeiro usando o código real do usuário
+      console.log('🔍 Testando conectividade com Judge0...')
+      const isConnected = await testJudge0Connection(code, problem.functionName, problem.testCases[0]?.input)
+      
+      if (!isConnected) {
+        console.error('❌ Judge0 não está disponível')
+        setCompilationError('Judge0 não está disponível. Verifique se o Docker Desktop está rodando e os containers do Judge0 estão ativos.')
+        return
+      }
+      
+      console.log('✅ Judge0 está conectado, executando código...')
+      
       console.log('🔍 DEBUG FRONTEND - Problem:', {
         currentProblem,
         problemTitle: problem?.title,
@@ -61,7 +75,7 @@ export default function Assessment({ params }: { params: Promise<{ id: string }>
       const request: ExecutionRequest = {
         code,
         testCases: problem.testCases,
-        languageId: 63, // JavaScript/TypeScript
+        languageId: JUDGE0_LANGUAGES.TYPESCRIPT, // TypeScript
         timeoutMs: EXECUTION_LIMITS.TIMEOUT_MS,
         functionName: problem.functionName
       }
@@ -95,6 +109,8 @@ export default function Assessment({ params }: { params: Promise<{ id: string }>
       if (!result.success) {
         if (result.compilationError) {
           setCompilationError(result.compilationError)
+        } else if (result.error) {
+          setCompilationError(result.error)
         }
         return
       }
