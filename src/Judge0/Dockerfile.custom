@@ -1,9 +1,0 @@
-FROM judge0/judge0:1.13.1-extra
-
-# Desabilita isolate em todos os lugares possíveis
-RUN sed -i 's/USE_ISOLATE = true/USE_ISOLATE = false/g' /api/lib/constants.rb || true
-RUN sed -i 's/isolate/echo "isolate disabled"/g' /api/lib/isolate.rb || true
-RUN sed -i 's/--cg//g' /api/lib/isolate.rb || true
-
-# Verificar mudanças
-RUN echo "=== Verificando constants.rb ===" && grep -n "USE_ISOLATE" /api/lib/constants.rb || echo "Arquivo não encontrado"

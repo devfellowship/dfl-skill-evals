@@ -1,5 +1,3 @@
-# Removido version obsoleto
-
 services:
   db:
     image: postgres:13
@@ -30,33 +28,27 @@ services:
     restart: unless-stopped
 
   server:
-    build:
-      context: .
-      dockerfile: Dockerfile.custom
+    image: judge0/judge0:latest-extra
     environment:
-      # Configurações do banco
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
       - POSTGRES_DB=judge0
       - POSTGRES_USER=judge0
       - POSTGRES_PASSWORD=YourJudge0PostgresPassword
-      # Configurações do Redis
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      # Configurações Rails
       - SECRET_KEY_BASE=umaChaveSuperLongaESeguraQueVoceGereAqui
       - RAILS_ENV=production
       - PORT=2358
-      # Configurações críticas para WSL/Windows
-      - ENABLE_ISOLATE=false
-      - DISABLE_SANDBOX=true
-      - RUN_UNTRUSTED_CODE_OUTSIDE_SANDBOX=true
+      - ENABLE_ISOLATE=true         # Isolamento real ativado
+      - DISABLE_SANDBOX=false
+      - RUN_UNTRUSTED_CODE_OUTSIDE_SANDBOX=false
       - DISABLE_DATABASE_ENVIRONMENT_CHECK=1
-      # Limites
       - MAX_FILE_SIZE=4096
       - MAX_OUTPUT_SIZE=4096
     volumes:
       - judge0-box:/box:rw
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
     ports:
       - "2358:2358"
     depends_on:
@@ -75,29 +67,24 @@ services:
     user: "0:0"
 
   worker:
-    build:
-      context: .
-      dockerfile: Dockerfile.custom
+    image: judge0/judge0:latest-extra
     environment:
-      # Configurações do banco
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
       - POSTGRES_DB=judge0
       - POSTGRES_USER=judge0
       - POSTGRES_PASSWORD=YourJudge0PostgresPassword
-      # Configurações do Redis
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      # Configurações Rails
       - SECRET_KEY_BASE=umaChaveSuperLongaESeguraQueVoceGereAqui
       - RAILS_ENV=production
-      # Configurações críticas para WSL/Windows
-      - ENABLE_ISOLATE=false
-      - DISABLE_SANDBOX=true
-      - RUN_UNTRUSTED_CODE_OUTSIDE_SANDBOX=true
+      - ENABLE_ISOLATE=true         # Isolamento real ativado
+      - DISABLE_SANDBOX=false
+      - RUN_UNTRUSTED_CODE_OUTSIDE_SANDBOX=false
       - DISABLE_DATABASE_ENVIRONMENT_CHECK=1
     volumes:
       - judge0-box:/box:rw
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
     depends_on:
       db:
         condition: service_healthy
