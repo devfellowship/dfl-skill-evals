@@ -28,7 +28,7 @@ services:
     restart: unless-stopped
 
   server:
-    image: judge0/judge0:latest-extra
+    image: judge0/judge0:1.13.1
     environment:
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
@@ -67,7 +67,7 @@ services:
     user: "0:0"
 
   worker:
-    image: judge0/judge0:latest-extra
+    image: judge0/judge0:1.13.1
     environment:
       - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
