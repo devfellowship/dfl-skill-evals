@@ -75,7 +75,7 @@ export default function Assessment({ params }: { params: Promise<{ id: string }>
       const request: ExecutionRequest = {
         code,
         testCases: problem.testCases,
-        languageId: JUDGE0_LANGUAGES.TYPESCRIPT, // TypeScript
+        languageId: JUDGE0_LANGUAGES.JAVASCRIPT, // Sempre JavaScript (TS é transpilado no backend)
         timeoutMs: EXECUTION_LIMITS.TIMEOUT_MS,
         functionName: problem.functionName
       }
@@ -106,16 +106,20 @@ export default function Assessment({ params }: { params: Promise<{ id: string }>
         fullResponse: result
       })
 
+      // Sempre definir os resultados dos testes, independente do sucesso
+      setTestResults(result.testResults)
+      
+      // Se não foi bem-sucedido, mostrar erro de compilação se houver
       if (!result.success) {
         if (result.compilationError) {
           setCompilationError(result.compilationError)
         } else if (result.error) {
           setCompilationError(result.error)
         }
-        return
+      } else {
+        // Limpar erros se tudo passou
+        setCompilationError(null)
       }
-
-      setTestResults(result.testResults)
       
     } catch (error) {
       console.error('❌ DEBUG FRONTEND - Error executing code:', error)
@@ -132,7 +136,13 @@ export default function Assessment({ params }: { params: Promise<{ id: string }>
 
   const problem = problems[currentProblem]
   const passedTests = testResults.filter((test) => test.status === "passed").length
-  const totalVisibleTests = testResults.filter((test) => !problem.testCases.find(tc => tc.input === test.input)?.hidden).length
+  const totalVisibleTests = testResults.filter((test) => {
+    // Normalizar inputs para comparação (remove espaços extras)
+    const normalizedTestInput = test.input.replace(/\s/g, '')
+    return !problem.testCases.find(tc => 
+      tc.input.replace(/\s/g, '') === normalizedTestInput
+    )?.hidden
+  }).length
   const totalTests = problem.testCases.length
   const hiddenTests = problem.testCases.filter((test) => test.hidden).length
 
@@ -328,7 +338,14 @@ export default function Assessment({ params }: { params: Promise<{ id: string }>
             )}
 
             <div className="flex-1 overflow-hidden">
-              <CodeEditor value={code} onChange={setCode} language="typescript" />
+              <CodeEditor 
+          value={code} 
+          onChange={setCode} 
+          language="typescript" 
+          onRun={runCode}
+          isRunning={isRunning}
+          showRunButton={true}
+        />
             </div>
           </div>
 
@@ -347,7 +364,11 @@ export default function Assessment({ params }: { params: Promise<{ id: string }>
               <div className="space-y-2">
                 {testResults.length > 0 ? (
                   testResults.map((result, index) => {
-                    const testCase = problem.testCases.find(tc => tc.input === result.input)
+                    // Normalizar inputs para comparação (remove espaços extras)
+                    const normalizedResultInput = result.input.replace(/\s/g, '')
+                    const testCase = problem.testCases.find(tc => 
+                      tc.input.replace(/\s/g, '') === normalizedResultInput
+                    )
                     const isHidden = testCase?.hidden || false
                     
                     return (
@@ -373,7 +394,7 @@ export default function Assessment({ params }: { params: Promise<{ id: string }>
                                 <span className="font-medium">Expected:</span> {JSON.stringify(result.expectedOutput)}
                               </div>
                               <div className="text-xs text-muted-foreground mb-1">
-                                <span className="font-medium">Got:</span> {JSON.stringify(result.actualOutput)}
+                                <span className="font-medium">Got:</span> {result.actualOutput ? JSON.stringify(result.actualOutput) : 'No output'}
                               </div>
                             </>
                           )}

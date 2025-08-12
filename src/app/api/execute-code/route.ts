@@ -67,8 +67,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       
       const totalExecutionTime = Date.now() - startTime
       
+      // Calcular se todos os testes passaram
+      const allTestsPassed = testResults.every(r => r.status === 'passed')
+      
       const response: ExecutionResponse = {
-        success: true,
+        success: allTestsPassed,
         testResults,
         totalExecutionTime,
       }

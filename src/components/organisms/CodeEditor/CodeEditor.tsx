@@ -1,9 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Code } from "lucide-react"
+import { Code, Play } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Button } from "@/components/atoms/Button/Button"
 import { LANGUAGES, EDITOR_CONFIG } from "@/consts/editor"
 
 interface CodeEditorProps {
@@ -12,9 +13,10 @@ interface CodeEditorProps {
   language: string
   onRun?: () => void
   isRunning?: boolean
+  showRunButton?: boolean
 }
 
-export function CodeEditor({ value, onChange, language }: CodeEditorProps) {
+export function CodeEditor({ value, onChange, language, onRun, isRunning, showRunButton = false }: CodeEditorProps) {
   const [lastSaved, setLastSaved] = useState<Date>(new Date())
 
   useEffect(() => {
@@ -52,6 +54,27 @@ export function CodeEditor({ value, onChange, language }: CodeEditorProps) {
               ))}
             </SelectContent>
           </Select>
+          
+          {showRunButton && onRun && (
+            <Button 
+              onClick={onRun} 
+              disabled={isRunning}
+              size="sm"
+              className="h-7 px-3"
+            >
+              {isRunning ? (
+                <>
+                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current mr-2" />
+                  Running...
+                </>
+              ) : (
+                <>
+                  <Play className="h-3 w-3 mr-1" />
+                  Run Code
+                </>
+              )}
+            </Button>
+          )}
         </div>
       </div>
 

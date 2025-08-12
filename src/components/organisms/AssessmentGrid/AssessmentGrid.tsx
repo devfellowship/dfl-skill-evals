@@ -1,79 +1,41 @@
-import * as React from "react"
-import { Filter } from "lucide-react"
-import { AssessmentCard } from "../AssessmentCard"
-import { Button } from "../../atoms/Button/Button"
-import type { Assessment, SearchFilters } from "@/types"
-import { cn } from "@/lib/utils"
+import React from "react"
+import { AssessmentCard } from "@/components/organisms/AssessmentCard/AssessmentCard"
+import type { Challenge } from "@/types"
 
 interface AssessmentGridProps {
-  assessments: Assessment[]
+  assessments: Challenge[]
   isLoading?: boolean
-  emptyStateTitle?: string
-  emptyStateDescription?: string
-  onClearFilters?: () => void
-  className?: string
 }
 
-export const AssessmentGrid = React.forwardRef<
-  HTMLDivElement,
-  AssessmentGridProps
->(({ 
+export const AssessmentGrid: React.FC<AssessmentGridProps> = ({ 
   assessments, 
-  isLoading = false,
-  emptyStateTitle = "No assessments found",
-  emptyStateDescription = "Try adjusting your search query or filters",
-  onClearFilters,
-  className,
-  ...props 
-}, ref) => {
-  
+  isLoading = false 
+}) => {
   if (isLoading) {
     return (
-      <div 
-        ref={ref}
-        className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6", className)}
-        {...props}
-      >
-        {Array.from({ length: 6 }).map((_, index) => (
-          <div
-            key={index}
-            className="h-80 rounded-lg border bg-muted animate-pulse"
-          />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="animate-pulse">
+            <div className="bg-gray-200 rounded-lg h-64"></div>
+          </div>
         ))}
       </div>
     )
   }
 
-  if (assessments.length === 0) {
+  if (!assessments || assessments.length === 0) {
     return (
-      <div 
-        ref={ref}
-        className={cn("flex h-64 items-center justify-center", className)}
-        {...props}
-      >
-        <div className="text-center">
-          <Filter className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-medium">{emptyStateTitle}</h3>
-          <p className="text-muted-foreground mb-4">{emptyStateDescription}</p>
-          {onClearFilters && (
-            <Button variant="outline" onClick={onClearFilters}>
-              Clear all filters
-            </Button>
-          )}
-        </div>
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">Nenhum assessment encontrado.</p>
       </div>
     )
   }
 
   return (
-    <div 
-      ref={ref}
-      className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6", className)}
-      {...props}
-    >
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {assessments.map((assessment) => (
         <AssessmentCard key={assessment.id} assessment={assessment} />
       ))}
     </div>
   )
-}) 
+} 

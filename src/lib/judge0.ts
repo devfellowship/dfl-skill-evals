@@ -1,6 +1,7 @@
 import type { TestCase, TestResult, LanguageId } from '@/types/execution'
 import { executeCode, listAvailableLanguages, testJudge0Connection } from './judge0-config'
 import type { Judge0Result } from './judge0-config'
+import * as ts from 'typescript'
 
 // Rate limiting map (em produção usar Redis)
 const executionCounts = new Map<string, { count: number; resetTime: number }>()
@@ -25,6 +26,29 @@ export function checkRateLimit(identifier: string): boolean {
   
   entry.count++
   return true
+}
+
+// Função para transpilar TypeScript para JavaScript
+function transpileTsToJs(code: string): string {
+  try {
+    const result = ts.transpileModule(code, {
+      compilerOptions: {
+        target: ts.ScriptTarget.ES2019,
+        lib: ["ES2019"],
+        module: ts.ModuleKind.CommonJS,
+        strict: false,
+        esModuleInterop: true,
+        skipLibCheck: true,
+        forceConsistentCasingInFileNames: true
+      }
+    })
+    
+    console.log('✅ TypeScript transpilado com sucesso para JavaScript')
+    return result.outputText
+  } catch (error) {
+    console.error('❌ Erro na transpilação TypeScript:', error)
+    throw new Error(`Erro na transpilação TypeScript: ${error instanceof Error ? error.message : 'Erro desconhecido'}`)
+  }
 }
 
 export async function executeCodeWithJudge0(
@@ -53,18 +77,14 @@ export async function executeCodeWithJudge0(
   const languages = await listAvailableLanguages()
   console.log('📋 Linguagens disponíveis:', languages.length)
   
-  // Procurar por TypeScript primeiro, depois JavaScript
-  let targetLanguage = languages.find(lang => lang.id === 74) // TypeScript
-  
-  if (!targetLanguage) {
-    targetLanguage = languages.find(lang => lang.id === 63) // JavaScript
-  }
+  // Procurar por JavaScript (Node.js) para execução
+  let targetLanguage = languages.find(lang => lang.id === 63) // JavaScript (Node.js)
   
   if (!targetLanguage) {
     // Fallback: procurar por nome
     targetLanguage = languages.find(lang => {
       const langName = lang.name.toLowerCase()
-      return langName.includes('typescript') || langName.includes('javascript') || langName.includes('node') || langName.includes('js')
+      return langName.includes('javascript') || langName.includes('node') || langName.includes('js')
     })
   }
   
@@ -76,12 +96,27 @@ export async function executeCodeWithJudge0(
   
   console.log(`✅ Usando linguagem: ${targetLanguage.name} (ID: ${targetLanguage.id})`)
   
+  // Se o código for TypeScript (languageId === 74), transpilar para JavaScript
+  let processedCode = code
+  let isTypeScript = languageId === 74
+  
+  if (isTypeScript) {
+    console.log('🔄 Transpilando TypeScript para JavaScript...')
+    try {
+      processedCode = transpileTsToJs(code)
+      console.log('✅ Transpilação concluída com sucesso')
+    } catch (error) {
+      console.error('❌ Falha na transpilação TypeScript:', error)
+      throw new Error(`Erro na transpilação TypeScript: ${error instanceof Error ? error.message : 'Erro desconhecido'}`)
+    }
+  }
+  
   for (const testCase of testCases) {
     const startTime = Date.now()
     
     try {
       console.log(`🧪 Executando teste: ${testCase.input}`)
-      const result = await executeTestCase(code, testCase, targetLanguage.id, timeoutMs, functionName)
+      const result = await executeTestCase(processedCode, testCase, targetLanguage.id, timeoutMs, functionName)
       results.push({
         ...result,
         executionTime: Date.now() - startTime
@@ -130,7 +165,7 @@ async function executeTestCase(
   console.log('Function:', functionName);
   console.log('Language ID:', languageId);
   
-  const executableCode = createExecutableCode(code, functionName, testCase.input);
+  const executableCode = createExecutableCode(code, functionName, testCase.input, languageId);
   console.log('📝 Código executável:');
   console.log(executableCode);
   console.log('📏 Tamanho:', executableCode.length, 'caracteres');
@@ -138,8 +173,8 @@ async function executeTestCase(
   const payload = {
     source_code: executableCode,
     language_id: languageId,
-    cpu_time_limit: 3,
-    wall_time_limit: 3,
+    cpu_time_limit: 5,
+    wall_time_limit: 5,
     memory_limit: 128000,
     stack_limit: 128000,
     max_file_size: 4096,
@@ -208,6 +243,7 @@ function parseJudge0Result(
       return {
         ...baseResult,
         status: passed ? 'passed' : 'failed',
+        actualOutput: actual,
       }
     }
     
@@ -321,20 +357,42 @@ function parseTestCaseInput(input: string): any[] {
 }
 
 // Helper function to create executable code
-function createExecutableCode(userCode: string, functionName: string, testInput: string): string {
+function createExecutableCode(userCode: string, functionName: string, testInput: string, languageId: number): string {
   const params = parseTestCaseInput(testInput)
   const paramsString = params.map(p => JSON.stringify(p)).join(', ')
   
-  // Código TypeScript/JavaScript - remove anotações de tipo
-  const cleanCode = userCode
-    .replace(/:\s*number\[\]/g, '') // Remove number[]
-    .replace(/:\s*number/g, '') // Remove number
-    .replace(/:\s*string/g, '') // Remove string
-    .replace(/:\s*boolean/g, '') // Remove boolean
-    .replace(/:\s*any/g, '') // Remove any
+  // Para TypeScript (ID 74), manter o código intacto
+  if (languageId === 74) {
+    return `// Código do usuário
+${userCode}
+
+// Teste
+console.log(JSON.stringify(${functionName}(${paramsString})));`
+  }
   
-  return `// Código do usuário
+  // Para JavaScript (ID 63), remover tipos de forma mais inteligente
+  if (languageId === 63) {
+    // Remove anotações de tipo mais específicas
+    const cleanCode = userCode
+      .replace(/:\s*number\[\]/g, '') // Remove number[]
+      .replace(/:\s*number/g, '') // Remove number
+      .replace(/:\s*string/g, '') // Remove string
+      .replace(/:\s*boolean/g, '') // Remove boolean
+      .replace(/:\s*any/g, '') // Remove any
+      .replace(/:\s*\{[^}]*\}/g, '') // Remove tipos de objeto complexos
+      .replace(/export\s+/g, '') // Remove export para JS
+      .replace(/import\s+.*?from\s+['"][^'"]*['"];?\s*/g, '') // Remove imports
+    
+    return `// Código do usuário
 ${cleanCode}
+
+// Teste
+console.log(JSON.stringify(${functionName}(${paramsString})));`
+  }
+  
+  // Para outras linguagens, manter o código original
+  return `// Código do usuário
+${userCode}
 
 // Teste
 console.log(JSON.stringify(${functionName}(${paramsString})));`
