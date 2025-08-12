@@ -25,6 +25,7 @@ export default function Assessment({ params }: { params: Promise<{ id: string }>
   
   const [currentProblem, setCurrentProblem] = useState(0)
   const [code, setCode] = useState(DEFAULT_CODE_TEMPLATE)
+  const [language, setLanguage] = useState("typescript")
   const [timeLeft, setTimeLeft] = useState(CHALLENGE_TIMER.DURATION_MINUTES * 60)
   const [isRunning, setIsRunning] = useState(false)
   const [testResults, setTestResults] = useState<TestResult[]>([])
@@ -75,7 +76,7 @@ export default function Assessment({ params }: { params: Promise<{ id: string }>
       const request: ExecutionRequest = {
         code,
         testCases: problem.testCases,
-        languageId: JUDGE0_LANGUAGES.JAVASCRIPT, // Sempre JavaScript (TS é transpilado no backend)
+        languageId: language === "typescript" ? JUDGE0_LANGUAGES.TYPESCRIPT : JUDGE0_LANGUAGES.JAVASCRIPT,
         timeoutMs: EXECUTION_LIMITS.TIMEOUT_MS,
         functionName: problem.functionName
       }
@@ -316,9 +317,6 @@ export default function Assessment({ params }: { params: Promise<{ id: string }>
                       Get Hint ({hintsUsed}/{EXECUTION_LIMITS.MAX_HINTS})
                     </Button>
                   )}
-                  <Button onClick={runCode} disabled={isRunning} size="sm">
-                    {isRunning ? "Running..." : "Run Code"}
-                  </Button>
                 </div>
               </div>
             </div>
@@ -339,13 +337,14 @@ export default function Assessment({ params }: { params: Promise<{ id: string }>
 
             <div className="flex-1 overflow-hidden">
               <CodeEditor 
-          value={code} 
-          onChange={setCode} 
-          language="typescript" 
-          onRun={runCode}
-          isRunning={isRunning}
-          showRunButton={true}
-        />
+                value={code} 
+                onChange={setCode} 
+                language={language}
+                onLanguageChange={setLanguage}
+                onRun={runCode}
+                isRunning={isRunning}
+                showRunButton={true}
+              />
             </div>
           </div>
 

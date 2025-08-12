@@ -11,12 +11,13 @@ interface CodeEditorProps {
   value: string
   onChange: (code: string) => void
   language: string
+  onLanguageChange?: (language: string) => void
   onRun?: () => void
   isRunning?: boolean
   showRunButton?: boolean
 }
 
-export function CodeEditor({ value, onChange, language, onRun, isRunning, showRunButton = false }: CodeEditorProps) {
+export function CodeEditor({ value, onChange, language, onLanguageChange, onRun, isRunning, showRunButton = false }: CodeEditorProps) {
   const [lastSaved, setLastSaved] = useState<Date>(new Date())
 
   useEffect(() => {
@@ -42,7 +43,7 @@ export function CodeEditor({ value, onChange, language, onRun, isRunning, showRu
           <span className="text-sm font-medium">Code Editor</span>
         </div>
         <div className="flex items-center gap-2">
-          <Select value={language} disabled={true}>
+          <Select value={language} onValueChange={(newLanguage) => onLanguageChange?.(newLanguage) || onChange(`// Language changed to ${newLanguage}\n${value}`)}>
             <SelectTrigger className="w-32 h-7 text-xs">
               <SelectValue />
             </SelectTrigger>
