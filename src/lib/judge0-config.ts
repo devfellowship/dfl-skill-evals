@@ -47,11 +47,13 @@ export const JUDGE0_CONFIG = {
   } as const,
   
   // URLs
-  API_URL: process.env.JUDGE0_API_URL || 'http://localhost:2358',
+  API_URL: process.env.JUDGE0_API_URL || 'http://localhost:3000/api/judge0',
   API_KEY: process.env.JUDGE0_API_KEY,
   
   // Fallback URLs para diferentes configurações
   FALLBACK_URLS: [
+    process.env.JUDGE0_API_URL || 'http://localhost:3000/api/judge0',
+    'http://localhost:3000/api/judge0',
     'http://localhost:2358',
     'http://judge0-ce:2358',
     'https://judge0-ce.p.rapidapi.com'

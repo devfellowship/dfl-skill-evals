@@ -1,30 +1,87 @@
-# Mvp wireframe design
+# DevShaper - Plataforma de Desafios de Programação
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+Uma plataforma moderna para resolver desafios de programação com suporte a múltiplas linguagens usando Judge0.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/tainanfidelis-projects/v0-mvp-wireframe-design)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/kycOcOh6wFS)
+## 🚀 Configuração com VM Ubuntu
 
-## Overview
+### Pré-requisitos
+- VM Ubuntu com Docker instalado
+- Judge0 rodando na porta 2358
+- Rede configurada entre host e VM
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+### Configuração Rápida
 
-## Deployment
+#### No Windows (PowerShell):
+```powershell
+.\setup-vm-connection.ps1
+```
 
-Your project is live at:
+#### No Linux/Mac:
+```bash
+chmod +x setup-vm-connection.sh
+./setup-vm-connection.sh
+```
 
-**[https://vercel.com/tainanfidelis-projects/v0-mvp-wireframe-design](https://vercel.com/tainanfidelis-projects/v0-mvp-wireframe-design)**
+### Configuração Manual
 
-## Build your app
+1. **Descubra o IP da sua VM:**
+   ```bash
+   # Na VM Ubuntu
+   ip addr show
+   ```
 
-Continue building your app on:
+2. **Crie o arquivo `.env.local`:**
+   ```env
+   JUDGE0_API_URL=http://SEU_IP_DA_VM:2358
+   NEXT_PUBLIC_JUDGE0_URL=http://SEU_IP_DA_VM:2358
+   ```
 
-**[https://v0.dev/chat/projects/kycOcOh6wFS](https://v0.dev/chat/projects/kycOcOh6wFS)**
+3. **Teste a conexão:**
+   ```bash
+   export VM_IP=SEU_IP_DA_VM
+   node test-vm-connection.js
+   ```
 
-## How It Works
+## 🛠️ Desenvolvimento
 
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+```bash
+# Instalar dependências
+npm install
+
+# Rodar em desenvolvimento
+npm run dev
+
+# Testar conexão com Judge0
+node test-vm-connection.js
+```
+
+## 📁 Estrutura do Projeto
+
+- `src/app/api/execute-code/` - API para execução de código
+- `src/lib/judge0-config.ts` - Configuração do Judge0
+- `src/Judge0/` - Configurações do Docker para Judge0
+- `test-vm-connection.js` - Script para testar conexão
+
+## 🔧 Troubleshooting
+
+### Problemas de Conexão
+1. Verifique se a VM está rodando
+2. Confirme o IP da VM
+3. Teste se a porta 2358 está aberta
+4. Verifique se o Judge0 está rodando na VM
+
+### Comandos Úteis na VM
+```bash
+# Verificar se Judge0 está rodando
+docker ps
+
+# Ver logs do Judge0
+docker logs judge0-server
+
+# Reiniciar Judge0
+docker-compose restart
+```
+
+## 📝 Licença
+
+MIT
