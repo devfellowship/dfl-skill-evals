@@ -1,0 +1,1 @@
+export { CompilationError } from './CompilationError'

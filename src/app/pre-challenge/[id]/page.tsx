@@ -1,12 +1,12 @@
 "use client"
 
 import { useState, use } from "react"
-import { CheckCircle, AlertCircle, Monitor, Wifi, Clock, Star, Home, ChevronRight, LogOut, User } from "lucide-react"
+import { CheckCircle, AlertCircle, Monitor, Wifi, Clock, Star, LogOut, User } from "lucide-react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { Separator } from "@/components/ui/separator"
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
+import { AppBreadcrumb, createPreChallengeBreadcrumb } from "@/components/molecules/AppBreadcrumb"
 import { Avatar, AvatarFallback } from "@/components/atoms/Avatar/Avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
@@ -27,23 +27,7 @@ export default function PreAssessment({ params }: { params: Promise<{ id: string
               <header className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="flex h-16 items-center gap-4 px-6">
           <div className="flex-1">
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink asChild>
-                    <Link href="/">
-                      <Home className="h-4 w-4" />
-                    </Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator>
-                  <ChevronRight className="h-4 w-4" />
-                </BreadcrumbSeparator>
-                <BreadcrumbItem>
-                  <BreadcrumbPage>{BREADCRUMB_LABELS.PRE_CHALLENGE}</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+            <AppBreadcrumb items={createPreChallengeBreadcrumb()} />
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
