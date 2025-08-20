@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata } from "next";
 import "../styles/globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider"
+import { AuthProvider } from "@/components/providers/AuthProvider"
 
 export const metadata: Metadata = {
   title: "DevShaper - Technical Assessments",
@@ -18,11 +19,13 @@ export default function RootLayout({
       <body className="min-h-screen bg-background font-sans antialiased">
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <AuthProvider>
+            {children}
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

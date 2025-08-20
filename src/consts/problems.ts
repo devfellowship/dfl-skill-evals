@@ -1,8 +1,8 @@
 import type { Problem } from "@/types/problems"
 
-export const problems: Problem[] = [
-  {
-    id: 1,
+export const problems: Record<string, Problem> = {
+  "two-sum": {
+    id: "two-sum",
     title: "Two Sum",
     difficulty: "Easy",
     description:
@@ -64,7 +64,7 @@ export const problems: Problem[] = [
       },
     ],
   },
-]
+}
 
 export const DEFAULT_CODE_TEMPLATE = `function twoSum(nums: number[], target: number): number[] {
     // Your solution here

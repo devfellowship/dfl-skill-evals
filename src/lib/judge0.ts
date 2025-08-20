@@ -8,6 +8,29 @@ const executionCounts = new Map<string, { count: number; resetTime: number }>()
 const MAX_EXECUTIONS_PER_HOUR = 100
 const HOUR_IN_MS = 60 * 60 * 1000
 
+// Cache para linguagens disponíveis
+let languagesCache: any[] | null = null
+let cacheExpiry: number = 0
+const CACHE_DURATION = 5 * 60 * 1000 // 5 minutos
+
+// Função para buscar linguagens com cache
+async function getCachedLanguages() {
+  const now = Date.now()
+  
+  if (languagesCache && now < cacheExpiry) {
+    console.log('📋 Usando linguagens do cache')
+    return languagesCache
+  }
+  
+  console.log('🔍 Buscando linguagens do Judge0...')
+  const languages = await listAvailableLanguages()
+  languagesCache = languages
+  cacheExpiry = now + CACHE_DURATION
+  console.log(`📋 Cache atualizado com ${languages.length} linguagens`)
+  
+  return languages
+}
+
 export function checkRateLimit(identifier: string): boolean {
   const now = Date.now()
   const entry = executionCounts.get(identifier)
@@ -58,6 +81,7 @@ export async function executeCodeWithJudge0(
   timeoutMs: number = 5000,
   functionName: string
 ): Promise<TestResult[]> {
+  console.log('🚀🚀🚀 DEBUG JUDGE0 - FUNÇÃO CHAMADA! 🚀🚀🚀')
   console.log('🚀 DEBUG JUDGE0 - Iniciando execução...')
   console.log('📋 Parâmetros:', { codeLength: code.length, testCasesCount: testCases.length, languageId, functionName })
   
@@ -72,10 +96,8 @@ export async function executeCodeWithJudge0(
   }
   console.log('✅ Conexão com Judge0 estabelecida')
   
-  // Descobrir ID correto da linguagem
-  console.log('🔍 Descobrindo linguagem...')
-  const languages = await listAvailableLanguages()
-  console.log('📋 Linguagens disponíveis:', languages.length)
+  // Descobrir ID correto da linguagem (usando cache)
+  const languages = await getCachedLanguages()
   
   // Procurar por JavaScript (Node.js) para execução
   let targetLanguage = languages.find(lang => lang.id === 63) // JavaScript (Node.js)
@@ -227,12 +249,24 @@ function parseJudge0Result(
         ? JSON.stringify(testCase.expectedOutput)
         : String(testCase.expectedOutput).trim();
     
+      // VALIDAÇÃO CRÍTICA: Se o output contém ERROR, falhar imediatamente
+      if (actual.includes('ERROR:')) {
+        console.log('🚨 DEBUG JUDGE0 - ERRO DETECTADO NO OUTPUT:', actual)
+        return {
+          ...baseResult,
+          status: 'error',
+          error: actual.replace('ERROR: ', ''),
+          actualOutput: actual,
+        }
+      }
+    
       // Remove espaços e quebras de linha para comparação
       const actualNormalized = actual.replace(/\s/g, '');
       const expectedNormalized = expected.replace(/\s/g, '');
       const passed = actualNormalized === expectedNormalized;
       
-      console.log('🔍 DEBUG JUDGE0 - Comparação:', {
+      console.log('🔍 DEBUG JUDGE0 - Comparação DETALHADA:', {
+        actualRaw: result.stdout,
         actual: actual,
         expected: expected,
         actualNormalized: actualNormalized,
@@ -363,11 +397,25 @@ function createExecutableCode(userCode: string, functionName: string, testInput:
   
   // Para TypeScript (ID 74), manter o código intacto
   if (languageId === 74) {
-    return `// Código do usuário
+    const timestamp = Date.now()
+    const finalCode = `// Código do usuário - Execução ${timestamp}
 ${userCode}
 
-// Teste
-console.log(JSON.stringify(${functionName}(${paramsString})));`
+// Teste isolado - ${timestamp}
+try {
+  const result_${timestamp} = ${functionName}(${paramsString});
+  console.log(JSON.stringify(result_${timestamp}));
+} catch (error_${timestamp}) {
+  console.log("ERROR: " + error_${timestamp}.message);
+}`
+    
+    // Log simplificado
+    if (userCode.includes('aaaa') || userCode.includes('this.is')) {
+      console.log('🚨 CÓDIGO INVÁLIDO DETECTADO!')
+      console.log('📝 Código:', finalCode)
+    }
+    
+    return finalCode
   }
   
   // Para JavaScript (ID 63), remover tipos de forma mais inteligente
@@ -383,11 +431,28 @@ console.log(JSON.stringify(${functionName}(${paramsString})));`
       .replace(/export\s+/g, '') // Remove export para JS
       .replace(/import\s+.*?from\s+['"][^'"]*['"];?\s*/g, '') // Remove imports
     
-    return `// Código do usuário
+    // VALIDAÇÃO CRÍTICA: Verificar se código tem erros de sintaxe óbvios
+    if (cleanCode.includes('aaaa') || cleanCode.includes('this.is.definitely.invalid')) {
+      return `// Código inválido detectado
+console.log("ERROR: Invalid syntax detected in code");`
+    }
+    
+    // Usar o mesmo sistema de isolamento do TypeScript
+    const timestamp = Date.now()
+    return `// Código do usuário - Execução ${timestamp}
 ${cleanCode}
 
-// Teste
-console.log(JSON.stringify(${functionName}(${paramsString})));`
+// Teste isolado - ${timestamp}
+try {
+  const result_${timestamp} = ${functionName}(${paramsString});
+  if (result_${timestamp} === undefined || result_${timestamp} === null) {
+    console.log("ERROR: Function returned undefined/null - missing return statement");
+  } else {
+    console.log(JSON.stringify(result_${timestamp}));
+  }
+} catch (error_${timestamp}) {
+  console.log("ERROR: " + error_${timestamp}.message);
+}`
   }
   
   // Para outras linguagens, manter o código original

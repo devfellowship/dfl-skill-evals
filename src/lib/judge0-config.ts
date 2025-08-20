@@ -202,3 +202,6 @@ export async function getSubmissionResult(submissionId: string): Promise<Judge0R
     throw error;
   }
 }
+
+// Re-exportar executeCodeWithJudge0 do judge0.ts para evitar importações circulares
+export { executeCodeWithJudge0 } from './judge0'

@@ -6,10 +6,16 @@ import { Button } from "@/components/atoms/Button/Button"
 import { AssessmentGrid } from "@/components/organisms/AssessmentGrid/AssessmentGrid"
 import { Avatar, AvatarFallback } from "@/components/atoms/Avatar/Avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { mockChallenges } from "@/consts"
+import { useChallenges } from "@/hooks/useChallenges"
+import { useAuth } from "@/hooks/useAuth"
 import type { SearchFilters } from "@/types"
 
 export default function AssessmentLibrary() {
+  const { challenges, loading: challengesLoading } = useChallenges()
+  const { user, signOut } = useAuth()
+  
+  // Debug removido para performance
+  
   const [searchQuery, setSearchQuery] = useState("")
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     skills: [],
@@ -27,7 +33,7 @@ export default function AssessmentLibrary() {
   }
 
   const filteredAssessments = useMemo(() => {
-    let filtered = mockChallenges
+    let filtered = challenges
 
     if (searchQuery) {
       filtered = filtered.filter(
@@ -56,13 +62,14 @@ export default function AssessmentLibrary() {
       filtered = filtered.filter((assessment) => searchFilters.categories.includes(assessment.category))
     }
 
-    if (searchFilters.minRating > 0) {
-      filtered = filtered.filter((assessment) => assessment.rating >= searchFilters.minRating)
-    }
+    // Removendo filtros que não existem no Supabase por enquanto
+    // if (searchFilters.minRating > 0) {
+    //   filtered = filtered.filter((assessment) => assessment.rating >= searchFilters.minRating)
+    // }
 
-    if (searchFilters.trending) {
-      filtered = filtered.filter((assessment) => assessment.trending)
-    }
+    // if (searchFilters.trending) {
+    //   filtered = filtered.filter((assessment) => assessment.trending)
+    // }
 
     return filtered
   }, [searchQuery, searchFilters])
@@ -71,10 +78,10 @@ export default function AssessmentLibrary() {
     const sorted = [...(filteredAssessments || [])]
     
     switch (sortBy) {
-      case "rating":
-        return sorted.sort((a, b) => b.rating - a.rating)
-      case "popularity":
-        return sorted.sort((a, b) => b.participants - a.participants)
+      // case "rating":
+      //   return sorted.sort((a, b) => b.rating - a.rating)
+      // case "popularity":
+      //   return sorted.sort((a, b) => b.participants - a.participants)
       case "difficulty-asc":
         return sorted.sort((a, b) => a.difficulty - b.difficulty)
       case "difficulty-desc":
@@ -114,16 +121,18 @@ export default function AssessmentLibrary() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 rounded-full p-0">
                 <Avatar className="h-8 w-8">
-                  <AvatarFallback>AC</AvatarFallback>
+                  <AvatarFallback>
+                    {user ? user.email?.charAt(0).toUpperCase() : 'U'}
+                  </AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem>
                 <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
+                <span>{user?.email || 'Usuário'}</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => signOut()}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Logout</span>
               </DropdownMenuItem>
@@ -134,8 +143,8 @@ export default function AssessmentLibrary() {
       
       <div className="flex-1 overflow-auto p-6">
         <AssessmentGrid
-          assessments={sortedAssessments}
-          isLoading={false}
+          assessments={sortedAssessments as any}
+          isLoading={challengesLoading}
         />
       </div>
     </div>
