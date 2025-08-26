@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Tables, Inserts, Updates, ChallengeStatus, DifficultyLevel } from '@/lib/supabase'
-import { useAuth } from './useAuth'
 
 export interface CreateChallengeData {
   title: string
@@ -22,23 +21,17 @@ export interface CreateChallengeData {
 }
 
 export function useChallengeManagement() {
-  const { user } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const createChallenge = useCallback(async (data: CreateChallengeData) => {
-    if (!user?.id) {
-      setError('Usuário não autenticado')
-      return null
-    }
-
     try {
       setLoading(true)
       setError(null)
 
       const challengeData: Inserts<'challenges'> = {
         ...data,
-        created_by: user.id,
+        created_by: 'dev-user-id', // ID mockado para desenvolvimento
         status: 'draft', // Sempre começa como rascunho
         skills: data.skills || [],
         constraints: data.constraints || [],
@@ -67,7 +60,7 @@ export function useChallengeManagement() {
     } finally {
       setLoading(false)
     }
-  }, [user?.id])
+  }, [])
 
   const updateChallenge = useCallback(async (id: string, updates: Partial<CreateChallengeData>) => {
     try {
@@ -118,11 +111,6 @@ export function useChallengeManagement() {
   }, [])
 
   const approveChallenge = useCallback(async (challengeId: string) => {
-    if (!user?.id) {
-      setError('Usuário não autenticado')
-      return null
-    }
-
     try {
       setLoading(true)
       setError(null)
@@ -131,7 +119,7 @@ export function useChallengeManagement() {
         .from('challenges')
         .update({ 
           status: 'approved',
-          approved_by: user.id,
+          approved_by: 'dev-admin-id', // ID mockado para desenvolvimento
           approved_at: new Date().toISOString(),
           published_at: new Date().toISOString(),
           is_public: true
@@ -150,7 +138,7 @@ export function useChallengeManagement() {
     } finally {
       setLoading(false)
     }
-  }, [user?.id])
+  }, [])
 
   const rejectChallenge = useCallback(async (challengeId: string, reason: string) => {
     try {
@@ -201,9 +189,31 @@ export function useChallengeManagement() {
     }
   }, [])
 
-  const getUserChallenges = useCallback(async (status?: ChallengeStatus) => {
-    if (!user?.id) return []
+  // Função para buscar TODOS os challenges (sem filtro de usuário)
+  const getAllChallenges = useCallback(async () => {
+    try {
+      setLoading(true)
+      setError(null)
 
+      const { data: challenges, error: fetchError } = await supabase
+        .from('challenges')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (fetchError) throw fetchError
+
+      return challenges || []
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao buscar challenges'
+      setError(errorMessage)
+      return []
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  // Função para buscar challenges de um usuário específico (mantida para compatibilidade)
+  const getUserChallenges = useCallback(async (status?: ChallengeStatus) => {
     try {
       setLoading(true)
       setError(null)
@@ -211,7 +221,6 @@ export function useChallengeManagement() {
       let query = supabase
         .from('challenges')
         .select('*')
-        .eq('created_by', user.id)
         .order('created_at', { ascending: false })
 
       if (status) {
@@ -230,7 +239,7 @@ export function useChallengeManagement() {
     } finally {
       setLoading(false)
     }
-  }, [user?.id])
+  }, [])
 
   const getPendingChallenges = useCallback(async () => {
     try {
@@ -267,6 +276,7 @@ export function useChallengeManagement() {
     approveChallenge,
     rejectChallenge,
     deleteChallenge,
+    getAllChallenges, // Nova função para buscar todos os challenges
     getUserChallenges,
     getPendingChallenges,
   }

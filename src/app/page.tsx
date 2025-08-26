@@ -7,13 +7,11 @@ import { AssessmentGrid } from "@/components/organisms/AssessmentGrid/Assessment
 import { Avatar, AvatarFallback } from "@/components/atoms/Avatar/Avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useChallenges } from "@/hooks/useChallenges"
-import { useAuth } from "@/hooks/useAuth"
 import type { SearchFilters } from "@/types"
 import Link from "next/link"
 
 export default function AssessmentLibrary() {
   const { challenges, loading: challengesLoading, error: challengesError } = useChallenges()
-  const { user, signOut } = useAuth()
   
   const [searchQuery, setSearchQuery] = useState("")
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
@@ -61,29 +59,46 @@ export default function AssessmentLibrary() {
     <div className="flex h-screen flex-col bg-background">
       <header className="shrink-0 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="flex h-16 items-center justify-between gap-4 px-6">
-          <div className="flex items-center gap-2">
-            <Home className="h-5 w-5 text-primary" />
-            <h2 className="text-lg font-semibold">Dashboard</h2>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Home className="h-5 w-5 text-primary" />
+              <h2 className="text-lg font-semibold">Dashboard</h2>
+            </div>
+            {/* Botão Admin - Entre esquerda e centro */}
+            <Button 
+              asChild 
+              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 font-medium shadow-md"
+            >
+              <Link href="/admin">
+                🚀 Dashboard Admin
+              </Link>
+            </Button>
+            {/* Botão Teacher - Entre esquerda e centro */}
+            <Button 
+              asChild 
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 font-medium shadow-md"
+            >
+              <Link href="/teacher">
+                👨‍🏫 Dashboard Teacher
+              </Link>
+            </Button>
+            {/* Botão Criar Challenge - Entre esquerda e centro */}
+            <Button 
+              asChild 
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 font-medium shadow-md"
+            >
+              <Link href="/teacher/create">
+                ➕ Criar Challenge
+              </Link>
+            </Button>
           </div>
           <div className="flex items-center gap-4">
-            {user?.profile?.role && ['admin', 'professor', 'mentor'].includes(user.profile.role) && (
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/teacher">Dashboard Professor</Link>
-              </Button>
-            )}
-            
-            {user?.profile?.role === 'admin' && (
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/admin">Admin</Link>
-              </Button>
-            )}
-
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 rounded-full p-0">
                   <Avatar className="h-8 w-8">
                     <AvatarFallback>
-                      {user ? user.email?.charAt(0).toUpperCase() : 'U'}
+                      U
                     </AvatarFallback>
                   </Avatar>
                 </Button>
@@ -91,17 +106,11 @@ export default function AssessmentLibrary() {
               <DropdownMenuContent align="end">
                 <DropdownMenuItem>
                   <User className="mr-2 h-4 w-4" />
-                  <span>{user?.email || 'Usuário'}</span>
+                  <span>Usuário</span>
                 </DropdownMenuItem>
-                {user?.profile?.role && (
-                  <DropdownMenuItem>
-                    <Award className="mr-2 h-4 w-4" />
-                    <span className="capitalize">{user.profile.role}</span>
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuItem onClick={() => signOut()}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Logout</span>
+                <DropdownMenuItem>
+                  <Award className="mr-2 h-4 w-4" />
+                  <span>Desenvolvedor</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
