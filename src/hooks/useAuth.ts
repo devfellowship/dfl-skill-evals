@@ -1,28 +1,63 @@
 import { useEffect, useState } from 'react'
-import { User, Session } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
+import type { User } from '@supabase/supabase-js'
+import type { UserRole, Tables } from '@/lib/supabase'
+
+interface AuthUser extends User {
+  profile?: Tables<'profiles'>
+}
 
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(null)
-  const [session, setSession] = useState<Session | null>(null)
+  const [user, setUser] = useState<AuthUser | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Obter sessão atual
+    // Pegar sessão atual
     const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      setSession(session)
-      setUser(session?.user ?? null)
-      setLoading(false)
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        
+        if (session?.user) {
+          // Buscar perfil do usuário
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single()
+          
+          setUser({ ...session.user, profile })
+        } else {
+          setUser(null)
+        }
+      } catch (err) {
+        console.error('Erro ao buscar sessão:', err)
+        setError(err instanceof Error ? err.message : 'Erro desconhecido')
+      } finally {
+        setLoading(false)
+      }
     }
 
     getSession()
 
-    // Escutar mudanças na autenticação
+    // Escutar mudanças de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        setSession(session)
-        setUser(session?.user ?? null)
+    
+        
+        if (session?.user) {
+          // Buscar perfil atualizado
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single()
+          
+          setUser({ ...session.user, profile })
+        } else {
+          setUser(null)
+        }
+        
         setLoading(false)
       }
     )
@@ -30,44 +65,45 @@ export function useAuth() {
     return () => subscription.unsubscribe()
   }, [])
 
-  const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-    return { error }
-  }
-
-  const signUp = async (email: string, password: string, fullName: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-        },
-      },
-    })
-    return { error }
-  }
-
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut()
-    return { error }
+    try {
+      setLoading(true)
+      const { error } = await supabase.auth.signOut()
+      if (error) throw error
+      setUser(null)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao fazer logout')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const resetPassword = async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email)
-    return { error }
+  const hasRole = (role: UserRole): boolean => {
+    return user?.profile?.role === role
+  }
+
+  const canCreateChallenges = (): boolean => {
+    const role = user?.profile?.role
+    return role === 'admin' || role === 'professor' || role === 'mentor'
+  }
+
+  const canApproveChallenges = (): boolean => {
+    const role = user?.profile?.role
+    return role === 'admin' || role === 'professor'
+  }
+
+  const isAdmin = (): boolean => {
+    return user?.profile?.role === 'admin'
   }
 
   return {
     user,
-    session,
     loading,
-    signIn,
-    signUp,
+    error,
     signOut,
-    resetPassword,
+    hasRole,
+    canCreateChallenges,
+    canApproveChallenges,
+    isAdmin,
   }
 }

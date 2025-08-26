@@ -1,0 +1,1 @@
+export { PreChallengeHero } from './PreChallengeHero'

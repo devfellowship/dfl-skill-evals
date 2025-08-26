@@ -8,6 +8,8 @@ export const CHALLENGE_TIMER = {
 
 export const PRE_CHALLENGE = "Pre-Challenge"
 export const CHALLENGE = "Challenge"
+export const PRE_CHALLENGE_ROUTE = "/pre-challenge-page"
+export const CHALLENGE_ROUTE = "/challenge-page"
 
 export const EXECUTION_LIMITS = {
   TIMEOUT_MS: 5000,

@@ -1,31 +1,80 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Tables } from '@/lib/supabase'
-import { mockChallenges } from '@/consts/challenges'
+import type { Challenge } from '@/types'
+
+
+// Cache simples em memória
+let challengesCache: Challenge[] | null = null
+let cacheTimestamp: number = 0
+const CACHE_DURATION = 5 * 60 * 1000 // 5 minutos
 
 export function useChallenges() {
-  const [challenges, setChallenges] = useState<Tables<'challenges'>[]>([])
+  const [challenges, setChallenges] = useState<Challenge[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchChallenges = async () => {
+  const fetchChallenges = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
       
-      // TEMPORÁRIO: Usar apenas dados mock para resolver rapidamente
-      console.log('🔧 USANDO DADOS MOCK DIRETAMENTE')
-      console.log('📊 Mock challenges:', mockChallenges.length, mockChallenges)
-      setChallenges(mockChallenges as any)
+      // Verificar cache primeiro
+      const now = Date.now()
+      if (challengesCache && (now - cacheTimestamp) < CACHE_DURATION) {
+        setChallenges(challengesCache)
+        setLoading(false)
+        return
+      }
+      
+      const { data, error: fetchError } = await supabase
+        .from('challenges')
+        .select('*')
+        .eq('status', 'approved')
+        .eq('is_public', true)
+        .order('order_index', { ascending: true })
+
+      if (fetchError) {
+        setError(`Erro ao conectar com o banco: ${fetchError.message}`)
+        setChallenges([])
+        return
+      }
+      
+      if (!data || data.length === 0) {
+        setChallenges([])
+        return
+      }
+      
+      // Adaptar dados do banco para o formato esperado pelo frontend
+      const adaptedChallenges = data.map((challenge, index) => ({
+        id: index + 1,
+        supabaseId: challenge.id,
+        title: challenge.title,
+        description: challenge.description,
+        skills: challenge.skills || [],
+        difficulty: challenge.difficulty,
+        duration: `${challenge.estimated_time_minutes} min`,
+        category: challenge.category || 'Algoritmos',
+        problems: 1,
+        participants: 500 + index * 50,
+        rating: 4.2 + (index * 0.1),
+        trending: index < 2,
+        image: undefined
+      }))
+      
+      // Atualizar cache
+      challengesCache = adaptedChallenges
+      cacheTimestamp = Date.now()
+      
+      setChallenges(adaptedChallenges)
       
     } catch (err) {
-      console.warn('❌ Erro geral, usando dados mock:', err)
-      setChallenges(mockChallenges as any)
-      setError(null)
+      setError(err instanceof Error ? err.message : 'Erro inesperado')
+      setChallenges([])
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   const fetchChallengeById = async (id: string) => {
     try {
@@ -45,7 +94,6 @@ export function useChallenges() {
       return data
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao buscar desafio')
-      console.error('Erro ao buscar desafio:', err)
       return null
     } finally {
       setLoading(false)
@@ -87,9 +135,26 @@ export function useChallenges() {
         throw updateError
       }
 
+      // Adaptar dados atualizados para o formato da aplicação
+      const adaptedData = {
+        id: challenges.find(c => c.supabaseId === id)?.id || 1,
+        supabaseId: data.id,
+        title: data.title,
+        description: data.description,
+        skills: data.skills,
+        difficulty: data.difficulty,
+        duration: data.duration,
+        category: data.category,
+        problems: 1,
+        participants: Math.floor(Math.random() * 1000) + 100,
+        rating: parseFloat((Math.random() * 2 + 3).toFixed(1)),
+        trending: Math.random() > 0.8,
+        image: undefined
+      }
+
       // Atualizar a lista local
       setChallenges(prev => prev.map(challenge => 
-        challenge.id === id ? data : challenge
+        challenge.supabaseId === id ? adaptedData : challenge
       ))
       return { data, error: null }
     } catch (err) {
@@ -111,7 +176,7 @@ export function useChallenges() {
       }
 
       // Atualizar a lista local
-      setChallenges(prev => prev.filter(challenge => challenge.id !== id))
+      setChallenges(prev => prev.filter(challenge => challenge.supabaseId !== id))
       return { error: null }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao deletar desafio'

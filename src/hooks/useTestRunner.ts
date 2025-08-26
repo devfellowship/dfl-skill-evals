@@ -23,18 +23,18 @@ export function useTestRunner() {
       setResults(null)
       setProgress(0)
 
-      console.log(`🧪 Iniciando testes para ${challengeId} com seed ${seed}`)
 
-      // 1. Gerar casos de teste determinísticos
+
+
       const generator = TestCaseGeneratorFactory.createGenerator(challengeId)
       const testCases = generator.generateTestCases(seed, testCount)
 
-      console.log(`📋 Gerados ${testCases.length} casos de teste`)
 
-      // 2. Criar runner e executar testes
+
+
       const runner = TestRunnerFactory.createRunner(challengeId, language)
       
-      // 3. Executar todos os testes
+
       const testSummary = await runner.runTests(
         code,
         testCases,
@@ -44,12 +44,12 @@ export function useTestRunner() {
       setResults(testSummary)
       setProgress(100)
       
-      console.log(`✅ Testes concluídos: ${testSummary.passCount}/${testSummary.totalCount} passaram`)
+
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
       setError(errorMessage)
-      console.error('❌ Erro ao executar testes:', err)
+
     } finally {
       setIsRunning(false)
       setCurrentTest('')
@@ -60,7 +60,7 @@ export function useTestRunner() {
     setIsRunning(false)
     setProgress(0)
     setCurrentTest('')
-    console.log('🛑 Testes cancelados pelo usuário')
+
   }, [])
 
   const generateTestCases = useCallback((
@@ -72,7 +72,7 @@ export function useTestRunner() {
       const generator = TestCaseGeneratorFactory.createGenerator(challengeId)
       return generator.generateTestCases(seed, count)
     } catch (err) {
-      console.error('Erro ao gerar casos de teste:', err)
+
       return []
     }
   }, [])
@@ -86,26 +86,23 @@ export function useTestRunner() {
       const generator = TestCaseGeneratorFactory.createGenerator(challengeId)
       return generator.validateOutput(input, output)
     } catch (err) {
-      console.error('Erro ao validar output:', err)
+
       return false
     }
   }, [])
 
   return {
-    // Estado
     isRunning,
     progress,
     currentTest,
     results,
     error,
     
-    // Ações
     runTests,
     cancelTests,
     generateTestCases,
     validateOutput,
     
-    // Utilitários
     reset: () => {
       setResults(null)
       setError(null)
@@ -114,12 +111,10 @@ export function useTestRunner() {
   }
 }
 
-// Função auxiliar para obter o nome da função baseado no desafio
 function getFunctionName(challengeId: string): string {
   switch (challengeId) {
     case 'two-sum':
       return 'twoSum'
-    // Adicionar outros desafios aqui
     default:
       return 'solution'
   }

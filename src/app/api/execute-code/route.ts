@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { executeCodeWithJudge0, checkRateLimit, isLanguageSupported, getLanguageName } from '@/lib/judge0'
+import { executeCodeWithJudge0, checkRateLimit, isLanguageSupported, getLanguageName } from '@/lib/execution/judge0-executor'
+import { validateCodeStructure, validateNoExtraCode, validateFunctionBody } from '@/lib/validation/code-validator'
 import type { ExecutionRequest, ExecutionResponse } from '@/types/execution'
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
@@ -7,14 +8,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const body: ExecutionRequest = await request.json()
     const { code, testCases, languageId, timeoutMs = 5000, functionName } = body
     
-    console.log('🚀 DEBUG API - Requisição recebida:', {
-      codeLength: code?.length,
-      testCasesCount: testCases?.length,
-      languageId,
-      timeoutMs,
-      functionName,
-      fullBody: body
-    })
+
     
     // Rate limiting (usando IP como identificador simples)
     const clientIp = request.headers.get('x-forwarded-for') || 'unknown'
@@ -59,15 +53,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       )
     }
     
+
+
     const startTime = Date.now()
     
     try {
-      // Execute code with Judge0
       const testResults = await executeCodeWithJudge0(code, testCases, languageId, timeoutMs, functionName)
       
       const totalExecutionTime = Date.now() - startTime
       
-      // Calcular se todos os testes passaram
       const allTestsPassed = testResults.every(r => r.status === 'passed')
       
       const response: ExecutionResponse = {
@@ -76,17 +70,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         totalExecutionTime,
       }
       
-      // Log para monitoramento
-      const passedTests = testResults.filter(r => r.status === 'passed').length
-      const languageName = getLanguageName(languageId)
-      console.log(`Code execution [${languageName}]: ${totalExecutionTime}ms, ${passedTests}/${testResults.length} tests passed`)
-      
       return NextResponse.json(response)
       
     } catch (error) {
       console.error('Judge0 execution error:', error)
       
-      // Check if it's a compilation error
       if (error instanceof Error && error.message.includes('Compilation')) {
         return NextResponse.json({
           success: false,
@@ -96,7 +84,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         })
       }
       
-      throw error // Re-throw for general error handling
+      throw error
     }
     
   } catch (error) {
@@ -111,4 +99,4 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       { status: 500 }
     )
   }
-} 
+}

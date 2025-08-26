@@ -21,8 +21,6 @@ class SeededRandom {
     return array[this.nextInt(0, array.length - 1)]
   }
 }
-
-// Gerador específico para o problema Two Sum
 export class TwoSumTestCaseGenerator implements TestCaseGenerator {
   generateTestCases(seed: number, count: number): TestCase[] {
     const random = new SeededRandom(seed)
@@ -46,12 +44,12 @@ export class TwoSumTestCaseGenerator implements TestCaseGenerator {
 
     return {
       id: `test_${seed}_${index}`,
-      challenge_id: 'two-sum', // ID do desafio
+      challenge_id: 'two-sum', 
       seed: seed,
       input,
       expected_output: JSON.stringify(expectedOutput),
       description: `Test case ${index + 1} (seed: ${seed})`,
-      is_hidden: index >= 3, // Primeiros 3 casos são visíveis
+      is_hidden: index >= 3,
       created_at: new Date().toISOString()
     }
   }
@@ -65,7 +63,6 @@ export class TwoSumTestCaseGenerator implements TestCaseGenerator {
   }
 
   private generateTarget(random: SeededRandom, nums: number[]): number {
-    // Garantir que sempre existe uma solução
     const i = random.nextInt(0, nums.length - 1)
     const j = random.nextInt(0, nums.length - 1)
     if (i === j) return this.generateTarget(random, nums)
@@ -90,12 +87,12 @@ export class TwoSumTestCaseGenerator implements TestCaseGenerator {
 
   validateOutput(input: string, output: string): boolean {
     try {
-      // Parse input: "[1,2,3], 5"
+
       const [numsStr, targetStr] = input.split(', ')
       const nums = JSON.parse(numsStr)
       const target = parseInt(targetStr)
       
-      // Parse output: "[0,1]"
+  
       const result = JSON.parse(output)
       
       if (!Array.isArray(result) || result.length !== 2) {
@@ -114,7 +111,6 @@ export class TwoSumTestCaseGenerator implements TestCaseGenerator {
   }
 }
 
-// Gerador genérico para outros tipos de problemas
 export class GenericTestCaseGenerator implements TestCaseGenerator {
   constructor(
     private challengeId: string,
@@ -153,14 +149,12 @@ export class GenericTestCaseGenerator implements TestCaseGenerator {
   }
 }
 
-// Factory para criar geradores específicos
 export class TestCaseGeneratorFactory {
   static createGenerator(challengeId: string): TestCaseGenerator {
     switch (challengeId) {
       case 'two-sum':
         return new TwoSumTestCaseGenerator()
       
-      // Adicionar outros desafios aqui
       default:
         throw new Error(`No generator found for challenge: ${challengeId}`)
     }

@@ -9,7 +9,11 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-// Tipos básicos para as tabelas principais
+export type UserRole = 'student' | 'mentor' | 'professor' | 'admin'
+export type ChallengeStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'archived'
+export type DifficultyLevel = 'beginner' | 'easy' | 'medium' | 'hard' | 'expert'
+export type ProgrammingLanguage = 'typescript' | 'javascript' | 'python' | 'java' | 'cpp' | 'csharp'
+
 export interface Database {
   public: {
     Tables: {
@@ -19,6 +23,10 @@ export interface Database {
           email: string
           full_name: string
           avatar_url?: string
+          role: UserRole
+          institution?: string
+          bio?: string
+          is_active: boolean
           created_at: string
           updated_at: string
         }
@@ -27,6 +35,10 @@ export interface Database {
           email: string
           full_name: string
           avatar_url?: string
+          role?: UserRole
+          institution?: string
+          bio?: string
+          is_active?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -35,6 +47,71 @@ export interface Database {
           email?: string
           full_name?: string
           avatar_url?: string
+          role?: UserRole
+          institution?: string
+          bio?: string
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      courses: {
+        Row: {
+          id: string
+          title: string
+          description?: string
+          created_by?: string
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          description?: string
+          created_by?: string
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          description?: string
+          created_by?: string
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      modules: {
+        Row: {
+          id: string
+          course_id: string
+          title: string
+          description?: string
+          order_index: number
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          course_id: string
+          title: string
+          description?: string
+          order_index?: number
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          course_id?: string
+          title?: string
+          description?: string
+          order_index?: number
+          is_active?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -44,34 +121,111 @@ export interface Database {
           id: string
           title: string
           description: string
-          difficulty: number
-          category: string
+          difficulty: DifficultyLevel
+          category?: string
           skills: string[]
-          duration: string
+          function_name: string
+          initial_code: string
+          test_cases: any
+          examples: any
+          constraints: string[]
+          hints: string[]
+          created_by?: string
+          approved_by?: string
+          course_id?: string
+          module_id?: string
+          status: ChallengeStatus
+          rejection_reason?: string
+          estimated_time_minutes: number
+          max_score: number
+          tags: string[]
+          is_public: boolean
+          order_index: number
           created_at: string
           updated_at: string
+          approved_at?: string
+          published_at?: string
         }
         Insert: {
           id?: string
           title: string
           description: string
-          difficulty: number
-          category: string
-          skills: string[]
-          duration: string
+          difficulty?: DifficultyLevel
+          category?: string
+          skills?: string[]
+          function_name?: string
+          initial_code: string
+          test_cases?: any
+          examples?: any
+          constraints?: string[]
+          hints?: string[]
+          created_by?: string
+          approved_by?: string
+          course_id?: string
+          module_id?: string
+          status?: ChallengeStatus
+          rejection_reason?: string
+          estimated_time_minutes?: number
+          max_score?: number
+          tags?: string[]
+          is_public?: boolean
+          order_index?: number
           created_at?: string
           updated_at?: string
+          approved_at?: string
+          published_at?: string
         }
         Update: {
           id?: string
           title?: string
           description?: string
-          difficulty?: number
+          difficulty?: DifficultyLevel
           category?: string
           skills?: string[]
-          duration?: string
+          function_name?: string
+          initial_code?: string
+          test_cases?: any
+          examples?: any
+          constraints?: string[]
+          hints?: string[]
+          created_by?: string
+          approved_by?: string
+          course_id?: string
+          module_id?: string
+          status?: ChallengeStatus
+          rejection_reason?: string
+          estimated_time_minutes?: number
+          max_score?: number
+          tags?: string[]
+          is_public?: boolean
+          order_index?: number
           created_at?: string
           updated_at?: string
+          approved_at?: string
+          published_at?: string
+        }
+      }
+      challenge_templates: {
+        Row: {
+          id: string
+          challenge_id: string
+          language: ProgrammingLanguage
+          initial_code: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          challenge_id: string
+          language: ProgrammingLanguage
+          initial_code: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          challenge_id?: string
+          language?: ProgrammingLanguage
+          initial_code?: string
+          created_at?: string
         }
       }
       submissions: {
@@ -80,33 +234,130 @@ export interface Database {
           user_id: string
           challenge_id: string
           code: string
-          language: string
-          status: 'pending' | 'running' | 'completed' | 'failed'
+          language: ProgrammingLanguage
+          status: string
           test_results: any
-          execution_time: number
+          compilation_error?: string
+          runtime_error?: string
+          execution_time?: number
+          memory_used?: number
+          score: number
+          tests_passed: number
+          total_tests: number
+          attempts_count: number
+          is_final_submission: boolean
+          hints_used: number
           created_at: string
+          completed_at?: string
         }
         Insert: {
           id?: string
           user_id: string
           challenge_id: string
           code: string
-          language: string
-          status?: 'pending' | 'running' | 'completed' | 'failed'
+          language?: ProgrammingLanguage
+          status?: string
           test_results?: any
+          compilation_error?: string
+          runtime_error?: string
           execution_time?: number
+          memory_used?: number
+          score?: number
+          tests_passed?: number
+          total_tests?: number
+          attempts_count?: number
+          is_final_submission?: boolean
+          hints_used?: number
           created_at?: string
+          completed_at?: string
         }
         Update: {
           id?: string
           user_id?: string
           challenge_id?: string
           code?: string
-          language?: string
-          status?: 'pending' | 'running' | 'completed' | 'failed'
+          language?: ProgrammingLanguage
+          status?: string
           test_results?: any
+          compilation_error?: string
+          runtime_error?: string
           execution_time?: number
+          memory_used?: number
+          score?: number
+          tests_passed?: number
+          total_tests?: number
+          attempts_count?: number
+          is_final_submission?: boolean
+          hints_used?: number
           created_at?: string
+          completed_at?: string
+        }
+      }
+      enrollments: {
+        Row: {
+          id: string
+          user_id: string
+          course_id: string
+          enrolled_at: string
+          completed_at?: string
+          is_active: boolean
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          course_id: string
+          enrolled_at?: string
+          completed_at?: string
+          is_active?: boolean
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          course_id?: string
+          enrolled_at?: string
+          completed_at?: string
+          is_active?: boolean
+        }
+      }
+      user_progress: {
+        Row: {
+          id: string
+          user_id: string
+          challenge_id: string
+          status: string
+          best_score: number
+          total_attempts: number
+          hints_used: number
+          time_spent: number
+          started_at?: string
+          completed_at?: string
+          last_attempt_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          challenge_id: string
+          status?: string
+          best_score?: number
+          total_attempts?: number
+          hints_used?: number
+          time_spent?: number
+          started_at?: string
+          completed_at?: string
+          last_attempt_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          challenge_id?: string
+          status?: string
+          best_score?: number
+          total_attempts?: number
+          hints_used?: number
+          time_spent?: number
+          started_at?: string
+          completed_at?: string
+          last_attempt_at?: string
         }
       }
     }

@@ -1,5 +1,5 @@
 import type { TestCase, TestResult, TestSummary } from '@/types/test-cases'
-import { executeCodeWithJudge0 } from './judge0-config'
+import { executeCodeWithJudge0 } from './execution/judge0-executor'
 import { JUDGE0_LANGUAGES } from '@/types/execution'
 
 export interface ParallelTestRunnerOptions {
@@ -24,7 +24,7 @@ export class ParallelTestRunner {
     this.completedResults = []
     this.runningJobs.clear()
 
-    console.log(`🚀 Iniciando execução de ${testCases.length} testes em paralelo...`)
+
 
     // Executar todos os testes
     const testPromises = testCases.map(testCase => 
@@ -38,7 +38,7 @@ export class ParallelTestRunner {
     const passCount = results.filter(r => r.status === 'passed').length
     const failCount = results.filter(r => r.status === 'failed').length
 
-    console.log(`✅ Execução concluída: ${passCount}/${testCases.length} testes passaram em ${totalExecutionTime}ms`)
+
 
     return {
       passCount,
@@ -57,12 +57,8 @@ export class ParallelTestRunner {
     const testStartTime = Date.now()
     
     try {
-      console.log(`🧪 Executando teste ${testCase.id}: ${testCase.input}`)
-      
-      // Preparar o código para execução
       const executionCode = this.prepareExecutionCode(code, testCase, functionName)
       
-      // Executar no Judge0
       const result = await executeCodeWithJudge0(
         executionCode,
         [{
@@ -142,7 +138,7 @@ console.log(JSON.stringify(result));`
 
   // Método para cancelar execuções em andamento
   cancelAll(): void {
-    console.log('🛑 Cancelando todas as execuções...')
+
     this.runningJobs.clear()
   }
 

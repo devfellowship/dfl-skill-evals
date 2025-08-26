@@ -1,5 +1,6 @@
 export interface Challenge {
   id: number
+  supabaseId?: string // UUID do Supabase (opcional para mock data)
   title: string
   description: string
   skills: string[]

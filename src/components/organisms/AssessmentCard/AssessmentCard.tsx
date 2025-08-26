@@ -6,7 +6,7 @@ import { Badge } from "@/components/atoms/Badge/Badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { DifficultyIndicator } from "@/components/molecules/DifficultyIndicator/DifficultyIndicator"
 import type { Challenge } from "@/types"
-import { formatParticipants } from "@/lib/utils"
+import { formatParticipants, generateSlug } from "@/lib/utils"
 
 interface AssessmentCardProps {
   assessment: Challenge
@@ -95,10 +95,10 @@ export const AssessmentCard = React.forwardRef<
               className="w-full"
               variant="outline"
             >
-                                             <Link href={`/pre-challenge/${assessment.id}`}>
-                 Start Challenge
-                 <ArrowRight className="ml-2 h-4 w-4" />
-               </Link>
+              <Link href={`/pre-challenge-page/${generateSlug(assessment.title)}`}>
+                Start Challenge
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
             </Button>
           </div>
         </div>

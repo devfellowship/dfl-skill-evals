@@ -1,0 +1,16 @@
+import { TestResultsPanel } from "@/components/organisms/TestResultsPanel"
+import type { ChallengeResultsProps } from "@/types/challenge-page"
+
+export function ChallengeResults({
+  results,
+  passedTests,
+  totalTests
+}: ChallengeResultsProps) {
+  return (
+    <TestResultsPanel
+      results={results}
+      passedTests={passedTests}
+      totalTests={totalTests}
+    />
+  )
+}

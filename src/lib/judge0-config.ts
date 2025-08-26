@@ -112,10 +112,7 @@ export async function updateLanguageIds(): Promise<void> {
     
     if (jsLanguage) {
       (JUDGE0_CONFIG.LANGUAGES as any).JAVASCRIPT = jsLanguage.id;
-      console.log('✅ ID do JavaScript atualizado para:', jsLanguage.id);
     }
-    
-    console.log('✅ Configurações de linguagens atualizadas');
   } catch (error) {
     console.error('Erro ao atualizar IDs das linguagens:', error);
   }
@@ -131,11 +128,11 @@ export async function testJudge0Connection(): Promise<boolean> {
       try {
         const response = await fetch(`${JUDGE0_CONFIG.API_URL}${endpoint}`)
         if (response.ok) {
-          console.log(`✅ Judge0 conectado via ${endpoint}`)
+  
           return true
         }
       } catch (error) {
-        console.log(`❌ Endpoint ${endpoint} falhou:`, error)
+
       }
     }
     
@@ -153,10 +150,7 @@ export async function listAvailableLanguages(): Promise<Judge0Language[]> {
     const response = await fetch(`${JUDGE0_CONFIG.API_URL}/languages`);
     const languages: Judge0Language[] = await response.json();
     
-    console.log('📋 Linguagens disponíveis no Judge0:');
-    languages.forEach((lang) => {
-      console.log(`   ID ${lang.id}: ${lang.name} (${lang.extension})`);
-    });
+
     
     return languages;
   } catch (error) {
