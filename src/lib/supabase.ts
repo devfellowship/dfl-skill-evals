@@ -10,7 +10,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export type UserRole = 'student' | 'mentor' | 'professor' | 'admin'
-export type ChallengeStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'archived'
+export type ChallengeStatus = 'to_approve' | 'approved' | 'rejected' | 'archived'
 export type DifficultyLevel = 'beginner' | 'easy' | 'medium' | 'hard' | 'expert'
 export type ProgrammingLanguage = 'typescript' | 'javascript' | 'python' | 'java' | 'cpp' | 'csharp'
 
@@ -120,6 +120,7 @@ export interface Database {
         Row: {
           id: string
           title: string
+          slug: string
           description: string
           difficulty: DifficultyLevel
           category?: string
@@ -149,6 +150,7 @@ export interface Database {
         Insert: {
           id?: string
           title: string
+          slug: string
           description: string
           difficulty?: DifficultyLevel
           category?: string
@@ -178,6 +180,7 @@ export interface Database {
         Update: {
           id?: string
           title?: string
+          slug?: string
           description?: string
           difficulty?: DifficultyLevel
           category?: string

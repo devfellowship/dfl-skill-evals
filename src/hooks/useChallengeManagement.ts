@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Tables, Inserts, Updates, ChallengeStatus, DifficultyLevel } from '@/lib/supabase'
+import { generateUniqueSlug } from '@/lib/utils/slug-generator'
 
 export interface CreateChallengeData {
   title: string
@@ -29,10 +30,19 @@ export function useChallengeManagement() {
       setLoading(true)
       setError(null)
 
+      // Buscar slugs existentes para gerar um único
+      const { data: existingChallenges } = await supabase
+        .from('challenges')
+        .select('slug')
+      
+      const existingSlugs = existingChallenges?.map(c => c.slug) || []
+      const uniqueSlug = generateUniqueSlug(data.title, existingSlugs)
+
       const challengeData: Inserts<'challenges'> = {
         ...data,
+        slug: uniqueSlug,
         created_by: 'dev-user-id', // ID mockado para desenvolvimento
-        status: 'draft', // Sempre começa como rascunho
+        status: 'to_approve', // Sempre começa como "a ser aprovado"
         skills: data.skills || [],
         constraints: data.constraints || [],
         hints: data.hints || [],
@@ -53,9 +63,9 @@ export function useChallengeManagement() {
 
       return challenge
     } catch (err) {
+      console.error('Erro detalhado ao criar challenge:', err)
       const errorMessage = err instanceof Error ? err.message : 'Erro ao criar challenge'
       setError(errorMessage)
-      console.error('Erro ao criar challenge:', err)
       return null
     } finally {
       setLoading(false)
@@ -93,7 +103,7 @@ export function useChallengeManagement() {
 
       const { data: challenge, error: submitError } = await supabase
         .from('challenges')
-        .update({ status: 'pending' })
+        .update({ status: 'to_approve' })
         .eq('id', challengeId)
         .select()
         .single()
@@ -160,6 +170,34 @@ export function useChallengeManagement() {
       return challenge
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao rejeitar challenge'
+      setError(errorMessage)
+      return null
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  const archiveChallenge = useCallback(async (challengeId: string) => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      const { data: challenge, error: archiveError } = await supabase
+        .from('challenges')
+        .update({ 
+          status: 'archived',
+          archived_at: new Date().toISOString(),
+          is_public: false
+        })
+        .eq('id', challengeId)
+        .select()
+        .single()
+
+      if (archiveError) throw archiveError
+
+      return challenge
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao arquivar challenge'
       setError(errorMessage)
       return null
     } finally {
@@ -252,7 +290,7 @@ export function useChallengeManagement() {
           *,
           created_by_profile:profiles!challenges_created_by_fkey(full_name, email)
         `)
-        .eq('status', 'pending')
+        .eq('status', 'to_approve')
         .order('created_at', { ascending: true })
 
       if (fetchError) throw fetchError
@@ -267,6 +305,82 @@ export function useChallengeManagement() {
     }
   }, [])
 
+  // Função para buscar challenge por slug
+  const getChallengeBySlug = useCallback(async (slug: string) => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      const { data: challenge, error: fetchError } = await supabase
+        .from('challenges')
+        .select('*')
+        .eq('slug', slug)
+        .single()
+
+      if (fetchError) throw fetchError
+
+      return challenge
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao buscar challenge por slug'
+      setError(errorMessage)
+      return null
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  // Função para atualizar challenges existentes com slugs
+  const updateExistingChallengesWithSlugs = useCallback(async () => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      // Buscar todas as challenges que não têm slug
+      const { data: challengesWithoutSlug, error: fetchError } = await supabase
+        .from('challenges')
+        .select('id, title')
+        .is('slug', null)
+
+      if (fetchError) throw fetchError
+
+      if (!challengesWithoutSlug || challengesWithoutSlug.length === 0) {
+        return { updated: 0, message: 'Todas as challenges já têm slugs' }
+      }
+
+      // Buscar todos os slugs existentes
+      const { data: existingChallenges } = await supabase
+        .from('challenges')
+        .select('slug')
+        .not('slug', 'is', null)
+
+      const existingSlugs = existingChallenges?.map(c => c.slug) || []
+      let updatedCount = 0
+
+      // Atualizar cada challenge sem slug
+      for (const challenge of challengesWithoutSlug) {
+        const uniqueSlug = generateUniqueSlug(challenge.title, existingSlugs)
+        
+        const { error: updateError } = await supabase
+          .from('challenges')
+          .update({ slug: uniqueSlug })
+          .eq('id', challenge.id)
+
+        if (!updateError) {
+          updatedCount++
+          existingSlugs.push(uniqueSlug) // Adicionar ao array para evitar duplicatas
+        }
+      }
+
+      return { updated: updatedCount, message: `${updatedCount} challenges atualizadas com slugs` }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao atualizar challenges com slugs'
+      setError(errorMessage)
+      return { updated: 0, message: errorMessage }
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
   return {
     loading,
     error,
@@ -275,9 +389,12 @@ export function useChallengeManagement() {
     submitForApproval,
     approveChallenge,
     rejectChallenge,
+    archiveChallenge,
     deleteChallenge,
     getAllChallenges, // Nova função para buscar todos os challenges
     getUserChallenges,
     getPendingChallenges,
+    getChallengeBySlug,
+    updateExistingChallengesWithSlugs,
   }
 }

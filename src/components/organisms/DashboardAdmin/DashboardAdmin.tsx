@@ -9,18 +9,23 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/atoms/Badge/Badge"
-import { Plus, Edit, Trash2, Eye, Code, TestTube, BarChart3, CheckCircle } from "lucide-react"
+import { Plus, Edit, Trash2, Eye, Code, TestTube, BarChart3, CheckCircle, Clock, Archive, XCircle, AlertTriangle, RefreshCw } from "lucide-react"
 import { toast } from "sonner"
 import { useChallengeManagement } from "@/hooks/useChallengeManagement"
 import { Challenge, ChallengeFormData, DIFFICULTY_OPTIONS, CATEGORY_OPTIONS, STATUS_OPTIONS } from "./types"
 import { validateSupabaseConfig } from "@/lib/config"
+import Link from "next/link"
 
 export function DashboardAdmin() {
   const { 
     getAllChallenges, 
     createChallenge, 
     updateChallenge, 
-    deleteChallenge, 
+    deleteChallenge,
+    approveChallenge,
+    rejectChallenge,
+    archiveChallenge,
+    getPendingChallenges,
     loading, 
     error 
   } = useChallengeManagement()
@@ -65,6 +70,7 @@ export function DashboardAdmin() {
         const adaptedChallenges: Challenge[] = dbChallenges.map(challenge => ({
           id: challenge.id,
           title: challenge.title,
+          slug: challenge.slug,
           description: challenge.description,
           difficulty: challenge.difficulty,
           category: challenge.category || "Algoritmos",
@@ -249,7 +255,7 @@ export function DashboardAdmin() {
 
       {/* Tabs */}
       <Tabs defaultValue="challenges" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="challenges" className="flex items-center gap-2">
             <Code className="w-4 h-4" />
             Challenges
@@ -265,6 +271,10 @@ export function DashboardAdmin() {
           <TabsTrigger value="settings" className="flex items-center gap-2">
             <TestTube className="w-4 h-4" />
             Configurações
+          </TabsTrigger>
+          <TabsTrigger value="tools" className="flex items-center gap-2">
+            <Code className="w-4 h-4" />
+            Ferramentas
           </TabsTrigger>
         </TabsList>
 
@@ -452,14 +462,14 @@ export function DashboardAdmin() {
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => window.open(`/challenge-page/${challenge.id}`, '_blank')}
-                        className="opacity-70 group-hover:opacity-100 transition-opacity duration-200"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </Button>
+                                             <Button
+                         variant="outline"
+                         size="sm"
+                         onClick={() => window.open(`/challenges/${challenge.slug}`, '_blank')}
+                         className="opacity-70 group-hover:opacity-100 transition-opacity duration-200"
+                       >
+                         <Eye className="w-4 h-4" />
+                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
@@ -483,15 +493,11 @@ export function DashboardAdmin() {
             <CardHeader>
               <CardTitle>Challenges Pendentes de Aprovação</CardTitle>
               <CardDescription>
-                Aprove ou rejeite challenges criados pelos professores
+                Aprove, rejeite, arquive ou exclua challenges criados pelos professores
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12 text-gray-500">
-                <CheckCircle className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                <h3 className="text-lg font-medium mb-2">Sistema de Aprovação em Desenvolvimento</h3>
-                <p>Esta funcionalidade permitirá aos admins aprovar ou rejeitar challenges pendentes</p>
-              </div>
+              <PendingApprovalsTab />
             </CardContent>
           </Card>
         </TabsContent>
@@ -533,7 +539,327 @@ export function DashboardAdmin() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* Tab: Ferramentas */}
+        <TabsContent value="tools" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Ferramentas Administrativas</CardTitle>
+              <CardDescription>
+                Ferramentas úteis para manutenção da plataforma
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="border rounded-lg p-4">
+                <h4 className="font-semibold text-gray-900 mb-2">Atualização de Slugs</h4>
+                <p className="text-gray-600 mb-3">
+                  Atualiza todas as challenges existentes com slugs baseados no título para que as URLs funcionem corretamente.
+                </p>
+                <Button asChild>
+                  <Link href="/admin/update-slugs">
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Ir para Atualização de Slugs
+                  </Link>
+                </Button>
+              </div>
+              
+              <div className="border rounded-lg p-4">
+                <h4 className="font-semibold text-gray-900 mb-2">Manutenção do Banco</h4>
+                <p className="text-gray-600 mb-3">
+                  Ferramentas para limpeza e otimização do banco de dados (em desenvolvimento).
+                </p>
+                <Button variant="outline" disabled>
+                  <Code className="w-4 h-4 mr-2" />
+                  Em Breve
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
+    </div>
+  )
+}
+
+// Componente para a aba de aprovações
+function PendingApprovalsTab() {
+  const { 
+    getPendingChallenges, 
+    approveChallenge, 
+    rejectChallenge, 
+    archiveChallenge, 
+    deleteChallenge,
+    loading 
+  } = useChallengeManagement()
+
+  const [pendingChallenges, setPendingChallenges] = useState<any[]>([])
+  const [rejectionReason, setRejectionReason] = useState("")
+  const [showRejectModal, setShowRejectModal] = useState(false)
+  const [selectedChallenge, setSelectedChallenge] = useState<any>(null)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+
+  useEffect(() => {
+    loadPendingChallenges()
+  }, [])
+
+  const loadPendingChallenges = async () => {
+    try {
+      const challenges = await getPendingChallenges()
+      setPendingChallenges(challenges || [])
+    } catch (err) {
+      console.error('Erro ao carregar challenges pendentes:', err)
+      toast.error("Erro ao carregar challenges pendentes")
+    }
+  }
+
+  const handleApprove = async (challengeId: string) => {
+    try {
+      const result = await approveChallenge(challengeId)
+      if (result) {
+        toast.success("Challenge aprovado com sucesso!")
+        loadPendingChallenges()
+      } else {
+        toast.error("Erro ao aprovar challenge")
+      }
+    } catch (err) {
+      console.error('Erro ao aprovar challenge:', err)
+      toast.error("Erro ao aprovar challenge")
+    }
+  }
+
+  const handleReject = async (challengeId: string, reason: string) => {
+    try {
+      const result = await rejectChallenge(challengeId, reason)
+      if (result) {
+        toast.success("Challenge rejeitado e retornado ao professor")
+        setShowRejectModal(false)
+        setRejectionReason("")
+        setSelectedChallenge(null)
+        loadPendingChallenges()
+      } else {
+        toast.error("Erro ao rejeitar challenge")
+      }
+    } catch (err) {
+      console.error('Erro ao rejeitar challenge:', err)
+      toast.error("Erro ao rejeitar challenge")
+    }
+  }
+
+  const handleArchive = async (challengeId: string) => {
+    try {
+      const result = await archiveChallenge(challengeId)
+      if (result) {
+        toast.success("Challenge arquivado com sucesso!")
+        loadPendingChallenges()
+      } else {
+        toast.error("Erro ao arquivar challenge")
+      }
+    } catch (err) {
+      console.error('Erro ao arquivar challenge:', err)
+      toast.error("Erro ao arquivar challenge")
+    }
+  }
+
+  const handleDelete = async (challengeId: string) => {
+    try {
+      const result = await deleteChallenge(challengeId)
+      if (result) {
+        toast.success("Challenge excluído com sucesso!")
+        setShowDeleteModal(false)
+        setSelectedChallenge(null)
+        loadPendingChallenges()
+      } else {
+        toast.error("Erro ao excluir challenge")
+      }
+    } catch (err) {
+      console.error('Erro ao excluir challenge:', err)
+      toast.error("Erro ao excluir challenge")
+    }
+  }
+
+  const openRejectModal = (challenge: any) => {
+    setSelectedChallenge(challenge)
+    setShowRejectModal(true)
+  }
+
+  const openDeleteModal = (challenge: any) => {
+    setSelectedChallenge(challenge)
+    setShowDeleteModal(true)
+  }
+
+  if (loading) {
+    return (
+      <div className="text-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Carregando challenges pendentes...</p>
+      </div>
+    )
+  }
+
+  if (pendingChallenges.length === 0) {
+    return (
+      <div className="text-center py-12 text-gray-500">
+        <CheckCircle className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+        <h3 className="text-lg font-medium mb-2">Nenhum challenge pendente</h3>
+        <p>Todos os challenges foram revisados!</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Lista de challenges pendentes */}
+      <div className="space-y-4">
+        {pendingChallenges.map((challenge) => (
+          <div
+            key={challenge.id}
+            className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/30 transition-all duration-200"
+          >
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <h3 className="font-semibold text-lg">{challenge.title}</h3>
+                <Badge className="bg-yellow-100 text-yellow-800">A ser aprovado</Badge>
+                <Badge className="bg-blue-100 text-blue-800">{challenge.difficulty}</Badge>
+                <Badge className="bg-gray-100 text-gray-800">{challenge.category || "Algoritmos"}</Badge>
+              </div>
+              <p className="text-muted-foreground text-sm mb-2">{challenge.description}</p>
+              <div className="flex items-center gap-4 text-xs text-muted-foreground/70">
+                <span>👤 Professor: {challenge.created_by_profile?.full_name || "Desconhecido"}</span>
+                <span>📅 Criado: {new Date(challenge.created_at).toLocaleDateString('pt-BR')}</span>
+                <span>⚡ Função: {challenge.function_name}</span>
+              </div>
+            </div>
+            
+            {/* Ações do admin */}
+            <div className="flex gap-2">
+                             <Button
+                 variant="outline"
+                 size="sm"
+                 onClick={() => window.open(`/challenges/${challenge.slug}`, '_blank')}
+                 className="opacity-70 hover:opacity-100 transition-opacity duration-200"
+                 title="Visualizar Challenge"
+               >
+                 <Eye className="w-4 h-4" />
+               </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleApprove(challenge.id)}
+                className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100 opacity-70 hover:opacity-100 transition-opacity duration-200"
+                title="Aprovar Challenge"
+              >
+                <CheckCircle className="w-4 h-4" />
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => openRejectModal(challenge)}
+                className="bg-red-50 text-red-700 border-red-200 hover:bg-red-100 opacity-70 hover:opacity-100 transition-opacity duration-200"
+                title="Rejeitar Challenge"
+              >
+                <XCircle className="w-4 h-4" />
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleArchive(challenge.id)}
+                className="bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100 opacity-70 hover:opacity-100 transition-opacity duration-200"
+                title="Arquivar Challenge"
+              >
+                <Archive className="w-4 h-4" />
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => openDeleteModal(challenge)}
+                className="bg-red-50 text-red-700 border-red-200 hover:bg-red-100 opacity-70 hover:opacity-100 transition-opacity duration-200"
+                title="Excluir Challenge"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Modal de Rejeição */}
+      {showRejectModal && selectedChallenge && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+            <div className="flex items-center gap-2 mb-4">
+              <AlertTriangle className="w-5 h-5 text-red-500" />
+              <h3 className="text-lg font-semibold">Rejeitar Challenge</h3>
+            </div>
+            <p className="text-gray-600 mb-4">
+              O challenge <strong>"{selectedChallenge.title}"</strong> será rejeitado e retornado ao professor.
+            </p>
+            <div className="space-y-3">
+              <Label htmlFor="rejection-reason">Motivo da rejeição (opcional):</Label>
+              <Textarea
+                id="rejection-reason"
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                placeholder="Descreva o motivo da rejeição..."
+                rows={3}
+              />
+            </div>
+            <div className="flex gap-2 mt-6">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowRejectModal(false)
+                  setRejectionReason("")
+                  setSelectedChallenge(null)
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={() => handleReject(selectedChallenge.id, rejectionReason)}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                Rejeitar Challenge
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Exclusão */}
+      {showDeleteModal && selectedChallenge && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+            <div className="flex items-center gap-2 mb-4">
+              <AlertTriangle className="w-5 h-5 text-red-500" />
+              <h3 className="text-lg font-semibold">Excluir Challenge</h3>
+            </div>
+            <p className="text-gray-600 mb-4">
+              <strong>ATENÇÃO:</strong> Esta ação é irreversível! O challenge <strong>"{selectedChallenge.title}"</strong> será excluído permanentemente.
+            </p>
+            <div className="flex gap-2 mt-6">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowDeleteModal(false)
+                  setSelectedChallenge(null)
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={() => handleDelete(selectedChallenge.id)}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                Excluir Permanentemente
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

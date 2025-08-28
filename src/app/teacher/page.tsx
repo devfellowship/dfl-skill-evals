@@ -20,7 +20,8 @@ import {
   Trash2,
   Code,
   TestTube,
-  Settings
+  Settings,
+  Send
 } from "lucide-react"
 import Link from "next/link"
 import { AdminRouteWrapper } from "@/components/atoms/AdminRouteWrapper"
@@ -29,6 +30,7 @@ import { AdminNavigation } from "@/components/atoms/AdminNavigation"
 interface TeacherChallenge {
   id: string
   title: string
+  slug: string
   description: string
   difficulty: string
   category: string
@@ -42,15 +44,16 @@ interface TeacherChallenge {
 export default function TeacherDashboard() {
   const { 
     getUserChallenges, 
+    submitForApproval,
     loading: challengeLoading 
   } = useChallengeManagement()
   
   const [myChallenges, setMyChallenges] = useState<TeacherChallenge[]>([])
   const [teacherStats, setTeacherStats] = useState({
     totalChallenges: 0,
-    publishedChallenges: 0,
-    draftChallenges: 0,
-    pendingChallenges: 0,
+    approvedChallenges: 0,
+    toApproveChallenges: 0,
+    rejectedChallenges: 0,
     totalSubmissions: 0,
     averageScore: 0
   })
@@ -66,6 +69,7 @@ export default function TeacherDashboard() {
         const adaptedChallenges: TeacherChallenge[] = challenges.map(challenge => ({
           id: challenge.id,
           title: challenge.title,
+          slug: challenge.slug,
           description: challenge.description,
           difficulty: challenge.difficulty,
           category: challenge.category || "Algoritmos",
@@ -80,9 +84,9 @@ export default function TeacherDashboard() {
         // Calcular estatísticas do professor
         const stats = {
           totalChallenges: adaptedChallenges.length,
-          publishedChallenges: adaptedChallenges.filter(c => c.status === 'published').length,
-          draftChallenges: adaptedChallenges.filter(c => c.status === 'draft').length,
-          pendingChallenges: adaptedChallenges.filter(c => c.status === 'pending').length,
+          approvedChallenges: adaptedChallenges.filter(c => c.status === 'approved').length,
+          toApproveChallenges: adaptedChallenges.filter(c => c.status === 'to_approve').length,
+          rejectedChallenges: adaptedChallenges.filter(c => c.status === 'rejected').length,
           totalSubmissions: adaptedChallenges.reduce((sum, c) => sum + (c.submissions_count || 0), 0),
           averageScore: adaptedChallenges.length > 0 
             ? adaptedChallenges.reduce((sum, c) => sum + (c.average_score || 0), 0) / adaptedChallenges.length 
@@ -95,6 +99,21 @@ export default function TeacherDashboard() {
     }
   }
 
+  const handleSubmitForApproval = async (challengeId: string) => {
+    try {
+      const result = await submitForApproval(challengeId);
+      if (result) {
+        alert('Challenge submetido para aprovação com sucesso!');
+        loadMyChallenges(); // Recarrega as challenges para atualizar o status
+      } else {
+        alert('Erro ao submeter challenge para aprovação.');
+      }
+    } catch (err) {
+      console.error('Erro ao submeter challenge para aprovação:', err);
+      alert('Erro ao submeter challenge para aprovação.');
+    }
+  };
+
   const getDifficultyColor = (difficulty: string) => {
     const colors = {
       easy: "bg-green-100 text-green-800",
@@ -106,20 +125,20 @@ export default function TeacherDashboard() {
 
   const getStatusColor = (status: string) => {
     const colors = {
-      draft: "bg-gray-100 text-gray-800",
-      pending: "bg-yellow-100 text-yellow-800",
-      published: "bg-green-100 text-green-800",
-      rejected: "bg-red-100 text-red-800"
+      to_approve: "bg-yellow-100 text-yellow-800",
+      approved: "bg-green-100 text-green-800",
+      rejected: "bg-red-100 text-red-800",
+      archived: "bg-gray-100 text-gray-800"
     }
     return colors[status as keyof typeof colors] || "bg-gray-100 text-gray-800"
   }
 
   const getStatusLabel = (status: string) => {
     const labels = {
-      draft: "Rascunho",
-      pending: "Pendente",
-      published: "Publicado",
-      rejected: "Rejeitado"
+      to_approve: "A ser aprovado",
+      approved: "Aprovado",
+      rejected: "Reprovado",
+      archived: "Arquivado"
     }
     return labels[status as keyof typeof labels] || status
   }
@@ -189,9 +208,9 @@ export default function TeacherDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{teacherStats.totalChallenges}</div>
-                <p className="text-xs text-muted-foreground">
-                  {teacherStats.publishedChallenges} publicados, {teacherStats.draftChallenges} rascunhos
-                </p>
+                                 <p className="text-xs text-muted-foreground">
+                   {teacherStats.approvedChallenges} aprovados, {teacherStats.toApproveChallenges} a serem aprovados
+                 </p>
               </CardContent>
             </Card>
 
@@ -201,7 +220,7 @@ export default function TeacherDashboard() {
                 <Clock className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{teacherStats.pendingChallenges}</div>
+                                 <div className="text-2xl font-bold">{teacherStats.toApproveChallenges}</div>
                 <p className="text-xs text-muted-foreground">Em revisão pelo admin</p>
               </CardContent>
             </Card>
@@ -304,25 +323,27 @@ export default function TeacherDashboard() {
                                 <Edit className="w-4 h-4" />
                               </Link>
                             </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              asChild
-                              className="opacity-70 group-hover:opacity-100 transition-opacity duration-200"
-                            >
-                              <Link href={`/challenge-page/${challenge.id}`} target="_blank">
-                                <Eye className="w-4 h-4" />
-                              </Link>
-                            </Button>
-                            {challenge.status === 'draft' && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="opacity-70 group-hover:opacity-100 transition-opacity duration-200"
-                              >
-                                <CheckCircle className="w-4 h-4" />
-                              </Button>
-                            )}
+                                                         <Button
+                               variant="outline"
+                               size="sm"
+                               asChild
+                               className="opacity-70 group-hover:opacity-100 transition-opacity duration-200"
+                             >
+                               <Link href={`/challenges/${challenge.slug}`} target="_blank">
+                                 <Eye className="w-4 h-4" />
+                               </Link>
+                             </Button>
+                                                         {challenge.status === 'to_approve' && (
+                               <Button
+                                 variant="outline"
+                                 size="sm"
+                                 className="opacity-70 group-hover:opacity-100 transition-opacity duration-200 text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50"
+                                 title="Aguardando Aprovação"
+                                 disabled
+                               >
+                                 <Clock className="w-4 h-4" />
+                               </Button>
+                             )}
                           </div>
                         </div>
                       ))}

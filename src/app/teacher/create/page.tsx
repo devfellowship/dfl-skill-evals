@@ -14,6 +14,7 @@ import { Save, ArrowLeft, Plus, Trash2, BarChart3, Users, BookOpen } from "lucid
 import Link from "next/link"
 import { AdminRouteWrapper } from "@/components/atoms/AdminRouteWrapper"
 import { AdminNavigation } from "@/components/atoms/AdminNavigation"
+import { toast } from 'sonner'
 
 interface TestCase {
   input: string
@@ -50,108 +51,7 @@ export default function CreateChallenge() {
     estimated_time_minutes: 30
   })
 
-  // Estado para o sistema de compilação
-  const [compilationResult, setCompilationResult] = useState<{
-    success: boolean
-    output: any
-    error: string | null
-    executionTime: number
-  } | null>(null)
-  
-  const [isCompiling, setIsCompiling] = useState(false)
-  const [testInput, setTestInput] = useState('')
-  const [expectedOutput, setExpectedOutput] = useState('')
 
-  // Função para compilar e testar o código
-  const compileAndTest = async () => {
-    if (!testInput.trim() || !formData.initial_code.trim()) {
-      alert('Por favor, preencha o input de teste e o código inicial')
-      return
-    }
-
-    setIsCompiling(true)
-    setCompilationResult(null)
-
-    try {
-      const startTime = performance.now()
-      
-      // Cria uma função segura para execução
-      const safeEval = new Function('input', `
-        try {
-          ${formData.initial_code}
-          
-          // Chama a função com o input
-          const result = ${formData.function_name}(${testInput});
-          return { success: true, output: result };
-        } catch (error) {
-          return { success: false, error: error.message };
-        }
-      `)
-
-      // Executa com timeout de segurança
-      const result = await Promise.race([
-        safeEval(testInput),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Timeout: Código demorou muito para executar')), 5000)
-        )
-      ])
-
-      const endTime = performance.now()
-      const executionTime = endTime - startTime
-
-      if (result.success) {
-        setCompilationResult({
-          success: true,
-          output: result.output,
-          error: null,
-          executionTime: Math.round(executionTime)
-        })
-        
-        // Atualiza automaticamente o output esperado
-        setExpectedOutput(JSON.stringify(result.output))
-      } else {
-        setCompilationResult({
-          success: false,
-          output: null,
-          error: result.error,
-          executionTime: Math.round(executionTime)
-        })
-      }
-    } catch (error) {
-      setCompilationResult({
-        success: false,
-        output: null,
-        error: error instanceof Error ? error.message : 'Erro desconhecido',
-        executionTime: 0
-      })
-    } finally {
-      setIsCompiling(false)
-    }
-  }
-
-  // Função para salvar o teste com output validado
-  const saveValidatedTest = () => {
-    if (!compilationResult?.success || !testInput.trim()) {
-      alert('Por favor, compile um teste válido primeiro')
-      return
-    }
-
-    const newTestCase = {
-      input: testInput,
-      expectedOutput: JSON.stringify(compilationResult.output),
-      description: `Teste validado - Output: ${JSON.stringify(compilationResult.output)}`,
-      hidden: false
-    }
-
-    setTestCases([...testCases, newTestCase])
-    
-    // Limpa os campos
-    setTestInput('')
-    setExpectedOutput('')
-    setCompilationResult(null)
-    
-    alert('Teste salvo com sucesso!')
-  }
 
   const [testCases, setTestCases] = useState<TestCase[]>([
     { input: '', expectedOutput: '', description: '', hidden: false }
@@ -168,15 +68,46 @@ export default function CreateChallenge() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
+    // Validação dos campos obrigatórios
+    if (!formData.title.trim()) {
+      toast.error('Título é obrigatório')
+      return
+    }
+    
+    if (!formData.description.trim()) {
+      toast.error('Descrição é obrigatória')
+      return
+    }
+    
+    if (!formData.function_name.trim()) {
+      toast.error('Nome da função é obrigatório')
+      return
+    }
+    
+    if (!formData.initial_code.trim()) {
+      toast.error('Código inicial é obrigatório')
+      return
+    }
+    
     const challengeData: CreateChallengeData = {
       ...formData,
       test_cases: testCases.filter(tc => tc.input && tc.expectedOutput),
       examples: examples.filter(ex => ex.input && ex.output),
     }
 
-    const result = await createChallenge(challengeData)
-    if (result) {
-      router.push('/teacher')
+    console.log('Dados da challenge a serem enviados:', challengeData)
+
+    try {
+      const result = await createChallenge(challengeData)
+      if (result) {
+        toast.success('Challenge criada com sucesso!')
+        router.push('/teacher')
+      } else {
+        toast.error('Erro ao criar challenge')
+      }
+    } catch (error) {
+      console.error('Erro no handleSubmit:', error)
+      toast.error('Erro ao criar challenge')
     }
   }
 
@@ -414,114 +345,7 @@ export default function CreateChallenge() {
                   />
                 </div>
 
-                {/* Sistema de Teste Integrado */}
-                <div className="border-t pt-4">
-                  <h4 className="font-semibold text-blue-800 mb-3 flex items-center gap-2">
-                    🧪 <span>Teste seu Código em Tempo Real</span>
-                  </h4>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <Label htmlFor="testInput" className="text-blue-700">Input de Teste *</Label>
-                      <Input
-                        id="testInput"
-                        value={testInput}
-                        onChange={(e) => setTestInput(e.target.value)}
-                        placeholder="Ex: [2, 7, 11, 15], 9"
-                        className="border-blue-300"
-                      />
-                      <p className="text-sm text-blue-600 mt-1">
-                        Digite o input para testar seu código
-                      </p>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="expectedOutput" className="text-blue-700">Output Esperado</Label>
-                      <Input
-                        id="expectedOutput"
-                        value={expectedOutput}
-                        onChange={(e) => setExpectedOutput(e.target.value)}
-                        placeholder="Será preenchido automaticamente"
-                        className="border-blue-300"
-                        readOnly
-                      />
-                      <p className="text-sm text-blue-600 mt-1">
-                        Resultado da compilação
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-3 mb-4">
-                    <Button 
-                      type="button" 
-                      onClick={compileAndTest}
-                      disabled={isCompiling || !testInput.trim() || !formData.initial_code.trim()}
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
-                      {isCompiling ? (
-                        <>⏳ Compilando...</>
-                      ) : (
-                        <>🚀 Compilar e Testar</>
-                      )}
-                    </Button>
-                    
-                    {compilationResult?.success && (
-                      <Button 
-                        type="button" 
-                        onClick={saveValidatedTest}
-                        className="bg-green-600 hover:bg-green-700"
-                      >
-                        ✅ Salvar Teste Validado
-                      </Button>
-                    )}
-                  </div>
-                  
-                  {/* Resultado da Compilação */}
-                  {compilationResult && (
-                    <div className={`p-4 rounded-lg border ${
-                      compilationResult.success 
-                        ? 'bg-green-50 border-green-200' 
-                        : 'bg-red-50 border-red-200'
-                    }`}>
-                      <div className="flex items-center gap-2 mb-2">
-                        {compilationResult.success ? (
-                          <>✅ <span className="font-semibold text-green-800">Compilação Bem-sucedida!</span></>
-                        ) : (
-                          <>❌ <span className="font-semibold text-red-800">Erro na Compilação</span></>
-                        )}
-                      </div>
-                      
-                      {compilationResult.success ? (
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <span className="text-green-700 font-medium">Output:</span>
-                            <code className="bg-green-100 px-2 py-1 rounded text-green-800">
-                              {JSON.stringify(compilationResult.output)}
-                            </code>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-green-700 font-medium">Tempo de Execução:</span>
-                            <span className="text-green-800">{compilationResult.executionTime}ms</span>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="text-red-700">
-                          <span className="font-medium">Erro:</span> {compilationResult.error}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  
-                  <div className="text-sm text-blue-600 bg-white p-3 rounded border">
-                    <strong>💡 Como usar:</strong> 
-                    <ol className="list-decimal list-inside mt-2 space-y-1">
-                      <li>Escreva seu código acima</li>
-                      <li>Digite um input de teste</li>
-                      <li>Clique em "Compilar e Testar"</li>
-                      <li>Se der certo, clique em "Salvar Teste Validado"</li>
-                    </ol>
-                  </div>
-                </div>
+
               </CardContent>
             </Card>
 
