@@ -493,18 +493,17 @@ export function useChallengeManagement() {
     }
   }, [])
 
-  // Função para buscar challenges aprovados (exclui "Em análise" e "Arquivados")
+  // Função para buscar TODAS as challenges (independente do status)
   const getAllChallenges = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
 
-      console.log('🔍 Buscando challenges aprovados (excluindo "Em análise" e "Arquivados")...')
+      console.log('🔍 Buscando TODAS as challenges (todos os status)...')
 
       const { data: challenges, error: fetchError } = await supabase
         .from('challenges')
         .select('*')
-        .eq('status', 'approved') // Buscar apenas challenges aprovados
         .order('created_at', { ascending: false })
 
       if (fetchError) {
@@ -512,7 +511,7 @@ export function useChallengeManagement() {
         throw fetchError
       }
 
-      console.log('✅ Challenges aprovados encontrados:', challenges)
+      console.log('✅ Todas as challenges encontradas:', challenges)
       return challenges || []
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao buscar challenges'

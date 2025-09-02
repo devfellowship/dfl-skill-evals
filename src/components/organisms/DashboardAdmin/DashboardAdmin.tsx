@@ -21,7 +21,8 @@ export function DashboardAdmin() {
     archived, 
     isInitialLoading, 
     lastUpdate,
-    updateChallengeInList
+    updateChallengeInList,
+    removeChallengeFromList
   } = useChallengesGlobal()
 
   // Hook para operações com estados separados
@@ -89,7 +90,7 @@ export function DashboardAdmin() {
   // Handlers com optimistic updates
   const handleDeleteWithOptimistic = async (id: string) => {
     // Optimistic update: remover da lista imediatamente
-    updateChallengeInList(id, { status: 'deleted' as any })
+    removeChallengeFromList(id)
     
     // Executar ação no servidor
     const result = await handleDelete(id)

@@ -1,17 +1,15 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
-import { useChallengeManagement } from './useChallengeManagement'
 import { Challenge } from '@/components/organisms/DashboardAdmin/types'
+import type { RealtimeChannel } from '@supabase/supabase-js'
 
 export function useChallengesGlobal() {
-  const { getAllChallenges } = useChallengeManagement()
   const [challenges, setChallenges] = useState<Challenge[]>([])
   const [isInitialLoading, setIsInitialLoading] = useState(true)
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date())
+  const channelRef = useRef<RealtimeChannel | null>(null)
 
-  // Função para adaptar challenge do banco para o frontend
   const adaptChallenge = useCallback((raw: any): Challenge => {
-    // Converte status do Supabase para 'draft' | 'published' | 'archived'
     const mapStatus = raw.status === 'approved'
       ? 'published'
       : raw.status === 'to_approve' || raw.status === 'rejected'
@@ -20,12 +18,23 @@ export function useChallengesGlobal() {
       ? 'archived'
       : 'draft'
 
+    const mapDifficulty = (difficulty: number) => {
+      switch (difficulty) {
+        case 1: return 'easy'
+        case 2: return 'medium'
+        case 3: return 'hard'
+        case 4: return 'hard'
+        case 5: return 'hard'
+        default: return 'medium'
+      }
+    }
+
     return {
       id: raw.id,
       slug: raw.slug,
       title: raw.title,
       description: raw.description,
-      difficulty: raw.difficulty === 1 ? 'easy' : raw.difficulty === 2 ? 'medium' : 'hard',
+      difficulty: mapDifficulty(raw.difficulty),
       category: raw.category || 'Algoritmos',
       functionName: raw.function_name,
       status: mapStatus,
@@ -36,11 +45,19 @@ export function useChallengesGlobal() {
     }
   }, [])
 
-  // Carregar todas as challenges na montagem
   const loadAllChallenges = useCallback(async () => {
     try {
-      console.log('🔄 Carregando todas as challenges...')
-      const dbChallenges = await getAllChallenges()
+      console.log('🔄 Carregando todas as challenges diretamente do Supabase...')
+      
+      const { data: dbChallenges, error: fetchError } = await supabase
+        .from('challenges')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (fetchError) {
+        console.error('❌ Erro ao buscar challenges:', fetchError)
+        throw fetchError
+      }
       
       if (dbChallenges && dbChallenges.length > 0) {
         const adaptedChallenges = dbChallenges.map(adaptChallenge)
@@ -56,56 +73,52 @@ export function useChallengesGlobal() {
     } finally {
       setIsInitialLoading(false)
     }
-  }, [getAllChallenges, adaptChallenge])
+  }, [adaptChallenge])
 
-  // Setup Realtime como fonte única de verdade
   useEffect(() => {
-    // Carregar dados iniciais
     loadAllChallenges()
 
-    // Configurar Realtime uma única vez
-    const channel = supabase
-      .channel('public:challenges')
-      .on('postgres_changes', 
-          { event: '*', schema: 'public', table: 'challenges' }, 
-          payload => {
-            console.log('🔄 Realtime Event:', payload.eventType, payload.new || payload.old)
-            
-            setChallenges(prev => {
-              switch (payload.eventType) {
-                case 'INSERT':
-                  return [adaptChallenge(payload.new), ...prev]
-                case 'UPDATE':
-                  return prev.map(ch => 
-                    ch.id === payload.new.id ? adaptChallenge(payload.new) : ch
-                  )
-                case 'DELETE':
-                  return prev.filter(ch => ch.id !== payload.old.id)
-                default:
-                  return prev
-              }
-            })
-            setLastUpdate(new Date())
-          }
-      )
+    const channel = supabase.channel('challenges-broadcast')
+    channelRef.current = channel
+
+    channel
+      .on('broadcast', { event: 'challenge-created' }, ({ payload }) => {
+        console.log('🔄 Broadcast: Challenge criado', payload.challenge)
+        const adaptedChallenge = adaptChallenge(payload.challenge)
+        setChallenges(prev => [adaptedChallenge, ...prev])
+        setLastUpdate(new Date())
+      })
+      .on('broadcast', { event: 'challenge-updated' }, ({ payload }) => {
+        console.log('🔄 Broadcast: Challenge atualizado', payload.challenge)
+        const adaptedChallenge = adaptChallenge(payload.challenge)
+        setChallenges(prev => prev.map(ch => 
+          ch.id === adaptedChallenge.id ? adaptedChallenge : ch
+        ))
+        setLastUpdate(new Date())
+      })
+      .on('broadcast', { event: 'challenge-deleted' }, ({ payload }) => {
+        console.log('🔄 Broadcast: Challenge deletado', payload.challengeId)
+        setChallenges(prev => prev.filter(ch => ch.id !== payload.challengeId))
+        setLastUpdate(new Date())
+      })
       .subscribe((status) => {
-        console.log('📡 Realtime Status:', status)
+        console.log('📡 Broadcast Status:', status)
         if (status === 'SUBSCRIBED') {
-          console.log('✅ Realtime conectado como fonte única de verdade!')
+          console.log('✅ Broadcast conectado - sincronização entre abas ativa!')
         } else if (status === 'CHANNEL_ERROR') {
-          console.error('❌ Erro no canal Realtime - usando fallback')
-          // Fallback silencioso: recarregar apenas se necessário
-          loadAllChallenges()
+          console.error('❌ Erro no canal Broadcast')
         }
       })
 
     return () => {
-      console.log('🧹 Limpando subscription do Realtime')
-      supabase.removeChannel(channel)
+      console.log('🧹 Limpando subscription do Broadcast')
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current)
+        channelRef.current = null
+      }
     }
   }, [loadAllChallenges, adaptChallenge])
 
-  // Filtrar challenges por status usando useMemo para performance
   const published = useMemo(() => 
     challenges.filter(c => c.status === 'published'), 
     [challenges]
@@ -120,8 +133,6 @@ export function useChallengesGlobal() {
     challenges.filter(c => c.status === 'archived'), 
     [challenges]
   )
-
-  // Funções de atualização granular para optimistic updates
   const updateChallengeInList = useCallback((challengeId: string, updates: Partial<Challenge>) => {
     setChallenges(prev => prev.map(challenge => 
       challenge.id === challengeId 
@@ -142,22 +153,50 @@ export function useChallengesGlobal() {
     setLastUpdate(new Date())
   }, [])
 
+  const broadcastChallengeCreated = useCallback((challenge: any) => {
+    if (channelRef.current) {
+      channelRef.current.send({
+        type: 'broadcast',
+        event: 'challenge-created',
+        payload: { challenge }
+      })
+    }
+  }, [])
+
+  const broadcastChallengeUpdated = useCallback((challenge: any) => {
+    if (channelRef.current) {
+      channelRef.current.send({
+        type: 'broadcast',
+        event: 'challenge-updated',
+        payload: { challenge }
+      })
+    }
+  }, [])
+
+  const broadcastChallengeDeleted = useCallback((challengeId: string) => {
+    if (channelRef.current) {
+      channelRef.current.send({
+        type: 'broadcast',
+        event: 'challenge-deleted',
+        payload: { challengeId }
+      })
+    }
+  }, [])
+
   return {
-    // Lista completa
     challenges,
     isInitialLoading,
     lastUpdate,
-    
-    // Listas filtradas
     published,
     pending,
     archived,
-    
-    // Funções de atualização
     updateChallengeInList,
     addChallengeToList,
     removeChallengeFromList,
     adaptChallenge,
-    loadAllChallenges
+    loadAllChallenges,
+    broadcastChallengeCreated,
+    broadcastChallengeUpdated,
+    broadcastChallengeDeleted
   }
 }
