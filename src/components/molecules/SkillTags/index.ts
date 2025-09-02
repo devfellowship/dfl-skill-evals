@@ -1,1 +1,0 @@
-export { SkillTags } from './SkillTags' 

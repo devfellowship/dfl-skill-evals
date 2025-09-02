@@ -1,7 +1,0 @@
-export { Button } from './atoms/Button/Button'
-export { Badge } from './atoms/Badge/Badge'
-export { Avatar, AvatarFallback } from './atoms/Avatar/Avatar'
-export { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
-export { Progress } from './atoms/Progress/Progress'
-export { AssessmentGrid } from './organisms/AssessmentGrid/AssessmentGrid'
-export { CodeEditor } from './organisms/CodeEditor/CodeEditor' 

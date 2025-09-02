@@ -1,4 +1,4 @@
-import { TestResultsPanel } from "@/components/organisms/TestResultsPanel"
+import { TestResultsPanel } from "@/components/organisms/TestResultsPanel/TestResultsPanel"
 import type { ChallengeResultsProps } from "@/types/challenge-page"
 
 export function ChallengeResults({

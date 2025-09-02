@@ -1,1 +1,0 @@
-export { ChallengeResults } from './ChallengeResults'

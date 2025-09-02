@@ -1,1 +1,0 @@
-export { Hints } from './Hints'

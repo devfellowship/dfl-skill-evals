@@ -1,8 +1,8 @@
 "use client"
 
-import { DashboardAdmin } from "@/components/organisms/DashboardAdmin"
-import { AdminRouteWrapper } from "@/components/atoms/AdminRouteWrapper"
-import { AdminNavigation } from "@/components/atoms/AdminNavigation"
+import { DashboardAdmin } from "@/components/organisms/DashboardAdmin/DashboardAdmin"
+import { AdminRouteWrapper } from "@/components/atoms/AdminRouteWrapper/AdminRouteWrapper"
+import { AdminNavigation } from "@/components/atoms/AdminNavigation/AdminNavigation"
 import { BarChart3, Users, BookOpen, Plus } from "lucide-react"
 
 export default function AdminPage() {

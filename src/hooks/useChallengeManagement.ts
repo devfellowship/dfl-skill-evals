@@ -28,13 +28,13 @@ export function useChallengeManagement() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Mapa para converter strings de dificuldade para números (banco usa integer)
+
   const difficultyMap: Record<string, number> = {
     beginner: 1,
-    easy: 2,
-    medium: 3,
-    hard: 4,
-    expert: 5,
+    easy: 1,
+    medium: 2,
+    hard: 3,
+    expert: 4,
   }
 
   const createChallenge = useCallback(async (data: CreateChallengeData) => {
@@ -45,14 +45,14 @@ export function useChallengeManagement() {
       console.log('🚀 Iniciando criação de challenge...')
       console.log('📝 Dados recebidos:', data)
 
-      // Validar configuração do Supabase
+
       if (!supabase) {
         throw new Error('Cliente Supabase não inicializado')
       }
 
       console.log('🔧 Cliente Supabase:', supabase)
 
-      // Buscar slugs existentes para gerar um único
+
       console.log('🔍 Buscando slugs existentes...')
       const { data: existingChallenges, error: slugError } = await supabase
         .from('challenges')
@@ -108,13 +108,13 @@ export function useChallengeManagement() {
     } catch (err) {
       console.error('Erro detalhado ao criar challenge:', err)
       
-      // Melhor tratamento de erro
+
       let errorMessage = 'Erro ao criar challenge'
       
       if (err instanceof Error) {
         errorMessage = err.message
       } else if (typeof err === 'object' && err !== null) {
-        // Se for um objeto de erro do Supabase
+
         if ('message' in err) {
           errorMessage = String(err.message)
         } else if ('details' in err) {
@@ -141,7 +141,7 @@ export function useChallengeManagement() {
       console.log('🚀 Atualizando challenge:', id)
       console.log('📝 Dados recebidos:', updates)
 
-      // Mapear campos do frontend para o banco
+
       const mappedUpdates: any = {}
       
       // Campos diretos
@@ -204,13 +204,13 @@ export function useChallengeManagement() {
         if (updates.difficulty === 'beginner') {
           mappedUpdates.difficulty = 1
         } else if (updates.difficulty === 'easy') {
-          mappedUpdates.difficulty = 2
+          mappedUpdates.difficulty = 1
         } else if (updates.difficulty === 'medium') {
-          mappedUpdates.difficulty = 3
+          mappedUpdates.difficulty = 2
         } else if (updates.difficulty === 'hard') {
-          mappedUpdates.difficulty = 4
+          mappedUpdates.difficulty = 3
         } else if (updates.difficulty === 'expert') {
-          mappedUpdates.difficulty = 5
+          mappedUpdates.difficulty = 4
         } else {
           // Se for um número, usar diretamente
           mappedUpdates.difficulty = updates.difficulty

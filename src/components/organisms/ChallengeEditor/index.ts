@@ -1,1 +1,0 @@
-export { ChallengeEditor } from './ChallengeEditor'

@@ -1,7 +1,7 @@
-import { ChallengeHeader } from "@/components/organisms/ChallengeHeader"
-import { ProblemPanel } from "@/components/organisms/ProblemPanel"
-import { CodeExecutionPanel } from "@/components/organisms/CodeExecutionPanel"
-import { TestResultsPanel } from "@/components/organisms/TestResultsPanel"
+import { ChallengeHeader } from "@/components/organisms/ChallengeHeader/ChallengeHeader"
+import { ProblemPanel } from "@/components/organisms/ProblemPanel/ProblemPanel"
+import { CodeExecutionPanel } from "@/components/organisms/CodeExecutionPanel/CodeExecutionPanel"
+import { TestResultsPanel } from "@/components/organisms/TestResultsPanel/TestResultsPanel"
 import type { ChallengeLayoutProps, ChallengeProblem, ChallengeResults } from "@/types/challenge-page"
 
 export function ChallengeLayout({

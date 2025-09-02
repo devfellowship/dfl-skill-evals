@@ -3,14 +3,14 @@
 import { useChallenges } from "@/hooks/useChallenges"
 import { mockResults } from "@/consts/results"
 import { generateSlug } from "@/lib/utils"
-import { ResultsHeader } from "@/components/organisms/ResultsHeader"
-import { ResultsHero } from "@/components/molecules/ResultsHero"
-import { ScoreCircle } from "@/components/molecules/ScoreCircle"
-import { SkillBreakdownCard } from "@/components/organisms/SkillBreakdownCard"
-import { QuickStatsCard } from "@/components/organisms/QuickStatsCard"
-import { ProblemAnalysisCard } from "@/components/organisms/ProblemAnalysisCard"
-import { ResultsActions } from "@/components/molecules/ResultsActions"
-import { LoadingState } from "@/components/molecules/LoadingState"
+import { ResultsHeader } from "@/components/organisms/ResultsHeader/ResultsHeader"
+import { ResultsHero } from "@/components/molecules/ResultsHero/ResultsHero"
+import { ScoreCircle } from "@/components/molecules/ScoreCircle/ScoreCircle"
+import { SkillBreakdownCard } from "@/components/organisms/SkillBreakdownCard/SkillBreakdownCard"
+import { QuickStatsCard } from "@/components/organisms/QuickStatsCard/QuickStatsCard"
+import { ProblemAnalysisCard } from "@/components/organisms/ProblemAnalysisCard/ProblemAnalysisCard"
+import { ResultsActions } from "@/components/molecules/ResultsActions/ResultsActions"
+import { LoadingState } from "@/components/molecules/LoadingState/LoadingState"
 
 export default function Results() {
   const { challenges } = useChallenges()

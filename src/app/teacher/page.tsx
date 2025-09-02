@@ -24,8 +24,8 @@ import {
   Send
 } from "lucide-react"
 import Link from "next/link"
-import { AdminRouteWrapper } from "@/components/atoms/AdminRouteWrapper"
-import { AdminNavigation } from "@/components/atoms/AdminNavigation"
+import { AdminRouteWrapper } from "@/components/atoms/AdminRouteWrapper/AdminRouteWrapper"
+import { AdminNavigation } from "@/components/atoms/AdminNavigation/AdminNavigation"
 
 interface TeacherChallenge {
   id: string
@@ -81,7 +81,7 @@ export default function TeacherDashboard() {
         }))
         setMyChallenges(adaptedChallenges)
         
-        // Calcular estatísticas do professor
+
         const stats = {
           totalChallenges: adaptedChallenges.length,
           approvedChallenges: adaptedChallenges.filter(c => c.status === 'approved').length,
@@ -114,13 +114,47 @@ export default function TeacherDashboard() {
     }
   };
 
-  const getDifficultyColor = (difficulty: string) => {
+  const getDifficultyColor = (difficulty: string | number) => {
+
+    const difficultyMap: { [key: string]: string } = {
+      '1': 'beginner',
+      '2': 'easy', 
+      '3': 'medium',
+      '4': 'hard',
+      '5': 'expert',
+      'beginner': 'beginner',
+      'easy': 'easy',
+      'medium': 'medium', 
+      'hard': 'hard',
+      'expert': 'expert'
+    }
+    
+    const normalizedDifficulty = difficultyMap[difficulty.toString()] || difficulty.toString()
+    
     const colors = {
+      beginner: "bg-blue-100 text-blue-800",
       easy: "bg-green-100 text-green-800",
       medium: "bg-yellow-100 text-yellow-800",
-      hard: "bg-red-100 text-red-800"
+      hard: "bg-red-100 text-red-800",
+      expert: "bg-purple-100 text-purple-800"
     }
-    return colors[difficulty as keyof typeof colors] || "bg-gray-100 text-gray-800"
+    return colors[normalizedDifficulty as keyof typeof colors] || "bg-gray-100 text-gray-800"
+  }
+
+  const getDifficultyLabel = (difficulty: string | number) => {
+    const difficultyMap: { [key: string]: string } = {
+      '1': 'Iniciante',
+      '2': 'Fácil',
+      '3': 'Médio', 
+      '4': 'Difícil',
+      '5': 'Expert',
+      'beginner': 'Iniciante',
+      'easy': 'Fácil',
+      'medium': 'Médio',
+      'hard': 'Difícil', 
+      'expert': 'Expert'
+    }
+    return difficultyMap[difficulty.toString()] || difficulty.toString()
   }
 
   const getStatusColor = (status: string) => {
@@ -288,7 +322,7 @@ export default function TeacherDashboard() {
                                 {challenge.title}
                               </h3>
                               <Badge className={getDifficultyColor(challenge.difficulty)}>
-                                {challenge.difficulty}
+                                {getDifficultyLabel(challenge.difficulty)}
                               </Badge>
                               <Badge className={getStatusColor(challenge.status)}>
                                 {getStatusLabel(challenge.status)}

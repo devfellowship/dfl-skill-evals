@@ -1,7 +1,7 @@
 "use client"
 
 import { Progress } from "@/components/atoms/Progress/Progress"
-import { TestResultCard } from "@/components/molecules/TestResultCard"
+import { TestResultCard } from "@/components/molecules/TestResultCard/TestResultCard"
 
 interface TestResultsPanelProps {
   results: any

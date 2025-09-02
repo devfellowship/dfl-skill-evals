@@ -1,5 +1,5 @@
-import { CodeEditor } from "@/components/organisms/CodeEditor"
-import { ChallengeControls } from "@/components/organisms/ChallengeControls"
+import { CodeEditor } from "@/components/organisms/CodeEditor/CodeEditor"
+import { ChallengeControls } from "@/components/organisms/ChallengeControls/ChallengeControls"
 import type { ChallengeEditorProps } from "@/types/challenge-page"
 
 export function ChallengeEditor({

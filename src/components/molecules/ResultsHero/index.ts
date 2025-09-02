@@ -1,1 +1,0 @@
-export { ResultsHero } from './ResultsHero'

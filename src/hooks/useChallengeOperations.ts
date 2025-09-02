@@ -16,6 +16,14 @@ export function useChallengeOperations() {
   const [isApproving, setIsApproving] = useState<string | null>(null)
   const [isArchiving, setIsArchiving] = useState<string | null>(null)
 
+  const difficultyMap: Record<string, number> = {
+    beginner: 1,
+    easy: 1,
+    medium: 2,
+    hard: 3,
+    expert: 4,
+  }
+
   const handleCreate = async (challengeData: any) => {
     setIsSubmitting(true)
     try {
@@ -24,7 +32,7 @@ export function useChallengeOperations() {
         .insert({
           title: challengeData.title,
           description: challengeData.description,
-          difficulty: challengeData.difficulty,
+          difficulty: difficultyMap[challengeData.difficulty] || 2,
           category: challengeData.category,
           function_name: challengeData.function_name,
           initial_code: challengeData.initial_code || "// Seu código aqui",
@@ -37,11 +45,15 @@ export function useChallengeOperations() {
         .single()
 
       if (createError) {
-        console.error('❌ Erro ao criar challenge:', createError)
-        throw createError
+        console.error('❌ Erro ao criar challenge:', {
+          message: createError.message,
+          details: createError.details,
+          hint: createError.hint,
+          code: createError.code
+        })
+        throw new Error(createError.message || 'Erro ao criar challenge')
       }
 
-      console.log('✅ Challenge criado:', challenge)
       toast.success("Challenge criado com sucesso!")
       
       try {
@@ -62,6 +74,7 @@ export function useChallengeOperations() {
   }
 
   const handleUpdate = async (id: string, updateData: any) => {
+    console.log('🚀 Iniciando atualização:', id, updateData)
     setIsSubmitting(true)
     try {
       const { data: challenge, error: updateError } = await supabase
@@ -69,27 +82,34 @@ export function useChallengeOperations() {
         .update({
           title: updateData.title,
           description: updateData.description,
-          difficulty: updateData.difficulty,
+          difficulty: difficultyMap[updateData.difficulty] || 2,
           category: updateData.category,
           function_name: updateData.function_name,
           initial_code: updateData.initial_code,
           test_cases: updateData.test_cases,
-          status: updateData.status
+          status: updateData.status,
+          slug: updateData.slug
         })
         .eq('id', id)
         .select()
         .single()
 
       if (updateError) {
-        console.error('❌ Erro ao atualizar challenge:', updateError)
-        throw updateError
+        console.error('❌ Erro ao atualizar challenge:', {
+          message: updateError.message,
+          details: updateError.details,
+          hint: updateError.hint,
+          code: updateError.code
+        })
+        throw new Error(updateError.message || 'Erro ao atualizar challenge')
       }
 
-      console.log('✅ Challenge atualizado:', challenge)
+      console.log('✅ Challenge atualizado no banco:', challenge)
       toast.success("Challenge atualizado com sucesso!")
       
       try {
         broadcastChallengeUpdated(challenge)
+        console.log('📡 Broadcast enviado com sucesso')
       } catch (broadcastError) {
         console.warn('⚠️ Falha no broadcast, recarregando dados:', broadcastError)
         loadAllChallenges()
@@ -118,11 +138,15 @@ export function useChallengeOperations() {
         .eq('id', id)
 
       if (deleteError) {
-        console.error('❌ Erro ao deletar challenge:', deleteError)
-        throw deleteError
+        console.error('❌ Erro ao deletar challenge:', {
+          message: deleteError.message,
+          details: deleteError.details,
+          hint: deleteError.hint,
+          code: deleteError.code
+        })
+        throw new Error(deleteError.message || 'Erro ao deletar challenge')
       }
 
-      console.log('✅ Challenge deletado:', id)
       toast.success("Challenge excluído com sucesso!")
       
       try {
@@ -156,11 +180,15 @@ export function useChallengeOperations() {
         .single()
 
       if (approveError) {
-        console.error('❌ Erro ao aprovar challenge:', approveError)
-        throw approveError
+        console.error('❌ Erro ao aprovar challenge:', {
+          message: approveError.message,
+          details: approveError.details,
+          hint: approveError.hint,
+          code: approveError.code
+        })
+        throw new Error(approveError.message || 'Erro ao aprovar challenge')
       }
 
-      console.log('✅ Challenge aprovado:', challenge)
       toast.success("Challenge aprovado com sucesso!")
       
       try {
@@ -195,11 +223,15 @@ export function useChallengeOperations() {
         .single()
 
       if (rejectError) {
-        console.error('❌ Erro ao rejeitar challenge:', rejectError)
-        throw rejectError
+        console.error('❌ Erro ao rejeitar challenge:', {
+          message: rejectError.message,
+          details: rejectError.details,
+          hint: rejectError.hint,
+          code: rejectError.code
+        })
+        throw new Error(rejectError.message || 'Erro ao rejeitar challenge')
       }
 
-      console.log('✅ Challenge rejeitado:', challenge)
       toast.success("Challenge rejeitado e retornado ao professor")
       
       try {
@@ -233,11 +265,15 @@ export function useChallengeOperations() {
         .single()
 
       if (archiveError) {
-        console.error('❌ Erro ao arquivar challenge:', archiveError)
-        throw archiveError
+        console.error('❌ Erro ao arquivar challenge:', {
+          message: archiveError.message,
+          details: archiveError.details,
+          hint: archiveError.hint,
+          code: archiveError.code
+        })
+        throw new Error(archiveError.message || 'Erro ao arquivar challenge')
       }
 
-      console.log('✅ Challenge arquivado:', challenge)
       toast.success("Challenge arquivado com sucesso!")
       
       try {
@@ -275,11 +311,15 @@ export function useChallengeOperations() {
         .single()
 
       if (sendBackError) {
-        console.error('❌ Erro ao enviar challenge de volta:', sendBackError)
-        throw sendBackError
+        console.error('❌ Erro ao enviar challenge de volta:', {
+          message: sendBackError.message,
+          details: sendBackError.details,
+          hint: sendBackError.hint,
+          code: sendBackError.code
+        })
+        throw new Error(sendBackError.message || 'Erro ao enviar challenge de volta')
       }
 
-      console.log('✅ Challenge enviado de volta para análise:', challenge)
       toast.success("Challenge enviado de volta para análise!")
       
       try {

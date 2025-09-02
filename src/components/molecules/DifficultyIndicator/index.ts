@@ -1,1 +1,0 @@
-export { DifficultyIndicator } from './DifficultyIndicator'

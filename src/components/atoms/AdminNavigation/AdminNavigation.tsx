@@ -31,7 +31,7 @@ interface AdminNavigationProps {
 }
 
 export function AdminNavigation({ 
-  items, 
+  items = [], 
   showBackButton = false, 
   backHref, 
   backLabel = "Voltar",

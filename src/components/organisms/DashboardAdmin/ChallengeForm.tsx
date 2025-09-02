@@ -5,7 +5,8 @@ import { Input } from "@/components/atoms/Input/Input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Challenge, ChallengeFormData, DIFFICULTY_OPTIONS, CATEGORY_OPTIONS, STATUS_OPTIONS } from "./types"
+import { DifficultyIndicator } from "@/components/molecules/DifficultyIndicator/DifficultyIndicator"
+import { AdminChallenge as Challenge, ChallengeFormData, DIFFICULTY_OPTIONS, CATEGORY_OPTIONS, STATUS_OPTIONS } from "@/types/admin-dashboard"
 
 interface ChallengeFormProps {
   isCreating: boolean
@@ -22,38 +23,48 @@ export function ChallengeForm({
   onCancel,
   isSubmitting
 }: ChallengeFormProps) {
+  const getDifficultyNumber = (difficulty: string): number => {
+    const difficultyMap: Record<string, number> = {
+      'easy': 1,
+      'medium': 2,
+      'hard': 3,
+      'expert': 4,
+    }
+    return difficultyMap[difficulty] || 1
+  }
   const [formData, setFormData] = useState<ChallengeFormData>({
     title: "",
     description: "",
     difficulty: "easy",
-    category: "",
+    category: [],
     functionName: "",
     status: "draft",
     initialCode: "",
     testCases: []
   })
 
-  // Carregar dados do challenge sendo editado
+
   useEffect(() => {
     if (editingChallenge) {
+      console.log('🔄 Carregando dados da challenge para edição:', editingChallenge)
       const editFormData = {
-        title: editingChallenge.title,
-        description: editingChallenge.description,
-        difficulty: editingChallenge.difficulty,
-        category: editingChallenge.category,
-        functionName: editingChallenge.functionName,
-        status: editingChallenge.status,
+        title: editingChallenge.title || "",
+        description: editingChallenge.description || "",
+        difficulty: editingChallenge.difficulty || "easy",
+        category: Array.isArray(editingChallenge.category) ? editingChallenge.category : (editingChallenge.category ? [editingChallenge.category] : []),
+        functionName: editingChallenge.functionName || "",
+        status: editingChallenge.status || "draft",
         initialCode: editingChallenge.initialCode || "",
         testCases: editingChallenge.testCases || []
       }
+      console.log('📝 Dados do formulário carregados:', editFormData)
       setFormData(editFormData)
     } else {
-      // Reset form for new challenge
       setFormData({
         title: "",
         description: "",
         difficulty: "easy",
-        category: "",
+        category: [],
         functionName: "",
         status: "draft",
         initialCode: "",
@@ -64,6 +75,15 @@ export function ChallengeForm({
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  const handleCategoryChange = (category: string, checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      category: checked 
+        ? [...prev.category, category]
+        : prev.category.filter(c => c !== category)
+    }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -116,39 +136,51 @@ export function ChallengeForm({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="difficulty">Dificuldade</Label>
-              <Select
-                value={formData.difficulty}
-                onValueChange={(value) => handleInputChange("difficulty", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {DIFFICULTY_OPTIONS.map(option => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="space-y-2">
+                <Select
+                  value={formData.difficulty}
+                  onValueChange={(value) => handleInputChange("difficulty", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {DIFFICULTY_OPTIONS.map(option => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Nível:</span>
+                  <DifficultyIndicator difficulty={getDifficultyNumber(formData.difficulty)} />
+                </div>
+              </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="category">Categoria</Label>
-              <Select
-                value={formData.category}
-                onValueChange={(value) => handleInputChange("category", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione uma categoria" />
-                </SelectTrigger>
-                <SelectContent>
-                  {CATEGORY_OPTIONS.map(category => (
-                    <SelectItem key={category} value={category}>
+              <Label htmlFor="category">Categorias</Label>
+              <div className="grid grid-cols-2 gap-2 p-3 border rounded-md">
+                {CATEGORY_OPTIONS.map(category => (
+                  <div key={category} className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id={`category-${category}`}
+                      checked={formData.category.includes(category)}
+                      onChange={(e) => handleCategoryChange(category, e.target.checked)}
+                      className="rounded border-gray-300"
+                    />
+                    <Label htmlFor={`category-${category}`} className="text-sm">
                       {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                    </Label>
+                  </div>
+                ))}
+              </div>
+              {formData.category.length > 0 && (
+                <div className="text-sm text-muted-foreground">
+                  Selecionadas: {formData.category.join(", ")}
+                </div>
+              )}
             </div>
           </div>
 

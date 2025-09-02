@@ -3,12 +3,12 @@
 import { useState, useEffect } from "react"
 import { useChallengeDetails } from "@/hooks/useChallengeDetails"
 import { useChallengeExecution } from "@/hooks/useChallengeExecution"
-import { ChallengeHeader } from "@/components/organisms/ChallengeHeader"
-import { ProblemPanel } from "@/components/organisms/ProblemPanel"
-import { CodeExecutionPanel } from "@/components/organisms/CodeExecutionPanel"
-import { TestResultsPanel } from "@/components/organisms/TestResultsPanel"
-import { NotFoundState } from "@/components/molecules/NotFoundState"
-import { LoadingState } from "@/components/molecules/LoadingState"
+import { ChallengeHeader } from "@/components/organisms/ChallengeHeader/ChallengeHeader"
+import { ProblemPanel } from "@/components/organisms/ProblemPanel/ProblemPanel"
+import { CodeExecutionPanel } from "@/components/organisms/CodeExecutionPanel/CodeExecutionPanel"
+import { TestResultsPanel } from "@/components/organisms/TestResultsPanel/TestResultsPanel"
+import { NotFoundState } from "@/components/molecules/NotFoundState/NotFoundState"
+import { LoadingState } from "@/components/molecules/LoadingState/LoadingState"
 import type { ChallengePageProps, ChallengeProblem } from "@/types/challenge-page"
 
 export function ChallengePage({ challengeId }: ChallengePageProps) {

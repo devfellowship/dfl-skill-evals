@@ -1,1 +1,0 @@
-export { ChallengeHeader } from './ChallengeHeader'

@@ -2,8 +2,8 @@
 
 import { ReactNode } from 'react'
 import { useAuth } from '@/hooks/useAuth'
-import { LoadingState } from '@/components/molecules/LoadingState'
-import { NotFoundState } from '@/components/molecules/NotFoundState'
+import { LoadingState } from '@/components/molecules/LoadingState/LoadingState'
+import { NotFoundState } from '@/components/molecules/NotFoundState/NotFoundState'
 import type { UserRole } from '@/lib/supabase'
 
 interface RoleGuardProps {

@@ -1,1 +1,0 @@
-export { ChallengeRightSidebar } from './ChallengeRightSidebar'

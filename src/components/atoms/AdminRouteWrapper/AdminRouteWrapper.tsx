@@ -15,8 +15,8 @@ export function AdminRouteWrapper({ children, fallback }: AdminRouteWrapperProps
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Por enquanto, sem autenticação - sempre autorizado
-    // TODO: Implementar verificação de autenticação quando conectar com banco
+
+
     setIsAuthorized(true)
     setIsLoading(false)
   }, [])
@@ -37,7 +37,7 @@ export function AdminRouteWrapper({ children, fallback }: AdminRouteWrapperProps
       return <>{fallback}</>
     }
     
-    // Redireciona para página principal se não autorizado
+
     router.push('/')
     return null
   }

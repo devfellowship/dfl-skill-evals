@@ -1,11 +1,11 @@
 import type { TestCase, TestResult, TestSummary } from '@/types/test-cases'
 import { executeCodeWithJudge0 } from './execution/judge0-executor'
-import { JUDGE0_LANGUAGES } from '@/types/execution'
+import { JUDGE0_LANGUAGES, type LanguageId } from '@/types/execution'
 
 export interface ParallelTestRunnerOptions {
   maxConcurrentJobs: number
   timeoutMs: number
-  languageId: number
+  languageId: LanguageId
 }
 
 export class ParallelTestRunner {
@@ -119,7 +119,7 @@ export class ParallelTestRunner {
       
       return `${userCode}
 
-// Teste automático
+
 const input = ${testCase.input};
 const result = ${functionName}(...input);
 console.log(JSON.stringify(result));`

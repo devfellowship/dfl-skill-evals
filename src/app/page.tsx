@@ -32,7 +32,7 @@ export default function AssessmentLibrary() {
   const filteredAssessments = useMemo(() => {
     if (!challenges.length) return []
     
-    // Filtro simples apenas por título/descrição para performance
+
     if (searchQuery) {
       return challenges.filter(
         (assessment) =>
@@ -44,7 +44,7 @@ export default function AssessmentLibrary() {
     return challenges
   }, [challenges, searchQuery])
 
-  // Simplificado para performance - retorna diretamente os filtrados
+
   const sortedAssessments = filteredAssessments
 
   const activeFiltersCount =
@@ -58,15 +58,15 @@ export default function AssessmentLibrary() {
 
 
   return (
-    <div className="flex h-screen flex-col bg-background">
-      <header className="shrink-0 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="flex h-16 items-center justify-between gap-4 px-6">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <Home className="h-5 w-5 text-primary" />
               <h2 className="text-lg font-semibold">Dashboard</h2>
             </div>
-            {/* Botão Admin - Entre esquerda e centro */}
+
             <Button 
               asChild 
               className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 font-medium shadow-md"
@@ -75,7 +75,7 @@ export default function AssessmentLibrary() {
                 🚀 Dashboard Admin
               </Link>
             </Button>
-            {/* Botão Teacher - Entre esquerda e centro */}
+
             <Button 
               asChild 
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 font-medium shadow-md"
@@ -84,7 +84,7 @@ export default function AssessmentLibrary() {
                 👨‍🏫 Dashboard Teacher
               </Link>
             </Button>
-            {/* Botão Criar Challenge - Entre esquerda e centro */}
+
             <Button 
               asChild 
               className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 font-medium shadow-md"
@@ -120,9 +120,9 @@ export default function AssessmentLibrary() {
         </div>
       </header>
       
-      <div className="flex-1 overflow-auto p-6">
+      <main className="p-6">
         {challengesError ? (
-          <div className="flex h-full items-center justify-center">
+          <div className="flex h-96 items-center justify-center">
             <div className="text-center">
               <h2 className="text-xl font-semibold text-destructive mb-2">Erro de Conexão</h2>
               <p className="text-muted-foreground">{challengesError}</p>
@@ -134,7 +134,7 @@ export default function AssessmentLibrary() {
             isLoading={challengesLoading}
           />
         )}
-      </div>
+      </main>
     </div>
   )
 }

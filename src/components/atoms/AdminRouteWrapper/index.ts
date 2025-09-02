@@ -1,1 +1,0 @@
-export { AdminRouteWrapper } from './AdminRouteWrapper'

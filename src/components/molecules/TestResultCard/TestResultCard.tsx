@@ -17,7 +17,7 @@ interface TestResultCardProps {
 }
 
 export function TestResultCard({ result, index, isHidden = false }: TestResultCardProps) {
-  // Função para simplificar mensagens de erro
+
   const simplifyErrorMessage = (error: string): string => {
     if (!error || typeof error !== 'string') {
       return 'Erro desconhecido'
@@ -103,7 +103,7 @@ export function TestResultCard({ result, index, isHidden = false }: TestResultCa
               <span className="font-medium">Got:</span> {result.actualOutput ? result.actualOutput : 'No output'}
             </div>
             
-            {/* Exibir erros de forma clara e específica */}
+
             {(result.status === 'failed' || result.status === 'error') && result.errorMessage && (
               <div className="text-xs text-orange-600 mt-2 p-2 bg-orange-50 rounded border border-orange-200">
                 <div className="font-medium text-orange-700 mb-1">

@@ -9,7 +9,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Configuração para permitir requisições para Judge0
+
   async rewrites() {
     return [
       {

@@ -13,7 +13,7 @@ import {
 } from "lucide-react"
 import type { MenuItem, User } from "@/types"
 
-// Menu principal
+
 export const mainMenuItems: MenuItem[] = [
   {
     title: "Dashboard",
@@ -32,7 +32,7 @@ export const mainMenuItems: MenuItem[] = [
   },
 ]
 
-// Menu de progresso e achievements
+
 export const progressMenuItems: MenuItem[] = [
   {
     title: "Achievements",
@@ -58,7 +58,7 @@ export const progressMenuItems: MenuItem[] = [
   },
 ]
 
-// Menu de configurações
+
 export const settingsMenuItems: MenuItem[] = [
   {
     title: "Criar Challenge",
@@ -82,7 +82,7 @@ export const settingsMenuItems: MenuItem[] = [
   },
 ]
 
-// Dados do usuário mockados
+
 export const currentUser: User = {
   name: "Alex Costa",
   email: "alex@devshaper.com",

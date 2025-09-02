@@ -5,7 +5,7 @@
  * @returns Slug único
  */
 export function generateUniqueSlug(title: string, existingSlugs: string[] = []): string {
-  // Converter para minúsculas e remover acentos
+
   let baseSlug = title
     .toLowerCase()
     .normalize('NFD')
@@ -16,12 +16,12 @@ export function generateUniqueSlug(title: string, existingSlugs: string[] = []):
     .replace(/^-+|-+$/g, '') // Remove hífens no início e fim
     .trim()
 
-  // Garantir que o slug não esteja vazio
+
   if (!baseSlug) {
     baseSlug = 'challenge'
   }
 
-  // Se o slug base já existe, adicionar um número
+
   let finalSlug = baseSlug
   let counter = 1
   

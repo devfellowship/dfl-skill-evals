@@ -15,17 +15,12 @@ export function validateSupabaseConfig() {
     return false
   }
   
-  console.log('✅ Configuração do Supabase válida')
   return true
 }
 
 export const DEV_CONFIG = {
-  // IDs mockados para desenvolvimento
   mockUserId: 'dev-user-id',
   mockAdminId: 'dev-admin-id',
-  
-  //PERMITIR OPERAÇÕES SEM AUTENTICAÇÃO
   allowUnauthenticated: true,
-  
   verboseLogging: true,
 }

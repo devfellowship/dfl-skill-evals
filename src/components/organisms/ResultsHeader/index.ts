@@ -1,1 +1,0 @@
-export { ResultsHeader } from './ResultsHeader'

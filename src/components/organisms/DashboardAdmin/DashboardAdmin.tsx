@@ -7,14 +7,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Plus, Code, TestTube, BarChart3, CheckCircle, Archive, RefreshCw } from "lucide-react"
 import { useChallengesGlobal } from "@/hooks/useChallengesGlobal"
 import { useChallengeOperations } from "@/hooks/useChallengeOperations"
-import { Challenge, ChallengeFormData } from "./types"
+import { AdminChallenge as Challenge, ChallengeFormData } from "@/types/admin-dashboard"
 import { ChallengeForm } from "./ChallengeForm"
 import { ChallengeList } from "./ChallengeList"
 import { PendingApprovalsList } from "./PendingApprovalsList"
 import { ArchivedChallengesList } from "./ArchivedChallengesList"
 
 export function DashboardAdmin() {
-  // Hook global para todas as challenges
+
   const { 
     published, 
     pending, 
@@ -22,10 +22,11 @@ export function DashboardAdmin() {
     isInitialLoading, 
     lastUpdate,
     updateChallengeInList,
-    removeChallengeFromList
+    removeChallengeFromList,
+    loadAllChallenges
   } = useChallengesGlobal()
 
-  // Hook para operações com estados separados
+
   const {
     isSubmitting,
     isDeleting,
@@ -40,12 +41,12 @@ export function DashboardAdmin() {
     handleSendBackForReview
   } = useChallengeOperations()
 
-  // Estados locais do componente
+
   const [isCreating, setIsCreating] = useState(false)
   const [editingChallenge, setEditingChallenge] = useState<Challenge | null>(null)
   const [activeTab, setActiveTab] = useState<string>("challenges")
 
-  // Handlers simplificados
+
   const handleSubmit = async (formData: ChallengeFormData) => {
     if (editingChallenge) {
       const updateData = {
@@ -56,9 +57,26 @@ export function DashboardAdmin() {
         function_name: formData.functionName,
         initial_code: formData.initialCode || "// Seu código aqui",
         test_cases: formData.testCases || [],
-        status: formData.status
+        status: formData.status,
+        slug: formData.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
       }
-      await handleUpdate(editingChallenge.id, updateData)
+      
+      console.log('🔄 Atualizando challenge:', editingChallenge.id, updateData)
+      
+      updateChallengeInList(editingChallenge.id, {
+        title: formData.title,
+        description: formData.description,
+        difficulty: formData.difficulty,
+        category: formData.category,
+        status: formData.status
+      })
+      
+      const result = await handleUpdate(editingChallenge.id, updateData)
+      console.log('✅ Resultado da atualização:', result)
+      
+      if (!result) {
+        loadAllChallenges()
+      }
     } else {
       const createData = {
         title: formData.title,
@@ -72,7 +90,7 @@ export function DashboardAdmin() {
       await handleCreate(createData)
     }
     
-    // Limpar formulário após sucesso
+
     setIsCreating(false)
     setEditingChallenge(null)
   }
@@ -87,79 +105,79 @@ export function DashboardAdmin() {
     setEditingChallenge(null)
   }
 
-  // Handlers com optimistic updates
+
   const handleDeleteWithOptimistic = async (id: string) => {
-    // Optimistic update: remover da lista imediatamente
+
     removeChallengeFromList(id)
     
-    // Executar ação no servidor
+
     const result = await handleDelete(id)
     
-    // Se falhou, o Realtime irá restaurar o item
+
     if (!result) {
-      // O Realtime irá restaurar automaticamente via evento
+
     }
   }
 
   const handleApproveWithOptimistic = async (id: string) => {
-    // Optimistic update: remover da lista de pendentes
+
     updateChallengeInList(id, { status: 'published' as any })
     
-    // Executar ação no servidor
+
     const result = await handleApprove(id)
     
-    // Se falhou, o Realtime irá restaurar
+
     if (!result) {
-      // O Realtime irá restaurar automaticamente via evento
+
     }
   }
 
   const handleRejectWithOptimistic = async (id: string) => {
-    // Optimistic update: remover da lista de pendentes
+
     updateChallengeInList(id, { status: 'draft' as any })
     
-    // Executar ação no servidor (precisa de motivo)
+
     const reason = prompt("Motivo da rejeição (opcional):")
     const result = await handleReject(id, reason || "")
     
-    // Se falhou, o Realtime irá restaurar
+
     if (!result) {
-      // O Realtime irá restaurar automaticamente via evento
+
     }
   }
 
   const handleArchiveWithOptimistic = async (id: string) => {
-    // Optimistic update: remover da lista atual
+
     updateChallengeInList(id, { status: 'archived' as any })
     
-    // Executar ação no servidor
+
     const result = await handleArchive(id)
     
-    // Se falhou, o Realtime irá restaurar
+
     if (!result) {
-      // O Realtime irá restaurar automaticamente via evento
+
     }
   }
 
   const handleSendBackWithOptimistic = async (id: string) => {
-    // Optimistic update: atualizar status imediatamente
+
     updateChallengeInList(id, { status: 'draft' as any })
     
-    // Executar ação no servidor
+
     const result = await handleSendBackForReview(id)
     
-    // Se falhou, o Realtime irá restaurar o status
+
     if (!result) {
-      // O Realtime irá restaurar automaticamente via evento
+
     }
   }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      {/* Header simplificado */}
+
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard Admin</h1>
+          <h1 className="text-3xl font-bold text-primary">Dashboard Admin</h1>
           <p className="text-gray-600">Gerencie challenges e visualize analytics</p>
           <p className="text-xs text-gray-400 mt-1">
             Última atualização: {lastUpdate.toLocaleTimeString()}
@@ -177,7 +195,7 @@ export function DashboardAdmin() {
         </div>
       </div>
 
-      {/* Tabs */}
+
       <Tabs defaultValue="challenges" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="challenges" className="flex items-center gap-2">
@@ -198,9 +216,9 @@ export function DashboardAdmin() {
           </TabsTrigger>
         </TabsList>
 
-        {/* Tab: Challenges */}
+
         <TabsContent value="challenges" className="space-y-6">
-          {/* Formulário de Criação/Edição */}
+
           <ChallengeForm
             isCreating={isCreating}
             editingChallenge={editingChallenge}
@@ -209,7 +227,7 @@ export function DashboardAdmin() {
             isSubmitting={isSubmitting}
           />
 
-          {/* Lista de Challenges */}
+
           <Card>
             <CardHeader>
               <CardTitle>Challenges Aprovados ({published.length})</CardTitle>
@@ -233,7 +251,7 @@ export function DashboardAdmin() {
           </Card>
         </TabsContent>
 
-        {/* Tab: Aprovações */}
+
         <TabsContent value="approvals" className="space-y-6">
           <Card>
             <CardHeader>

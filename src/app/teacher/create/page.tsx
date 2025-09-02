@@ -8,12 +8,12 @@ import { Button } from "@/components/atoms/Button/Button"
 import { Input } from "@/components/atoms/Input/Input"
 import { Textarea } from "@/components/atoms/Textarea/Textarea"
 import { Label } from "@/components/atoms/Label/Label"
-import { LoadingState } from "@/components/molecules/LoadingState"
-import { NotFoundState } from "@/components/molecules/NotFoundState"
+import { LoadingState } from "@/components/molecules/LoadingState/LoadingState"
+import { NotFoundState } from "@/components/molecules/NotFoundState/NotFoundState"
 import { Save, ArrowLeft, Plus, Trash2, BarChart3, Users, BookOpen } from "lucide-react"
 import Link from "next/link"
-import { AdminRouteWrapper } from "@/components/atoms/AdminRouteWrapper"
-import { AdminNavigation } from "@/components/atoms/AdminNavigation"
+import { AdminRouteWrapper } from "@/components/atoms/AdminRouteWrapper/AdminRouteWrapper"
+import { AdminNavigation } from "@/components/atoms/AdminNavigation/AdminNavigation"
 import { toast } from 'sonner'
 
 interface TestCase {
@@ -95,7 +95,7 @@ export default function CreateChallenge() {
       examples: examples.filter(ex => ex.input && ex.output),
     }
 
-    console.log('Dados da challenge a serem enviados:', challengeData)
+
 
     try {
       const result = await createChallenge(challengeData)

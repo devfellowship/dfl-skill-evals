@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { Separator } from "@/components/ui/separator"
-import { ProblemExamples } from "@/components/molecules/ProblemExamples"
+import { ProblemExamples } from "@/components/molecules/ProblemExamples/ProblemExamples"
 import type { Problem } from "@/types/problems"
 
 interface ProblemPanelProps {

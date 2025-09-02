@@ -22,7 +22,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Obter sessão atual
+
     const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       setSession(session)
@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     getSession()
 
-    // Escutar mudanças na autenticação
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
     

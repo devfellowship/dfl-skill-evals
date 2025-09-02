@@ -2,7 +2,7 @@ import type { Problem } from "@/types/problems"
 
 export const problems: Record<string, Problem> = {
   "two-sum": {
-    id: "two-sum",
+    id: 1,
     title: "Two Sum",
     difficulty: "Easy",
     description:
@@ -67,7 +67,7 @@ export const problems: Record<string, Problem> = {
 }
 
 export const DEFAULT_CODE_TEMPLATE = `function twoSum(nums: number[], target: number): number[] {
-    // Your solution here
+
     const map = new Map();
     
     for (let i = 0; i < nums.length; i++) {

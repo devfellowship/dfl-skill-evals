@@ -1,1 +1,0 @@
-export { ResultsActions } from './ResultsActions'

@@ -9,12 +9,12 @@ import { Button } from "@/components/atoms/Button/Button"
 import { Input } from "@/components/atoms/Input/Input"
 import { Textarea } from "@/components/atoms/Textarea/Textarea"
 import { Label } from "@/components/atoms/Label/Label"
-import { LoadingState } from "@/components/molecules/LoadingState"
-import { NotFoundState } from "@/components/molecules/NotFoundState"
+import { LoadingState } from "@/components/molecules/LoadingState/LoadingState"
+import { NotFoundState } from "@/components/molecules/NotFoundState/NotFoundState"
 import { Save, ArrowLeft, Plus, Trash2, Eye } from "lucide-react"
 import Link from "next/link"
-import { AdminRouteWrapper } from "@/components/atoms/AdminRouteWrapper"
-import { AdminNavigation } from "@/components/atoms/AdminNavigation"
+import { AdminRouteWrapper } from "@/components/atoms/AdminRouteWrapper/AdminRouteWrapper"
+import { AdminNavigation } from "@/components/atoms/AdminNavigation/AdminNavigation"
 import { toast } from 'sonner'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
@@ -46,7 +46,7 @@ export default function EditChallenge() {
     skills: [],
     function_name: 'solution',
     initial_code: `function solution() {
-    // Your code here
+
     return null;
 }`,
     test_cases: [],
@@ -70,7 +70,7 @@ export default function EditChallenge() {
   const [isLoading, setIsLoading] = useState(true)
   const [challenge, setChallenge] = useState<any>(null)
 
-  // Carregar dados da challenge
+
   useEffect(() => {
     if (challengeId) {
       loadChallenge()
@@ -106,7 +106,7 @@ export default function EditChallenge() {
           estimated_time_minutes: challengeData.estimated_time_minutes || 30
         })
 
-        // Converter test cases e examples para o formato local
+
         if (challengeData.test_cases) {
           setTestCases(challengeData.test_cases.map((tc: any) => ({
             input: tc.input || '',
@@ -139,7 +139,7 @@ export default function EditChallenge() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    // Validação dos campos obrigatórios
+
     if (!formData.title.trim()) {
       toast.error('Título é obrigatório')
       return
@@ -166,7 +166,7 @@ export default function EditChallenge() {
       examples: examples.filter(ex => ex.input && ex.output),
     }
 
-    console.log('Dados da challenge a serem atualizados:', challengeData)
+
 
     try {
       const result = await updateChallenge(challengeId, challengeData)
@@ -272,7 +272,17 @@ export default function EditChallenge() {
   return (
     <AdminRouteWrapper>
       <div className="min-h-screen bg-background">
-        <AdminNavigation />
+        <AdminNavigation 
+          items={[
+            { label: "Teacher", href: "/teacher" },
+            { label: "Editar Challenge", href: "#" }
+          ]}
+          showBackButton={true}
+          backHref="/teacher"
+          backLabel="Voltar ao Dashboard"
+          userName="Professor"
+          userRole="Teacher"
+        />
         
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}

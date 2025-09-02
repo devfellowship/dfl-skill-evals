@@ -5,7 +5,7 @@ interface DifficultyIndicatorProps {
   maxLevel?: number
 }
 
-export function DifficultyIndicator({ difficulty, maxLevel = 5 }: DifficultyIndicatorProps) {
+export function DifficultyIndicator({ difficulty, maxLevel = 4 }: DifficultyIndicatorProps) {
   return (
     <div className="flex gap-1">
       {Array.from({ length: maxLevel }, (_, index) => {

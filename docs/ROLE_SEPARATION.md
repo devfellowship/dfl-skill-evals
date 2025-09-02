@@ -2,18 +2,6 @@
 
 ## 🎯 **Visão Geral**
 
-### **Problema Identificado:**
-- **Teacher Dashboard** estava mostrando funcionalidades de admin
-- **Aprovação de challenges** estava disponível para professores
-- **Estatísticas gerais** da plataforma estavam visíveis para todos
-- **Falta de separação clara** entre os papéis
-
-### **Solução Implementada:**
-- **Separação clara** de responsabilidades
-- **Dashboard específico** para cada papel
-- **Funcionalidades exclusivas** para cada tipo de usuário
-- **Interface adaptada** às necessidades de cada papel
-
 ## 👑 **Admin (Super Usuário)**
 
 ### **Responsabilidades Principais:**
@@ -32,7 +20,7 @@
 - **Deletar** challenges
 - **Visualizar** challenges
 
-#### **2. Tab: Aprovações** ⭐ **NOVA**
+#### **2. Tab: Aprovações** ⭐
 - **Ver challenges pendentes** de aprovação
 - **Aprovar** challenges dos professores
 - **Rejeitar** challenges com motivo
@@ -62,7 +50,7 @@
 - **Gerenciar** seus próprios challenges
 - **Acompanhar** performance dos alunos
 - **Criar cursos** e módulos
-- **Gerenciar** suas turmas/mentorias
+- **Insights** Poderá ver insights das challenges?
 
 ### **Funcionalidades Disponíveis:**
 

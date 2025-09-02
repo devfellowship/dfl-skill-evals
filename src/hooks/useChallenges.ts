@@ -4,7 +4,7 @@ import type { Tables } from '@/lib/supabase'
 import type { Challenge } from '@/types'
 
 
-// Cache simples em memória
+
 let challengesCache: Challenge[] | null = null
 let cacheTimestamp: number = 0
 const CACHE_DURATION = 5 * 60 * 1000 // 5 minutos
@@ -19,7 +19,7 @@ export function useChallenges() {
       setLoading(true)
       setError(null)
       
-      // Verificar cache primeiro (só se não for refresh forçado)
+
       const now = Date.now()
       if (!forceRefresh && challengesCache && (now - cacheTimestamp) < CACHE_DURATION) {
         setChallenges(challengesCache)
@@ -45,7 +45,7 @@ export function useChallenges() {
         return
       }
       
-      // Adaptar dados do banco para o formato esperado pelo frontend
+
       const adaptedChallenges = data.map((challenge, index) => ({
         id: index + 1,
         supabaseId: challenge.id,
@@ -62,7 +62,7 @@ export function useChallenges() {
         image: undefined
       }))
       
-      // Atualizar cache
+
       challengesCache = adaptedChallenges
       cacheTimestamp = Date.now()
       

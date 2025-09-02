@@ -1,1 +1,0 @@
-export { TestResultCard } from './TestResultCard'

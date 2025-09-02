@@ -2,7 +2,7 @@ import { useMemo } from "react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { Edit, Trash2, Eye, RefreshCw, Plus, Archive } from "lucide-react"
-import { Challenge, DIFFICULTY_OPTIONS, STATUS_OPTIONS } from "./types"
+import { AdminChallenge as Challenge, DIFFICULTY_OPTIONS, STATUS_OPTIONS } from "@/types/admin-dashboard"
 
 interface ChallengeListProps {
   challenges: Challenge[]

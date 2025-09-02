@@ -1,9 +1,9 @@
 "use client"
 
 import { CodeEditor } from "@/components/organisms/CodeEditor/CodeEditor"
-import { CompilationErrorDisplay } from "@/components/molecules/CompilationErrorDisplay"
-import { ExecutionControls } from "@/components/molecules/ExecutionControls"
-import { ExecutionSummary } from "@/components/molecules/ExecutionSummary"
+import { CompilationErrorDisplay } from "@/components/molecules/CompilationErrorDisplay/CompilationErrorDisplay"
+import { ExecutionControls } from "@/components/molecules/ExecutionControls/ExecutionControls"
+import { ExecutionSummary } from "@/components/molecules/ExecutionSummary/ExecutionSummary"
 
 interface CodeExecutionPanelProps {
   code: string

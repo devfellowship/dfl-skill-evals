@@ -1,0 +1,29 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Círculo marrom de fundo -->
+  <circle cx="16" cy="16" r="15" fill="#8B4513"/>
+  
+  <!-- Bastão/Tocha estilizado com listras horizontais -->
+  <!-- Listra vermelha escura -->
+  <rect x="12" y="8" width="8" height="2" fill="#8B0000" transform="rotate(15 16 9)"/>
+  
+  <!-- Listra laranja -->
+  <rect x="12" y="10" width="8" height="2" fill="#FF8C00" transform="rotate(15 16 11)"/>
+  
+  <!-- Listra branca -->
+  <rect x="12" y="12" width="8" height="2" fill="#FFFFFF" transform="rotate(15 16 13)"/>
+  
+  <!-- Listra laranja -->
+  <rect x="12" y="14" width="8" height="2" fill="#FF8C00" transform="rotate(15 16 15)"/>
+  
+  <!-- Listra vermelha escura -->
+  <rect x="12" y="16" width="8" height="2" fill="#8B0000" transform="rotate(15 16 17)"/>
+  
+  <!-- Listra laranja -->
+  <rect x="12" y="18" width="8" height="2" fill="#FF8C00" transform="rotate(15 16 19)"/>
+  
+  <!-- Listra branca -->
+  <rect x="12" y="20" width="8" height="2" fill="#FFFFFF" transform="rotate(15 16 21)"/>
+  
+  <!-- Listra laranja -->
+  <rect x="12" y="22" width="8" height="2" fill="#FF8C00" transform="rotate(15 16 23)"/>
+</svg>
