@@ -13,13 +13,13 @@ export function useAuth() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Pegar sessão atual
+
     const getSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession()
         
         if (session?.user) {
-          // Buscar perfil do usuário
+
           const { data: profile } = await supabase
             .from('profiles')
             .select('*')

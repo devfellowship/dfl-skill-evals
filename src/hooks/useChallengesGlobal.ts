@@ -1,13 +1,15 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
-import { AdminChallenge as Challenge } from '@/types/admin-dashboard'
+import { AdminChallenge as Challenge } from '@/types/admin'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 
 export function useChallengesGlobal() {
   const [challenges, setChallenges] = useState<Challenge[]>([])
   const [isInitialLoading, setIsInitialLoading] = useState(true)
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date())
+  const [broadcastWorking, setBroadcastWorking] = useState(true)
   const channelRef = useRef<RealtimeChannel | null>(null)
+  const pollingRef = useRef<NodeJS.Timeout | null>(null)
 
   const adaptChallenge = useCallback((raw: any): Challenge => {
     const mapStatus = raw.status === 'approved'
@@ -37,8 +39,8 @@ export function useChallengesGlobal() {
       category: Array.isArray(raw.category) ? raw.category : (raw.category ? [raw.category] : ['Algoritmos']),
       functionName: raw.function_name,
       status: mapStatus,
-      createdAt: new Date(raw.created_at).toLocaleDateString('pt-BR'),
-      updatedAt: new Date(raw.updated_at).toLocaleDateString('pt-BR'),
+      createdAt: raw.created_at ? new Date(raw.created_at).toLocaleDateString('pt-BR') : 'Data não disponível',
+      updatedAt: raw.updated_at ? new Date(raw.updated_at).toLocaleDateString('pt-BR') : 'Data não disponível',
       initialCode: raw.initial_code ?? '',
       testCases: raw.test_cases ?? []
     }
@@ -70,43 +72,91 @@ export function useChallengesGlobal() {
     }
   }, [adaptChallenge])
 
+  // Sistema de polling como fallback
+  const startPolling = useCallback(() => {
+    if (pollingRef.current) return
+    
+    console.log('🔄 Iniciando polling como fallback...')
+    pollingRef.current = setInterval(() => {
+      console.log('🔄 Polling: verificando atualizações...')
+      loadAllChallenges()
+    }, 5000) // Polling a cada 5 segundos
+  }, [loadAllChallenges])
+
+  const stopPolling = useCallback(() => {
+    if (pollingRef.current) {
+      console.log('🔄 Parando polling...')
+      clearInterval(pollingRef.current)
+      pollingRef.current = null
+    }
+  }, [])
+
   useEffect(() => {
     loadAllChallenges()
 
-    const channel = supabase.channel('challenges-broadcast')
+    const channel = supabase.channel('challenges-broadcast', {
+      config: {
+        broadcast: { self: true }
+      }
+    })
     channelRef.current = channel
+
+    console.log('🔌 Configurando canal de broadcast...')
 
     channel
       .on('broadcast', { event: 'challenge-created' }, ({ payload }) => {
+        console.log('📡 Recebido broadcast: challenge-created', payload)
         const adaptedChallenge = adaptChallenge(payload.challenge)
         setChallenges(prev => [adaptedChallenge, ...prev])
         setLastUpdate(new Date())
+        setBroadcastWorking(true)
       })
       .on('broadcast', { event: 'challenge-updated' }, ({ payload }) => {
+        console.log('📡 Recebido broadcast: challenge-updated', payload)
         const adaptedChallenge = adaptChallenge(payload.challenge)
         setChallenges(prev => prev.map(ch => 
           ch.id === adaptedChallenge.id ? adaptedChallenge : ch
         ))
         setLastUpdate(new Date())
+        setBroadcastWorking(true)
       })
       .on('broadcast', { event: 'challenge-deleted' }, ({ payload }) => {
+        console.log('📡 Recebido broadcast: challenge-deleted', payload)
         setChallenges(prev => prev.filter(ch => ch.id !== payload.challengeId))
         setLastUpdate(new Date())
+        setBroadcastWorking(true)
       })
       .subscribe((status) => {
+        console.log('📡 Status do canal:', status)
         if (status === 'CHANNEL_ERROR') {
-
-          loadAllChallenges()
+          console.warn('⚠️ Erro no canal, iniciando polling...')
+          setBroadcastWorking(false)
+          startPolling()
+        } else if (status === 'SUBSCRIBED') {
+          console.log('✅ Canal de broadcast conectado com sucesso')
+          setBroadcastWorking(true)
+          stopPolling()
         }
       })
 
+    // Timeout para detectar se o broadcast não está funcionando
+    const broadcastTimeout = setTimeout(() => {
+      if (!broadcastWorking) {
+        console.warn('⚠️ Broadcast não funcionando, iniciando polling...')
+        startPolling()
+      }
+    }, 10000) // 10 segundos de timeout
+
     return () => {
       if (channelRef.current) {
+        console.log('🔌 Removendo canal de broadcast...')
         supabase.removeChannel(channelRef.current)
         channelRef.current = null
       }
+      stopPolling()
+      clearTimeout(broadcastTimeout)
     }
-  }, [loadAllChallenges, adaptChallenge])
+  }, [loadAllChallenges, adaptChallenge, broadcastWorking, startPolling, stopPolling])
 
   const published = useMemo(() => 
     challenges.filter(c => c.status === 'published'), 
@@ -144,31 +194,43 @@ export function useChallengesGlobal() {
 
   const broadcastChallengeCreated = useCallback((challenge: any) => {
     if (channelRef.current) {
-      channelRef.current.send({
+      console.log('📡 Enviando broadcast: challenge-created', challenge)
+      const result = channelRef.current.send({
         type: 'broadcast',
         event: 'challenge-created',
         payload: { challenge }
       })
+      console.log('📡 Resultado do broadcast:', result)
+    } else {
+      console.warn('⚠️ Canal não disponível para broadcast')
     }
   }, [])
 
   const broadcastChallengeUpdated = useCallback((challenge: any) => {
     if (channelRef.current) {
-      channelRef.current.send({
+      console.log('📡 Enviando broadcast: challenge-updated', challenge)
+      const result = channelRef.current.send({
         type: 'broadcast',
         event: 'challenge-updated',
         payload: { challenge }
       })
+      console.log('📡 Resultado do broadcast:', result)
+    } else {
+      console.warn('⚠️ Canal não disponível para broadcast')
     }
   }, [])
 
   const broadcastChallengeDeleted = useCallback((challengeId: string) => {
     if (channelRef.current) {
-      channelRef.current.send({
+      console.log('📡 Enviando broadcast: challenge-deleted', challengeId)
+      const result = channelRef.current.send({
         type: 'broadcast',
         event: 'challenge-deleted',
         payload: { challengeId }
       })
+      console.log('📡 Resultado do broadcast:', result)
+    } else {
+      console.warn('⚠️ Canal não disponível para broadcast')
     }
   }, [])
 
@@ -176,6 +238,7 @@ export function useChallengesGlobal() {
     challenges,
     isInitialLoading,
     lastUpdate,
+    broadcastWorking,
     published,
     pending,
     archived,

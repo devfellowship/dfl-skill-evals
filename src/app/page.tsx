@@ -17,7 +17,6 @@ export default function AssessmentLibrary() {
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     skills: [],
     difficulties: [],
-    durations: [],
     categories: [],
     minRating: 0,
     trending: false,
@@ -47,10 +46,9 @@ export default function AssessmentLibrary() {
 
   const sortedAssessments = filteredAssessments
 
-  const activeFiltersCount =
+    const activeFiltersCount = 
     searchFilters.skills.length +
     searchFilters.difficulties.length +
-    searchFilters.durations.length +
     searchFilters.categories.length +
     (searchFilters.minRating > 0 ? 1 : 0) +
     (searchFilters.trending ? 1 : 0)

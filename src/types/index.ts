@@ -1,13 +1,18 @@
-export * from './challenge'
+export * from './admin'
+export * from './editor'
+export * from './navigation'
 
-export * from './challenge-page'
+// Export challenges types with specific naming to avoid conflicts
+export type { 
+  Challenge, 
+  SearchFilters,
+  ChallengePageProps,
+  PreChallengePageProps,
+  Problem,
+  Example,
+  ProblemDifficulty,
+  TestCase as ChallengeTestCase
+} from './challenges'
 
-export * from './pre-challenge-page'
-
-export type { Problem, Example, ProblemDifficulty } from './problems'
-export type { TestCase as ProblemTestCase } from './problems'
-
-export type { ExecutionRequest, ExecutionResponse, TestResult } from './execution'
-export type { TestCase as ExecutionTestCase } from './execution'
-
-export * from './navigation' 
+// Re-export specific types to resolve conflicts
+export type { TestCase as ExecutionTestCase, TestResult } from './editor'

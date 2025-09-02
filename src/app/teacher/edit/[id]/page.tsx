@@ -11,7 +11,7 @@ import { Textarea } from "@/components/atoms/Textarea/Textarea"
 import { Label } from "@/components/atoms/Label/Label"
 import { LoadingState } from "@/components/molecules/LoadingState/LoadingState"
 import { NotFoundState } from "@/components/molecules/NotFoundState/NotFoundState"
-import { Save, ArrowLeft, Plus, Trash2, Eye } from "lucide-react"
+import { Save, ArrowLeft, Plus, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { AdminRouteWrapper } from "@/components/atoms/AdminRouteWrapper/AdminRouteWrapper"
 import { AdminNavigation } from "@/components/atoms/AdminNavigation/AdminNavigation"
@@ -53,7 +53,7 @@ export default function EditChallenge() {
     examples: [],
     constraints: [],
     hints: [],
-    estimated_time_minutes: 30
+
   })
 
   const [testCases, setTestCases] = useState<TestCase[]>([
@@ -103,7 +103,7 @@ export default function EditChallenge() {
           examples: challengeData.examples || [],
           constraints: challengeData.constraints || [],
           hints: challengeData.hints || [],
-          estimated_time_minutes: challengeData.estimated_time_minutes || 30
+
         })
 
 
@@ -302,18 +302,7 @@ export default function EditChallenge() {
               </div>
             </div>
             
-            <div className="flex gap-3">
-              <Button variant="outline" size="sm" asChild>
-                <Link href={`/challenges/${challenge.slug}`} target="_blank">
-                  <Eye className="w-4 h-4 mr-2" />
-                  Visualizar
-                </Link>
-              </Button>
-              <Button onClick={handleSubmit} disabled={updateLoading}>
-                <Save className="w-4 h-4 mr-2" />
-                {updateLoading ? 'Salvando...' : 'Salvar Alterações'}
-              </Button>
-            </div>
+
           </div>
 
           {/* Formulário */}
@@ -616,6 +605,26 @@ export default function EditChallenge() {
               </CardContent>
             </Card>
           </form>
+          
+          {/* Botões movidos para o final */}
+          <div className="flex gap-3 pt-6 border-t mt-6">
+            <Button 
+              onClick={handleSubmit} 
+              disabled={updateLoading}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              {updateLoading ? 'Salvando...' : 'Salvar Alterações'}
+            </Button>
+            <Button 
+              variant="outline" 
+              asChild
+            >
+              <Link href="/teacher">
+                Cancelar
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
     </AdminRouteWrapper>

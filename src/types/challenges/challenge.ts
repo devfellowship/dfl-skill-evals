@@ -5,7 +5,7 @@ export interface Challenge {
   description: string
   skills: string[]
   difficulty: number
-  duration: string
+
   problems: number
   participants: number
   rating: number
@@ -17,7 +17,7 @@ export interface Challenge {
 export interface SearchFilters {
   skills: string[]
   difficulties: string[]
-  durations: string[]
+
   minRating: number
   categories: string[]
   trending: boolean

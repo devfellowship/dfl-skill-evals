@@ -1,6 +1,6 @@
 "use client"
 
-import { Clock, Star } from "lucide-react"
+import { Star } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { Separator } from "@/components/ui/separator"
@@ -11,7 +11,7 @@ interface Challenge {
   description: string
   rating: number
   skills: string[]
-  duration: string
+
   difficulty: number
 }
 
@@ -30,7 +30,7 @@ export function PreAssessmentCard({ assessment }: PreAssessmentCardProps) {
           </div>
           <div className="flex items-center gap-1">
             <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-            <span className="text-sm font-medium">{assessment.rating}</span>
+            <span className="text-sm font-medium">{assessment.rating.toFixed(1)}</span>
           </div>
         </div>
       </CardHeader>
@@ -50,13 +50,7 @@ export function PreAssessmentCard({ assessment }: PreAssessmentCardProps) {
         <Separator />
 
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Duration</span>
-            <div className="flex items-center gap-1">
-              <Clock className="h-4 w-4" />
-              <span className="font-medium">{assessment.duration}</span>
-            </div>
-          </div>
+
         </div>
 
         <Separator />

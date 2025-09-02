@@ -1,13 +1,13 @@
 import { useState, useCallback, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Tables, Inserts, Updates, ChallengeStatus } from '@/lib/supabase'
-import type { DifficultyLevel } from '@/types'
+import type { DifficultyLevel } from '@/lib/supabase'
 import { generateUniqueSlug } from '@/lib/utils/slug-generator'
 
 export interface CreateChallengeData {
   title: string
   description: string
-  difficulty: DifficultyLevel | "easy" | "medium" | "hard" // Aceita tipos do frontend e do banco
+  difficulty: DifficultyLevel | "easy" | "medium" | "hard"
   category?: string
   skills?: string[]
   function_name: string
@@ -19,7 +19,7 @@ export interface CreateChallengeData {
   course_id?: string
   module_id?: string
   tags?: string[]
-  estimated_time_minutes?: number
+
 }
 
 
@@ -81,7 +81,7 @@ export function useChallengeManagement() {
         constraints: data.constraints || [],
         hints: data.hints || [],
         tags: data.tags || [],
-        estimated_time_minutes: data.estimated_time_minutes || 30,
+
         max_score: 100,
         is_public: false,
         order_index: 0,
@@ -144,7 +144,7 @@ export function useChallengeManagement() {
 
       const mappedUpdates: any = {}
       
-      // Campos diretos
+
       if (updates.title !== undefined) mappedUpdates.title = updates.title
       if (updates.description !== undefined) mappedUpdates.description = updates.description
       if (updates.category !== undefined) mappedUpdates.category = updates.category
@@ -152,12 +152,11 @@ export function useChallengeManagement() {
       if (updates.constraints !== undefined) mappedUpdates.constraints = updates.constraints
       if (updates.hints !== undefined) mappedUpdates.hints = updates.hints
       if (updates.tags !== undefined) mappedUpdates.tags = updates.tags
-      if (updates.estimated_time_minutes !== undefined) mappedUpdates.estimated_time_minutes = updates.estimated_time_minutes
+
       if (updates.course_id !== undefined) mappedUpdates.course_id = updates.course_id
       if (updates.module_id !== undefined) mappedUpdates.module_id = updates.module_id
       if (updates.examples !== undefined) mappedUpdates.examples = updates.examples
-      
-      // Mapear campos com nomes diferentes
+
       if (updates.function_name !== undefined) {
         mappedUpdates.function_name = updates.function_name
         console.log('🔍 Mapeando function_name:', updates.function_name)
@@ -523,12 +522,14 @@ export function useChallengeManagement() {
     }
   }, [])
 
-  // Função para buscar challenges de um usuário específico (mantida para compatibilidade)
+  // Função para buscar challenges de um usuário específico
   const getUserChallenges = useCallback(async (status?: ChallengeStatus) => {
     try {
       setLoading(true)
       setError(null)
 
+      // Como estamos usando login mock, vamos buscar todas as challenges
+      // Em produção, aqui seria filtrado por created_by = user.id
       let query = supabase
         .from('challenges')
         .select('*')
@@ -542,10 +543,14 @@ export function useChallengeManagement() {
 
       if (fetchError) throw fetchError
 
+      console.log('📚 Challenges encontradas:', challenges?.length || 0)
+      console.log('📊 Status das challenges:', challenges?.map(c => ({ id: c.id, status: c.status, title: c.title })))
+
       return challenges || []
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao buscar challenges'
       setError(errorMessage)
+      console.error('❌ Erro ao buscar challenges do usuário:', err)
       return []
     } finally {
       setLoading(false)

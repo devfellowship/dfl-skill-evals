@@ -25,11 +25,7 @@ export const mainMenuItems: MenuItem[] = [
     url: "/my-challenges",
     icon: BookOpen,
   },
-  {
-    title: "Resultados",
-    url: "/results",
-    icon: BarChart3,
-  },
+
 ]
 
 

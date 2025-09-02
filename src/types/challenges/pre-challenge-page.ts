@@ -20,7 +20,7 @@ export interface PreChallengeAssessment {
   examples: any
   constraints: string[]
   hints: string[]
-  estimated_time_minutes: number
+
   max_score: number
   tags: string[]
   order_index: number

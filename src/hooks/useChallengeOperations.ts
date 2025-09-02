@@ -77,6 +77,25 @@ export function useChallengeOperations() {
     console.log('🚀 Iniciando atualização:', id, updateData)
     setIsSubmitting(true)
     try {
+      // Buscar o status atual da challenge
+      const { data: currentChallenge, error: fetchError } = await supabase
+        .from('challenges')
+        .select('status')
+        .eq('id', id)
+        .single()
+
+      if (fetchError) {
+        console.error('❌ Erro ao buscar challenge atual:', fetchError)
+        throw new Error('Erro ao buscar challenge atual')
+      }
+
+      // Se a challenge estava aprovada e está sendo atualizada, mudar para "to_approve"
+      let newStatus = updateData.status
+      if (currentChallenge.status === 'approved' && updateData.status === 'approved') {
+        newStatus = 'to_approve'
+        console.log('🔄 Challenge aprovada sendo atualizada, mudando status para "to_approve"')
+      }
+
       const { data: challenge, error: updateError } = await supabase
         .from('challenges')
         .update({
@@ -87,7 +106,7 @@ export function useChallengeOperations() {
           function_name: updateData.function_name,
           initial_code: updateData.initial_code,
           test_cases: updateData.test_cases,
-          status: updateData.status,
+          status: newStatus,
           slug: updateData.slug
         })
         .eq('id', id)

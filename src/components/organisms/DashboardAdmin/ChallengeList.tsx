@@ -2,7 +2,7 @@ import { useMemo } from "react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { Edit, Trash2, Eye, RefreshCw, Plus, Archive } from "lucide-react"
-import { AdminChallenge as Challenge, DIFFICULTY_OPTIONS, STATUS_OPTIONS } from "@/types/admin-dashboard"
+import { AdminChallenge as Challenge, DIFFICULTY_OPTIONS, STATUS_OPTIONS } from "@/types/admin"
 
 interface ChallengeListProps {
   challenges: Challenge[]
@@ -28,15 +28,15 @@ export function ChallengeList({
   onCreateNew
 }: ChallengeListProps) {
   const getDifficultyColor = useMemo(() => (difficulty: string) => {
-    return DIFFICULTY_OPTIONS.find(opt => opt.value === difficulty)?.color || ""
+    return DIFFICULTY_OPTIONS.find((opt: any) => opt.value === difficulty)?.color || ""
   }, [])
 
   const getStatusColor = useMemo(() => (status: string) => {
-    return STATUS_OPTIONS.find(opt => opt.value === status)?.color || ""
+    return STATUS_OPTIONS.find((opt: any) => opt.value === status)?.color || ""
   }, [])
 
   const getStatusLabel = useMemo(() => (status: string) => {
-    return STATUS_OPTIONS.find(opt => opt.value === status)?.label || status
+    return STATUS_OPTIONS.find((opt: any) => opt.value === status)?.label || status
   }, [])
 
   if (isInitialLoading) {

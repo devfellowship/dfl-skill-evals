@@ -53,11 +53,11 @@ export function useChallenges() {
         description: challenge.description,
         skills: challenge.skills || [],
         difficulty: challenge.difficulty,
-        duration: `${challenge.estimated_time_minutes} min`,
+
         category: challenge.category || 'Algoritmos',
         problems: 1,
         participants: 500 + index * 50,
-        rating: 4.2 + (index * 0.1),
+        rating: parseFloat((4.2 + (index * 0.1)).toFixed(1)),
         trending: index < 2,
         image: undefined
       }))

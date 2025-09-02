@@ -1,4 +1,4 @@
-import type { Problem } from "@/types/problems"
+import type { Problem } from "@/types/challenges/problems"
 
 export const problems: Record<string, Problem> = {
   "two-sum": {

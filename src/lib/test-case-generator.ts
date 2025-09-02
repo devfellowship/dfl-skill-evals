@@ -1,6 +1,5 @@
-import type { TestCase, TestCaseGenerator } from '@/types/test-cases'
+import type { TestCase, TestCaseGenerator } from '@/types/challenges/test-cases'
 
-// Gerador de números pseudo-aleatórios baseado em seed
 class SeededRandom {
   private seed: number
 

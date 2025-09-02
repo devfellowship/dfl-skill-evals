@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { DifficultyIndicator } from "@/components/molecules/DifficultyIndicator/DifficultyIndicator"
-import { AdminChallenge as Challenge, ChallengeFormData, DIFFICULTY_OPTIONS, CATEGORY_OPTIONS, STATUS_OPTIONS } from "@/types/admin-dashboard"
+import { AdminChallenge as Challenge, ChallengeFormData, DIFFICULTY_OPTIONS, CATEGORY_OPTIONS, STATUS_OPTIONS } from "@/types/admin"
 
 interface ChallengeFormProps {
   isCreating: boolean
@@ -74,15 +74,15 @@ export function ChallengeForm({
   }, [editingChallenge])
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+    setFormData((prev: ChallengeFormData) => ({ ...prev, [field]: value }))
   }
 
   const handleCategoryChange = (category: string, checked: boolean) => {
-    setFormData(prev => ({
+    setFormData((prev: ChallengeFormData) => ({
       ...prev,
       category: checked 
         ? [...prev.category, category]
-        : prev.category.filter(c => c !== category)
+        : prev.category.filter((c: string) => c !== category)
     }))
   }
 
@@ -145,7 +145,7 @@ export function ChallengeForm({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {DIFFICULTY_OPTIONS.map(option => (
+                    {DIFFICULTY_OPTIONS.map((option: any) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.label}
                       </SelectItem>
@@ -161,7 +161,7 @@ export function ChallengeForm({
             <div className="space-y-2">
               <Label htmlFor="category">Categorias</Label>
               <div className="grid grid-cols-2 gap-2 p-3 border rounded-md">
-                {CATEGORY_OPTIONS.map(category => (
+                {CATEGORY_OPTIONS.map((category: string) => (
                   <div key={category} className="flex items-center space-x-2">
                     <input
                       type="checkbox"
@@ -206,7 +206,7 @@ export function ChallengeForm({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {STATUS_OPTIONS.map(option => (
+                {STATUS_OPTIONS.map((option: any) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>
@@ -215,24 +215,27 @@ export function ChallengeForm({
             </Select>
           </div>
 
-          <div className="flex gap-2 pt-4">
-            <Button 
-              type="submit" 
-              className="bg-blue-600 hover:bg-blue-700"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Salvando..." : editingChallenge ? "Atualizar" : "Criar"} Challenge
-            </Button>
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={onCancel}
-              disabled={isSubmitting}
-            >
-              Cancelar
-            </Button>
-          </div>
         </form>
+        
+        {/* Botões movidos para o final */}
+        <div className="flex gap-2 pt-6 border-t mt-6">
+          <Button 
+            type="button" 
+            onClick={handleSubmit}
+            className="bg-blue-600 hover:bg-blue-700"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Salvando..." : editingChallenge ? "Atualizar" : "Criar"} Challenge
+          </Button>
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={onCancel}
+            disabled={isSubmitting}
+          >
+            Cancelar
+          </Button>
+        </div>
       </CardContent>
     </Card>
   )

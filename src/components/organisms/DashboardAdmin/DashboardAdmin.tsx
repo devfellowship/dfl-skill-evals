@@ -4,14 +4,17 @@ import { useState } from "react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Plus, Code, TestTube, BarChart3, CheckCircle, Archive, RefreshCw } from "lucide-react"
+import { Code, TestTube, CheckCircle, Archive, RefreshCw } from "lucide-react"
 import { useChallengesGlobal } from "@/hooks/useChallengesGlobal"
 import { useChallengeOperations } from "@/hooks/useChallengeOperations"
-import { AdminChallenge as Challenge, ChallengeFormData } from "@/types/admin-dashboard"
+import { AdminChallenge as Challenge, ChallengeFormData } from "@/types/admin"
 import { ChallengeForm } from "./ChallengeForm"
 import { ChallengeList } from "./ChallengeList"
 import { PendingApprovalsList } from "./PendingApprovalsList"
 import { ArchivedChallengesList } from "./ArchivedChallengesList"
+import { DashboardHeaderButtons } from "@/components/atoms/DashboardHeaderButtons/DashboardHeaderButtons"
+import { AdminStatsCards } from "@/components/molecules/AdminStatsCards/AdminStatsCards"
+import { ConnectionStatus } from "@/components/atoms/ConnectionStatus/ConnectionStatus"
 
 export function DashboardAdmin() {
 
@@ -21,6 +24,7 @@ export function DashboardAdmin() {
     archived, 
     isInitialLoading, 
     lastUpdate,
+    broadcastWorking,
     updateChallengeInList,
     removeChallengeFromList,
     loadAllChallenges
@@ -178,26 +182,21 @@ export function DashboardAdmin() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold text-primary">Dashboard Admin</h1>
-          <p className="text-gray-600">Gerencie challenges e visualize analytics</p>
-          <p className="text-xs text-gray-400 mt-1">
-            Última atualização: {lastUpdate.toLocaleTimeString()}
-          </p>
+          <p className="text-gray-600">Gerencie challenges e aprovações</p>
+          <ConnectionStatus isConnected={broadcastWorking} lastUpdate={lastUpdate} />
         </div>
-        <div className="flex items-center gap-2">
-          <Button 
-            onClick={() => setIsCreating(true)}
-            className="bg-blue-600 hover:bg-blue-700 px-6 py-3 font-medium text-lg"
-            disabled={isSubmitting}
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            {isSubmitting ? "Salvando..." : "Novo Challenge"}
-          </Button>
-        </div>
+        <DashboardHeaderButtons
+          onCreateClick={() => setIsCreating(true)}
+          createButtonText="Novo Challenge"
+          isSubmitting={isSubmitting}
+          showHomeButton={true}
+          homeButtonText="Inicio"
+        />
       </div>
 
 
       <Tabs defaultValue="challenges" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="challenges" className="flex items-center gap-2">
             <Code className="w-4 h-4" />
             Challenges
@@ -206,10 +205,7 @@ export function DashboardAdmin() {
             <CheckCircle className="w-4 h-4" />
             Aprovações
           </TabsTrigger>
-          <TabsTrigger value="analytics" className="flex items-center gap-2">
-            <BarChart3 className="w-4 h-4" />
-            Analytics
-          </TabsTrigger>
+
           <TabsTrigger value="archived" className="flex items-center gap-2">
             <Archive className="w-4 h-4" />
             Arquivados
@@ -277,26 +273,6 @@ export function DashboardAdmin() {
           </Card>
         </TabsContent>
 
-        {/* Tab: Analytics */}
-        <TabsContent value="analytics" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Analytics</CardTitle>
-              <CardDescription>
-                Visualize métricas e estatísticas dos challenges
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12 text-gray-500">
-                <BarChart3 className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                <h3 className="text-lg font-medium mb-2">Em Desenvolvimento</h3>
-                <p>Esta funcionalidade estará disponível em breve!</p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Tab: Arquivados */}
         <TabsContent value="archived" className="space-y-6">
           <Card>
             <CardHeader>

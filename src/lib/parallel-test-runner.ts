@@ -1,6 +1,6 @@
-import type { TestCase, TestResult, TestSummary } from '@/types/test-cases'
+import type { TestCase, TestResult, TestSummary } from '@/types/challenges/test-cases'
 import { executeCodeWithJudge0 } from './execution/judge0-executor'
-import { JUDGE0_LANGUAGES, type LanguageId } from '@/types/execution'
+import { JUDGE0_LANGUAGES, type LanguageId } from '@/types/editor/execution'
 
 export interface ParallelTestRunnerOptions {
   maxConcurrentJobs: number
@@ -31,8 +31,8 @@ export class ParallelTestRunner {
     const results = await Promise.all(testPromises)
     
     const totalExecutionTime = Date.now() - this.startTime
-    const passCount = results.filter(r => r.status === 'passed').length
-    const failCount = results.filter(r => r.status === 'failed').length
+    const passCount = results.filter((r: TestResult) => r.status === 'passed').length
+    const failCount = results.filter((r: TestResult) => r.status === 'failed').length
 
     return {
       passCount,

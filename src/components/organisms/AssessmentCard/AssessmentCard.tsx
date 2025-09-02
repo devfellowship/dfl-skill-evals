@@ -1,6 +1,6 @@
 import React from "react"
 import Link from "next/link"
-import { ArrowRight, Clock, Code, Star, Users } from "lucide-react"
+import { ArrowRight, Code, Star, Users } from "lucide-react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { Card, CardContent } from "@/components/ui/card"
@@ -73,10 +73,7 @@ export const AssessmentCard = React.forwardRef<
             <DifficultyIndicator difficulty={assessment.difficulty} />
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <div className="flex items-center gap-3">
-                <span className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  {assessment.duration}
-                </span>
+
                 <span className="flex items-center gap-1">
                   <Users className="h-3 w-3" />
                   {formatParticipants(assessment.participants)}
@@ -84,7 +81,7 @@ export const AssessmentCard = React.forwardRef<
               </div>
               <div className="flex items-center gap-1">
                 <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                <span>{assessment.rating}</span>
+                <span>{assessment.rating.toFixed(1)}</span>
               </div>
             </div>
           </div>
