@@ -11,6 +11,7 @@ export interface AdminChallenge {
   updatedAt: string
   initialCode?: string
   testCases?: any[]
+  orderIndex?: number
 }
 
 export interface ChallengeFormData {

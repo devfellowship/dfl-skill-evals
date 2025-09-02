@@ -10,6 +10,7 @@ import { AdminNavigation } from "@/components/atoms/AdminNavigation/AdminNavigat
 import { DashboardHeaderButtons } from "@/components/atoms/DashboardHeaderButtons/DashboardHeaderButtons"
 import { TeacherStatsCards } from "@/components/molecules/TeacherStatsCards/TeacherStatsCards"
 import { TeacherChallengeList } from "@/components/molecules/TeacherChallengeList/TeacherChallengeList"
+import { SearchButton } from "@/components/atoms/SearchButton/SearchButton"
 
 export default function TeacherDashboard() {
   const { 
@@ -26,6 +27,8 @@ export default function TeacherDashboard() {
     totalSubmissions: 0,
     averageScore: 0
   })
+  const [activeTab, setActiveTab] = useState("published")
+  const [searchQuery, setSearchQuery] = useState("")
   const publishedChallenges = myChallenges.filter(c => c.status === 'approved')
   const pendingChallenges = myChallenges.filter(c => c.status === 'to_approve' || c.status === 'draft')
 
@@ -68,6 +71,10 @@ export default function TeacherDashboard() {
     }
   }
 
+  const handleTitleSearch = (query: string) => {
+    setSearchQuery(query)
+  }
+
   return (
     <AdminRouteWrapper>
       <div className="min-h-screen bg-background">
@@ -95,12 +102,19 @@ export default function TeacherDashboard() {
                 <h1 className="text-3xl font-bold text-primary">Dashboard Professor</h1>
                 <p className="text-muted-foreground">Gerencie seus challenges e acompanhe o progresso dos alunos</p>
               </div>
-              <DashboardHeaderButtons
-                createButtonHref="/teacher/create"
-                createButtonText="Criar Challenge"
-                showHomeButton={true}
-                homeButtonText="Inicio"
-              />
+              <div className="flex items-center gap-3">
+                <SearchButton 
+                  onSearch={handleTitleSearch}
+                  placeholder="Pesquisar challenges por título..."
+                  currentQuery={searchQuery}
+                />
+                <DashboardHeaderButtons
+                  createButtonHref="/teacher/create"
+                  createButtonText="Criar Challenge"
+                  showHomeButton={true}
+                  homeButtonText="Inicio"
+                />
+              </div>
             </div>
           </div>
         </header>
@@ -138,6 +152,7 @@ export default function TeacherDashboard() {
                     <TeacherChallengeList 
                       challenges={publishedChallenges} 
                       onDelete={handleDeleteChallenge}
+                      searchQuery={searchQuery}
                     />
                   )}
                 </CardContent>
@@ -162,6 +177,7 @@ export default function TeacherDashboard() {
                     <TeacherChallengeList 
                       challenges={pendingChallenges} 
                       onDelete={handleDeleteChallenge}
+                      searchQuery={searchQuery}
                     />
                   )}
                 </CardContent>

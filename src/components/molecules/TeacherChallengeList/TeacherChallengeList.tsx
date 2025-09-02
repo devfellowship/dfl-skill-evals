@@ -1,8 +1,9 @@
 "use client"
 
+import { useMemo } from "react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
-import { Edit, Eye, Trash2, CheckCircle, Plus } from "lucide-react"
+import { Edit, Trash2, CheckCircle, Plus, Eye } from "lucide-react"
 import Link from "next/link"
 
 interface TeacherChallenge {
@@ -18,9 +19,10 @@ interface TeacherChallenge {
 interface TeacherChallengeListProps {
   challenges: TeacherChallenge[]
   onDelete: (id: string) => void
+  searchQuery?: string
 }
 
-export function TeacherChallengeList({ challenges, onDelete }: TeacherChallengeListProps) {
+export function TeacherChallengeList({ challenges, onDelete, searchQuery = "" }: TeacherChallengeListProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'published': return 'bg-green-100 text-green-800'
@@ -41,7 +43,15 @@ export function TeacherChallengeList({ challenges, onDelete }: TeacherChallengeL
     }
   }
 
-  if (challenges.length === 0) {
+  const filteredChallenges = useMemo(() => {
+    if (!searchQuery.trim()) return challenges
+    
+    return challenges.filter(challenge => 
+      challenge.title.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  }, [challenges, searchQuery])
+
+  if (filteredChallenges.length === 0) {
     return (
       <div className="text-center py-12">
         <div className="text-gray-500 mb-4">Você ainda não criou nenhum challenge</div>
@@ -57,8 +67,8 @@ export function TeacherChallengeList({ challenges, onDelete }: TeacherChallengeL
 
   return (
     <div className="space-y-4">
-      {challenges.map((challenge) => (
-        <div key={challenge.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/30 hover:border-border/60 transition-all duration-200 group">
+             {filteredChallenges.map((challenge) => (
+        <div key={challenge.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/30 hover:border-border/60 transition-all duration-200 group w-full max-w-4xl">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
               <h3 className="font-semibold text-lg group-hover:text-primary transition-colors duration-200">{challenge.title}</h3>
@@ -86,16 +96,15 @@ export function TeacherChallengeList({ challenges, onDelete }: TeacherChallengeL
                 <Edit className="w-4 h-4" />
               </Link>
             </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              asChild
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.open(`/teacher/challenge/${challenge.id}`, '_blank')}
               className="opacity-70 group-hover:opacity-100 transition-opacity duration-200"
             >
-              <Link href={`/challenges/${challenge.slug}`} target="_blank">
-                <Eye className="w-4 h-4" />
-              </Link>
+              <Eye className="w-4 h-4" />
             </Button>
+
             {challenge.status === 'to_approve' && (
               <Button
                 variant="outline"

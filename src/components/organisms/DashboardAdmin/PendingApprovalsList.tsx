@@ -1,7 +1,7 @@
 import { useMemo } from "react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
-import { Edit, Trash2, Eye, CheckCircle, XCircle, Archive } from "lucide-react"
+import { Edit, Trash2, Eye, CheckCircle, XCircle, Archive, GitCompare } from "lucide-react"
 import { AdminChallenge as Challenge, DIFFICULTY_OPTIONS, STATUS_OPTIONS } from "@/types/admin"
 
 interface PendingApprovalsListProps {
@@ -12,9 +12,11 @@ interface PendingApprovalsListProps {
   onApprove: (id: string) => void
   onReject: (id: string) => void
   onArchive: (id: string) => void
+  onCompare?: (id: string) => void
   isDeleting?: string | null
   isApproving?: string | null
   isArchiving?: string | null
+  searchQuery?: string
 }
 
 export function PendingApprovalsList({
@@ -25,9 +27,11 @@ export function PendingApprovalsList({
   onApprove,
   onReject,
   onArchive,
+  onCompare,
   isDeleting,
   isApproving,
-  isArchiving
+  isArchiving,
+  searchQuery = ""
 }: PendingApprovalsListProps) {
   const getDifficultyColor = useMemo(() => (difficulty: string) => {
     return DIFFICULTY_OPTIONS.find(opt => opt.value === difficulty)?.color || ""
@@ -41,6 +45,14 @@ export function PendingApprovalsList({
     return STATUS_OPTIONS.find(opt => opt.value === status)?.label || status
   }, [])
 
+  const filteredChallenges = useMemo(() => {
+    if (!searchQuery.trim()) return challenges
+    
+    return challenges.filter(challenge => 
+      challenge.title.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  }, [challenges, searchQuery])
+
   if (isInitialLoading) {
     return (
       <div className="text-center py-8">
@@ -50,7 +62,7 @@ export function PendingApprovalsList({
     )
   }
 
-  if (challenges.length === 0) {
+  if (filteredChallenges.length === 0) {
     return (
       <div className="text-center py-12 text-gray-500">
         <CheckCircle className="w-16 h-16 mx-auto mb-4 text-gray-300" />
@@ -62,10 +74,10 @@ export function PendingApprovalsList({
 
   return (
     <div className="space-y-4">
-      {challenges.map(challenge => (
+             {filteredChallenges.map(challenge => (
         <div
           key={challenge.id}
-          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/30 hover:border-border/60 transition-all duration-200 group"
+          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/30 hover:border-border/60 transition-all duration-200 group w-full max-w-4xl"
         >
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
@@ -87,16 +99,38 @@ export function PendingApprovalsList({
             </div>
           </div>
           
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => window.open(`/challenges/${challenge.slug}`, '_blank')}
-              className="opacity-70 group-hover:opacity-100 transition-opacity duration-200"
-              title="Ver Detalhes da Challenge"
-            >
-              <Eye className="w-4 h-4" />
-            </Button>
+                     <div className="flex gap-2">
+             <Button
+               variant="outline"
+               size="sm"
+               onClick={() => onEdit(challenge)}
+               className="opacity-70 group-hover:opacity-100 transition-opacity duration-200"
+               title="Editar Challenge"
+             >
+               <Edit className="w-4 h-4" />
+             </Button>
+             
+             <Button
+               variant="outline"
+               size="sm"
+               onClick={() => window.open(`/admin/challenge/${challenge.id}`, '_blank')}
+               className="opacity-70 group-hover:opacity-100 transition-opacity duration-200"
+               title="Ver Detalhes da Challenge"
+             >
+               <Eye className="w-4 h-4" />
+             </Button>
+            
+            {onCompare && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onCompare(challenge.id)}
+                className="opacity-70 group-hover:opacity-100 transition-opacity duration-200"
+                title="Analisar Alterações"
+              >
+                <GitCompare className="w-4 h-4" />
+              </Button>
+            )}
             
             <Button
               variant="outline"

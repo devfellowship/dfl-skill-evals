@@ -1,8 +1,10 @@
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { Edit, Trash2, Eye, RefreshCw, Plus, Archive } from "lucide-react"
 import { AdminChallenge as Challenge, DIFFICULTY_OPTIONS, STATUS_OPTIONS } from "@/types/admin"
+import { SortButton } from "@/components/atoms/SortButton/SortButton"
+import { ChallengeSorter, SortType } from "@/lib/challenge-sorter"
 
 interface ChallengeListProps {
   challenges: Challenge[]
@@ -14,6 +16,7 @@ interface ChallengeListProps {
   isDeleting?: string | null
   isArchiving?: string | null
   onCreateNew: () => void
+  searchQuery?: string
 }
 
 export function ChallengeList({
@@ -25,8 +28,23 @@ export function ChallengeList({
   onArchive,
   isDeleting,
   isArchiving,
-  onCreateNew
+  onCreateNew,
+  searchQuery = ""
 }: ChallengeListProps) {
+  const [sortType, setSortType] = useState<SortType>('created_desc')
+  
+  const filteredAndSortedChallenges = useMemo(() => {
+    let filtered = challenges
+    
+    if (searchQuery.trim()) {
+      filtered = challenges.filter(challenge => 
+        challenge.title.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    }
+    
+    return ChallengeSorter.sortChallenges(filtered, sortType)
+  }, [challenges, sortType, searchQuery])
+
   const getDifficultyColor = useMemo(() => (difficulty: string) => {
     return DIFFICULTY_OPTIONS.find((opt: any) => opt.value === difficulty)?.color || ""
   }, [])
@@ -62,10 +80,25 @@ export function ChallengeList({
 
   return (
     <div className="space-y-4">
-      {challenges.map(challenge => (
+             <div className="flex items-center justify-between">
+         <div className="text-sm text-muted-foreground">
+           {filteredAndSortedChallenges.length} challenge{filteredAndSortedChallenges.length !== 1 ? 's' : ''} encontrado{filteredAndSortedChallenges.length !== 1 ? 's' : ''}
+           {searchQuery && (
+             <span className="ml-2 text-blue-600">
+               (filtrado por: "{searchQuery}")
+             </span>
+           )}
+         </div>
+        <SortButton 
+          currentSort={sortType} 
+          onSortChange={(sort) => setSortType(sort as SortType)}
+        />
+      </div>
+      
+             {filteredAndSortedChallenges.map(challenge => (
         <div
           key={challenge.id}
-          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/30 hover:border-border/60 transition-all duration-200 group"
+          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/30 hover:border-border/60 transition-all duration-200 group w-full max-w-4xl"
         >
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
@@ -102,14 +135,14 @@ export function ChallengeList({
               <Edit className="w-4 h-4" />
             </Button>
             
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => window.open(`/challenges/${challenge.slug}`, '_blank')}
-              className="opacity-70 group-hover:opacity-100 transition-opacity duration-200"
-            >
-              <Eye className="w-4 h-4" />
-            </Button>
+                                    <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open(`/admin/challenge/${challenge.id}`, '_blank')}
+                          className="opacity-70 group-hover:opacity-100 transition-opacity duration-200"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
 
             {/* Botão "Voltar para Análise" apenas para challenges aprovadas */}
             {challenge.status === 'published' && (

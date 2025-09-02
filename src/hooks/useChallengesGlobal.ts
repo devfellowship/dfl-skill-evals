@@ -42,7 +42,8 @@ export function useChallengesGlobal() {
       createdAt: raw.created_at ? new Date(raw.created_at).toLocaleDateString('pt-BR') : 'Data não disponível',
       updatedAt: raw.updated_at ? new Date(raw.updated_at).toLocaleDateString('pt-BR') : 'Data não disponível',
       initialCode: raw.initial_code ?? '',
-      testCases: raw.test_cases ?? []
+      testCases: raw.test_cases ?? [],
+      orderIndex: raw.order_index ?? null
     }
   }, [])
 
@@ -51,6 +52,7 @@ export function useChallengesGlobal() {
       const { data: dbChallenges, error: fetchError } = await supabase
         .from('challenges')
         .select('*')
+        .order('order_index', { ascending: true })
         .order('created_at', { ascending: false })
 
       if (fetchError) {

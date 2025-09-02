@@ -15,6 +15,8 @@ import { ArchivedChallengesList } from "./ArchivedChallengesList"
 import { DashboardHeaderButtons } from "@/components/atoms/DashboardHeaderButtons/DashboardHeaderButtons"
 import { AdminStatsCards } from "@/components/molecules/AdminStatsCards/AdminStatsCards"
 import { ConnectionStatus } from "@/components/atoms/ConnectionStatus/ConnectionStatus"
+import { ChallengeComparisonModal } from "@/components/molecules/ChallengeComparisonModal/ChallengeComparisonModal"
+import { SearchButton } from "@/components/atoms/SearchButton/SearchButton"
 
 export function DashboardAdmin() {
 
@@ -45,6 +47,9 @@ export function DashboardAdmin() {
     handleSendBackForReview
   } = useChallengeOperations()
 
+  const [comparisonModalOpen, setComparisonModalOpen] = useState(false)
+  const [challengeToCompare, setChallengeToCompare] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState("")
 
   const [isCreating, setIsCreating] = useState(false)
   const [editingChallenge, setEditingChallenge] = useState<Challenge | null>(null)
@@ -108,6 +113,8 @@ export function DashboardAdmin() {
     setIsCreating(false)
     setEditingChallenge(null)
   }
+
+
 
 
   const handleDeleteWithOptimistic = async (id: string) => {
@@ -176,6 +183,44 @@ export function DashboardAdmin() {
     }
   }
 
+  const handleOpenComparison = (challengeId: string) => {
+    setChallengeToCompare(challengeId)
+    setComparisonModalOpen(true)
+  }
+
+  const handleCloseComparison = () => {
+    setComparisonModalOpen(false)
+    setChallengeToCompare(null)
+  }
+
+  const handleApproveFromComparison = async () => {
+    if (challengeToCompare) {
+      try {
+        await handleApprove(challengeToCompare)
+        handleCloseComparison()
+        console.log("✅ Challenge aprovada após análise")
+      } catch (error) {
+        console.error("❌ Erro ao aprovar challenge:", error)
+      }
+    }
+  }
+
+  const handleRejectFromComparison = async () => {
+    if (challengeToCompare) {
+      try {
+        await handleReject(challengeToCompare, "Rejeitado após análise de alterações")
+        handleCloseComparison()
+        console.log("✅ Challenge rejeitada após análise")
+      } catch (error) {
+        console.error("❌ Erro ao rejeitar challenge:", error)
+      }
+    }
+  }
+
+  const handleTitleSearch = (query: string) => {
+    setSearchQuery(query)
+  }
+
   return (
     <div className="container mx-auto p-6 space-y-6">
 
@@ -185,13 +230,20 @@ export function DashboardAdmin() {
           <p className="text-gray-600">Gerencie challenges e aprovações</p>
           <ConnectionStatus isConnected={broadcastWorking} lastUpdate={lastUpdate} />
         </div>
-        <DashboardHeaderButtons
-          onCreateClick={() => setIsCreating(true)}
-          createButtonText="Novo Challenge"
-          isSubmitting={isSubmitting}
-          showHomeButton={true}
-          homeButtonText="Inicio"
-        />
+                 <div className="flex items-center gap-3">
+           <SearchButton 
+             onSearch={handleTitleSearch}
+             placeholder="Pesquisar challenges por título..."
+             currentQuery={searchQuery}
+           />
+           <DashboardHeaderButtons
+             onCreateClick={() => setIsCreating(true)}
+             createButtonText="Novo Challenge"
+             isSubmitting={isSubmitting}
+             showHomeButton={true}
+             homeButtonText="Inicio"
+           />
+         </div>
       </div>
 
 
@@ -232,23 +284,32 @@ export function DashboardAdmin() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ChallengeList
-                challenges={published}
-                isInitialLoading={isInitialLoading}
-                onEdit={handleEdit}
-                onDelete={handleDeleteWithOptimistic}
-                onSendBackForReview={handleSendBackWithOptimistic}
-                onArchive={handleArchiveWithOptimistic}
-                isDeleting={isDeleting}
-                isArchiving={isArchiving}
-                onCreateNew={() => setIsCreating(true)}
-              />
+                             <ChallengeList
+                 challenges={published}
+                 isInitialLoading={isInitialLoading}
+                 onEdit={handleEdit}
+                 onDelete={handleDeleteWithOptimistic}
+                 onSendBackForReview={handleSendBackWithOptimistic}
+                 onArchive={handleArchiveWithOptimistic}
+                 isDeleting={isDeleting}
+                 isArchiving={isArchiving}
+                 onCreateNew={() => setIsCreating(true)}
+                 searchQuery={searchQuery}
+               />
             </CardContent>
           </Card>
         </TabsContent>
 
 
         <TabsContent value="approvals" className="space-y-6">
+          <ChallengeForm
+            isCreating={isCreating}
+            editingChallenge={editingChallenge}
+            onSubmit={handleSubmit}
+            onCancel={handleCancel}
+            isSubmitting={isSubmitting}
+          />
+
           <Card>
             <CardHeader>
               <CardTitle>Challenges Pendentes de Aprovação ({pending.length})</CardTitle>
@@ -257,18 +318,20 @@ export function DashboardAdmin() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <PendingApprovalsList
-                challenges={pending}
-                isInitialLoading={isInitialLoading}
-                onEdit={handleEdit}
-                onDelete={handleDeleteWithOptimistic}
-                onApprove={handleApproveWithOptimistic}
-                onReject={handleRejectWithOptimistic}
-                onArchive={handleArchiveWithOptimistic}
-                isDeleting={isDeleting}
-                isApproving={isApproving}
-                isArchiving={isArchiving}
-              />
+                             <PendingApprovalsList
+                 challenges={pending}
+                 isInitialLoading={isInitialLoading}
+                 onEdit={handleEdit}
+                 onDelete={handleDeleteWithOptimistic}
+                 onApprove={handleApproveWithOptimistic}
+                 onReject={handleRejectWithOptimistic}
+                 onArchive={handleArchiveWithOptimistic}
+                 onCompare={handleOpenComparison}
+                 isDeleting={isDeleting}
+                 isApproving={isApproving}
+                 isArchiving={isArchiving}
+                 searchQuery={searchQuery}
+               />
             </CardContent>
           </Card>
         </TabsContent>
@@ -296,6 +359,17 @@ export function DashboardAdmin() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Modal de Comparação */}
+      {challengeToCompare && (
+        <ChallengeComparisonModal
+          isOpen={comparisonModalOpen}
+          onClose={handleCloseComparison}
+          challengeId={challengeToCompare}
+          onApprove={handleApproveFromComparison}
+          onReject={handleRejectFromComparison}
+        />
+      )}
     </div>
   )
 }
