@@ -138,11 +138,11 @@ export function DashboardAdmin() {
         console.log('📡 Realtime Status:', status)
         if (status === 'SUBSCRIBED') {
           console.log('✅ Realtime conectado como fonte única de verdade!')
-        } else if (status === 'CHANNEL_ERROR') {
-          console.error('❌ Erro no canal Realtime - usando fallback')
-          // Fallback: recarregar dados se Realtime falhar
-          loadChallenges()
-        }
+                 } else if (status === 'CHANNEL_ERROR') {
+           console.error('❌ Erro no canal Realtime - usando fallback')
+           // Fallback: recarregar dados silenciosamente se Realtime falhar
+           loadChallenges(true)
+         }
       })
 
     return () => {
@@ -153,10 +153,15 @@ export function DashboardAdmin() {
 
   // Função para adaptar challenge do banco para o frontend
   const adaptChallenge = (challenge: any): Challenge => {
-    let frontendStatus: any = challenge.status
-    if (challenge.status === 'to_approve') {
+    let frontendStatus: "draft" | "published" | "archived"
+    
+    if (challenge.status === 'approved') {
+      frontendStatus = 'published'
+    } else if (challenge.status === 'to_approve' || challenge.status === 'rejected') {
       frontendStatus = 'draft'
-    } else if (challenge.status === 'rejected') {
+    } else if (challenge.status === 'archived') {
+      frontendStatus = 'archived'
+    } else {
       frontendStatus = 'draft'
     }
     
@@ -202,38 +207,25 @@ export function DashboardAdmin() {
         console.log('📊 Challenges recebidos:', dbChallenges)
       }
       
-      if (dbChallenges && dbChallenges.length > 0) {
-        // Adaptar dados do banco para o formato esperado pelo componente
-        const adaptedChallenges: Challenge[] = dbChallenges.map(challenge => {
-          // Mapear status do banco para o formato do frontend
-          let frontendStatus: "draft" | "published" | "archived"
-          if (challenge.status === 'to_approve') {
-            frontendStatus = 'draft'
-          } else if (challenge.status === 'approved') {
-            frontendStatus = 'published'
-          } else if (challenge.status === 'archived') {
-            frontendStatus = 'archived'
-          } else if (challenge.status === 'rejected') {
-            frontendStatus = 'draft' // Rejeitados voltam para draft
-          } else {
-            frontendStatus = 'draft' // fallback
-          }
-
-          return {
-            id: challenge.id,
-            title: challenge.title,
-            slug: challenge.slug,
-            description: challenge.description,
-            difficulty: challenge.difficulty,
-            category: challenge.category || "Algoritmos",
-            functionName: challenge.function_name,
-            status: frontendStatus,
-            createdAt: new Date(challenge.created_at).toLocaleDateString('pt-BR'),
-            updatedAt: new Date(challenge.updated_at).toLocaleDateString('pt-BR')
-          }
-        })
-        console.log('✅ Challenges adaptados:', adaptedChallenges)
-        setChallenges(adaptedChallenges)
+             if (dbChallenges && dbChallenges.length > 0) {
+         // Adaptar dados do banco para o formato esperado pelo componente
+         const adaptedChallenges: Challenge[] = dbChallenges.map(challenge => {
+           const adapted = adaptChallenge(challenge)
+           return {
+             id: adapted.id,
+             title: adapted.title,
+             slug: adapted.slug,
+             description: adapted.description,
+             difficulty: adapted.difficulty,
+             category: adapted.category || "Algoritmos",
+             functionName: (adapted as any).function_name,
+             status: adapted.status,
+             createdAt: new Date((adapted as any).created_at).toLocaleDateString('pt-BR'),
+             updatedAt: new Date((adapted as any).updated_at).toLocaleDateString('pt-BR')
+           }
+         })
+         console.log('✅ Challenges adaptados:', adaptedChallenges)
+         setChallenges(adaptedChallenges)
       } else {
         console.log('⚠️ Nenhum challenge encontrado no banco')
         setChallenges([])
@@ -276,14 +268,14 @@ export function DashboardAdmin() {
         
         const result = await updateChallenge(editingChallenge.id, updateData)
         
-        if (result) {
-          toast.success("Challenge atualizado com sucesso!")
-          setEditingChallenge(null)
-          clearFormDataFromStorage()
-          await loadChallenges() // Recarregar lista
-        } else {
-          toast.error("Erro ao atualizar challenge")
-        }
+                 if (result) {
+           toast.success("Challenge atualizado com sucesso!")
+           setEditingChallenge(null)
+           clearFormDataFromStorage()
+           // O Realtime irá atualizar automaticamente via evento UPDATE
+         } else {
+           toast.error("Erro ao atualizar challenge")
+         }
       } else {
         // Criar novo challenge
         const result = await createChallenge({
@@ -296,13 +288,13 @@ export function DashboardAdmin() {
           test_cases: formData.testCases || []
         })
         
-        if (result) {
-          toast.success("Challenge criado com sucesso!")
-          clearFormDataFromStorage()
-          await loadChallenges() // Recarregar lista
-        } else {
-          toast.error("Erro ao criar challenge")
-        }
+                 if (result) {
+           toast.success("Challenge criado com sucesso!")
+           clearFormDataFromStorage()
+           // O Realtime irá atualizar automaticamente via evento INSERT
+         } else {
+           toast.error("Erro ao criar challenge")
+         }
       }
 
       // Limpar formulário
@@ -345,12 +337,12 @@ export function DashboardAdmin() {
     if (confirm("Tem certeza que deseja excluir este challenge?")) {
       try {
         const result = await deleteChallenge(id)
-        if (result) {
-          toast.success("Challenge excluído com sucesso!")
-          await loadChallenges() // Recarregar lista
-        } else {
-          toast.error("Erro ao excluir challenge")
-        }
+                 if (result) {
+           toast.success("Challenge excluído com sucesso!")
+           // O Realtime irá atualizar automaticamente via evento DELETE
+         } else {
+           toast.error("Erro ao excluir challenge")
+         }
       } catch (err) {
         toast.error("Erro ao excluir challenge")
         console.error(err)
@@ -864,15 +856,14 @@ function ArchivedChallengesTab() {
       const result = await approveChallenge(challengeId)
       console.log('✅ Resultado da aprovação:', result)
       
-      if (result) {
-        toast.success("Challenge aprovado e desarquivado com sucesso!")
-        // Sincronização silenciosa após a ação
-        setTimeout(() => loadArchivedChallenges(), 1000)
-      } else {
-        toast.error("Erro ao aprovar challenge")
-        // Reverter optimistic update em caso de erro
-        loadArchivedChallenges()
-      }
+             if (result) {
+         toast.success("Challenge aprovado e desarquivado com sucesso!")
+         // O Realtime irá atualizar automaticamente
+       } else {
+         toast.error("Erro ao aprovar challenge")
+         // Reverter optimistic update em caso de erro
+         loadArchivedChallenges()
+       }
     } catch (err) {
       console.error('❌ Erro ao aprovar challenge:', err)
       toast.error("Erro ao aprovar challenge")
