@@ -1,3 +1,4 @@
+import { useMemo } from "react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { Edit, Trash2, Eye, CheckCircle, XCircle, Archive } from "lucide-react"
@@ -28,17 +29,17 @@ export function PendingApprovalsList({
   isApproving,
   isArchiving
 }: PendingApprovalsListProps) {
-  const getDifficultyColor = (difficulty: string) => {
+  const getDifficultyColor = useMemo(() => (difficulty: string) => {
     return DIFFICULTY_OPTIONS.find(opt => opt.value === difficulty)?.color || ""
-  }
+  }, [])
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = useMemo(() => (status: string) => {
     return STATUS_OPTIONS.find(opt => opt.value === status)?.color || ""
-  }
+  }, [])
 
-  const getStatusLabel = (status: string) => {
+  const getStatusLabel = useMemo(() => (status: string) => {
     return STATUS_OPTIONS.find(opt => opt.value === status)?.label || status
-  }
+  }, [])
 
   if (isInitialLoading) {
     return (
