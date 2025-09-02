@@ -1,6 +1,6 @@
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
-import { Edit, Trash2, Eye, CheckCircle, RefreshCw } from "lucide-react"
+import { Edit, Trash2, Eye, CheckCircle, RefreshCw, Archive } from "lucide-react"
 import { Challenge, DIFFICULTY_OPTIONS, STATUS_OPTIONS } from "./types"
 
 interface ArchivedChallengesListProps {

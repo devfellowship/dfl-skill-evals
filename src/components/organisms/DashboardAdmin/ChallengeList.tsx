@@ -1,6 +1,6 @@
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
-import { Edit, Trash2, Eye, RefreshCw, Plus } from "lucide-react"
+import { Edit, Trash2, Eye, RefreshCw, Plus, Archive } from "lucide-react"
 import { Challenge, DIFFICULTY_OPTIONS, STATUS_OPTIONS } from "./types"
 
 interface ChallengeListProps {
@@ -9,7 +9,9 @@ interface ChallengeListProps {
   onEdit: (challenge: Challenge) => void
   onDelete: (id: string) => void
   onSendBackForReview: (id: string) => void
+  onArchive: (id: string) => void
   isDeleting?: string | null
+  isArchiving?: string | null
   onCreateNew: () => void
 }
 
@@ -19,7 +21,9 @@ export function ChallengeList({
   onEdit,
   onDelete,
   onSendBackForReview,
+  onArchive,
   isDeleting,
+  isArchiving,
   onCreateNew
 }: ChallengeListProps) {
   const getDifficultyColor = (difficulty: string) => {
@@ -116,6 +120,20 @@ export function ChallengeList({
                 title="Enviar de volta para análise"
               >
                 <RefreshCw className="w-4 h-4" />
+              </Button>
+            )}
+
+            {/* Botão "Arquivar" apenas para challenges aprovadas */}
+            {challenge.status === 'published' && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onArchive(challenge.id)}
+                disabled={isArchiving === challenge.id}
+                className="text-gray-600 hover:text-gray-700 opacity-70 group-hover:opacity-100 transition-opacity duration-200"
+                title="Arquivar challenge"
+              >
+                <Archive className="w-4 h-4" />
               </Button>
             )}
 

@@ -178,7 +178,7 @@ export function DashboardAdmin() {
 
       {/* Tabs */}
       <Tabs defaultValue="challenges" value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="challenges" className="flex items-center gap-2">
             <Code className="w-4 h-4" />
             Challenges
@@ -223,7 +223,9 @@ export function DashboardAdmin() {
                 onEdit={handleEdit}
                 onDelete={handleDeleteWithOptimistic}
                 onSendBackForReview={handleSendBackWithOptimistic}
+                onArchive={handleArchiveWithOptimistic}
                 isDeleting={isDeleting}
+                isArchiving={isArchiving}
                 onCreateNew={() => setIsCreating(true)}
               />
             </CardContent>
