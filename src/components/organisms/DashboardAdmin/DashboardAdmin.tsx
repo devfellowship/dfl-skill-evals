@@ -5,7 +5,7 @@ import { Button } from "@/components/atoms/Button/Button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Plus, Code, TestTube, BarChart3, CheckCircle, Archive, RefreshCw } from "lucide-react"
-import { useChallengesRealtime } from "@/hooks/useChallengesRealtime"
+import { useChallengesByStatus } from "@/hooks/useChallengesByStatus"
 import { useChallengeOperations } from "@/hooks/useChallengeOperations"
 import { Challenge, ChallengeFormData } from "./types"
 import { ChallengeForm } from "./ChallengeForm"
@@ -14,13 +14,10 @@ import { ChallengeList } from "./ChallengeList"
 // import { PendingApprovalsTab } from "./PendingApprovalsTab"
 
 export function DashboardAdmin() {
-  // Hook centralizado para Realtime
-  const {
-    challenges,
-    isInitialLoading,
-    lastUpdate,
-    updateChallengeInList
-  } = useChallengesRealtime()
+  // Hooks específicos por status
+  const approvedChallenges = useChallengesByStatus('approved')
+  const pendingChallenges = useChallengesByStatus('to_approve')
+  const archivedChallenges = useChallengesByStatus('archived')
 
   // Hook para operações com estados separados
   const {
@@ -36,6 +33,22 @@ export function DashboardAdmin() {
   const [isCreating, setIsCreating] = useState(false)
   const [editingChallenge, setEditingChallenge] = useState<Challenge | null>(null)
   const [activeTab, setActiveTab] = useState<string>("challenges")
+
+  // Selecionar dados baseado na aba ativa
+  const getCurrentTabData = () => {
+    switch (activeTab) {
+      case 'challenges':
+        return approvedChallenges
+      case 'approvals':
+        return pendingChallenges
+      case 'archived':
+        return archivedChallenges
+      default:
+        return approvedChallenges
+    }
+  }
+
+  const currentTabData = getCurrentTabData()
 
     // Handlers simplificados
   const handleSubmit = async (formData: ChallengeFormData) => {
@@ -81,7 +94,7 @@ export function DashboardAdmin() {
 
   const handleDeleteWithOptimistic = async (id: string) => {
     // Optimistic update: remover da lista imediatamente
-    updateChallengeInList(id, { status: 'deleted' as any })
+    currentTabData.updateChallengeInList(id, { status: 'deleted' as any })
     
     // Executar ação no servidor
     const result = await handleDelete(id)
@@ -94,7 +107,7 @@ export function DashboardAdmin() {
 
   const handleSendBackWithOptimistic = async (id: string) => {
     // Optimistic update: atualizar status imediatamente
-    updateChallengeInList(id, { status: 'draft' as any })
+    currentTabData.updateChallengeInList(id, { status: 'draft' as any })
     
     // Executar ação no servidor
     const result = await handleSendBackForReview(id)
@@ -113,7 +126,7 @@ export function DashboardAdmin() {
           <h1 className="text-3xl font-bold text-gray-900">Dashboard Admin</h1>
           <p className="text-gray-600">Gerencie challenges e visualize analytics</p>
           <p className="text-xs text-gray-400 mt-1">
-            Última atualização: {lastUpdate.toLocaleTimeString()}
+            Última atualização: {currentTabData.lastUpdate.toLocaleTimeString()}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -167,15 +180,15 @@ export function DashboardAdmin() {
           {/* Lista de Challenges */}
           <Card>
             <CardHeader>
-              <CardTitle>Challenges Aprovados ({challenges.length})</CardTitle>
+              <CardTitle>Challenges Aprovados ({currentTabData.challenges.length})</CardTitle>
               <CardDescription>
                 Gerencie challenges aprovados e publicados na plataforma
               </CardDescription>
             </CardHeader>
             <CardContent>
               <ChallengeList
-                challenges={challenges}
-                isInitialLoading={isInitialLoading}
+                challenges={currentTabData.challenges}
+                isInitialLoading={currentTabData.isInitialLoading}
                 onEdit={handleEdit}
                 onDelete={handleDeleteWithOptimistic}
                 onSendBackForReview={handleSendBackWithOptimistic}
@@ -190,17 +203,21 @@ export function DashboardAdmin() {
         <TabsContent value="approvals" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Challenges Pendentes de Aprovação</CardTitle>
+              <CardTitle>Challenges Pendentes de Aprovação ({pendingChallenges.challenges.length})</CardTitle>
               <CardDescription>
                 Aprove, rejeite, arquive ou exclua challenges criados pelos professores
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12 text-gray-500">
-                <CheckCircle className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                <h3 className="text-lg font-medium mb-2">Em Desenvolvimento</h3>
-                <p>Esta funcionalidade estará disponível em breve!</p>
-              </div>
+              <ChallengeList
+                challenges={pendingChallenges.challenges}
+                isInitialLoading={pendingChallenges.isInitialLoading}
+                onEdit={handleEdit}
+                onDelete={handleDeleteWithOptimistic}
+                onSendBackForReview={handleSendBackWithOptimistic}
+                isDeleting={isDeleting}
+                onCreateNew={() => setIsCreating(true)}
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -247,17 +264,21 @@ export function DashboardAdmin() {
         <TabsContent value="archived" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Challenges Arquivados</CardTitle>
+              <CardTitle>Challenges Arquivados ({archivedChallenges.challenges.length})</CardTitle>
               <CardDescription>
                 Challenges que foram arquivados e não estão mais ativos
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12 text-gray-500">
-                <Archive className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                <h3 className="text-lg font-medium mb-2">Em Desenvolvimento</h3>
-                <p>Esta funcionalidade estará disponível em breve!</p>
-              </div>
+              <ChallengeList
+                challenges={archivedChallenges.challenges}
+                isInitialLoading={archivedChallenges.isInitialLoading}
+                onEdit={handleEdit}
+                onDelete={handleDeleteWithOptimistic}
+                onSendBackForReview={handleSendBackWithOptimistic}
+                isDeleting={isDeleting}
+                onCreateNew={() => setIsCreating(true)}
+              />
             </CardContent>
           </Card>
         </TabsContent>
