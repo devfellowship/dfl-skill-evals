@@ -10,8 +10,8 @@ import { useChallengeOperations } from "@/hooks/useChallengeOperations"
 import { Challenge, ChallengeFormData } from "./types"
 import { ChallengeForm } from "./ChallengeForm"
 import { ChallengeList } from "./ChallengeList"
-// import { ArchivedChallengesTab } from "./ArchivedChallengesTab"
-// import { PendingApprovalsTab } from "./PendingApprovalsTab"
+import { PendingApprovalsList } from "./PendingApprovalsList"
+import { ArchivedChallengesList } from "./ArchivedChallengesList"
 
 export function DashboardAdmin() {
   // Hooks específicos por status
@@ -23,9 +23,14 @@ export function DashboardAdmin() {
   const {
     isSubmitting,
     isDeleting,
+    isApproving,
+    isArchiving,
     handleCreate,
     handleUpdate,
     handleDelete,
+    handleApprove,
+    handleReject,
+    handleArchive,
     handleSendBackForReview
   } = useChallengeOperations()
 
@@ -113,6 +118,47 @@ export function DashboardAdmin() {
     const result = await handleSendBackForReview(id)
     
     // Se falhou, o Realtime irá restaurar o status
+    if (!result) {
+      // O Realtime irá restaurar automaticamente via evento
+    }
+  }
+
+  // Handlers específicos para aprovações
+  const handleApproveWithOptimistic = async (id: string) => {
+    // Optimistic update: remover da lista de pendentes
+    pendingChallenges.updateChallengeInList(id, { status: 'published' as any })
+    
+    // Executar ação no servidor
+    const result = await handleApprove(id)
+    
+    // Se falhou, o Realtime irá restaurar
+    if (!result) {
+      // O Realtime irá restaurar automaticamente via evento
+    }
+  }
+
+  const handleRejectWithOptimistic = async (id: string) => {
+    // Optimistic update: remover da lista de pendentes
+    pendingChallenges.updateChallengeInList(id, { status: 'draft' as any })
+    
+    // Executar ação no servidor (precisa de motivo)
+    const reason = prompt("Motivo da rejeição (opcional):")
+    const result = await handleReject(id, reason || "")
+    
+    // Se falhou, o Realtime irá restaurar
+    if (!result) {
+      // O Realtime irá restaurar automaticamente via evento
+    }
+  }
+
+  const handleArchiveWithOptimistic = async (id: string) => {
+    // Optimistic update: remover da lista atual
+    currentTabData.updateChallengeInList(id, { status: 'archived' as any })
+    
+    // Executar ação no servidor
+    const result = await handleArchive(id)
+    
+    // Se falhou, o Realtime irá restaurar
     if (!result) {
       // O Realtime irá restaurar automaticamente via evento
     }
@@ -209,14 +255,17 @@ export function DashboardAdmin() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ChallengeList
+              <PendingApprovalsList
                 challenges={pendingChallenges.challenges}
                 isInitialLoading={pendingChallenges.isInitialLoading}
                 onEdit={handleEdit}
                 onDelete={handleDeleteWithOptimistic}
-                onSendBackForReview={handleSendBackWithOptimistic}
+                onApprove={handleApproveWithOptimistic}
+                onReject={handleRejectWithOptimistic}
+                onArchive={handleArchiveWithOptimistic}
                 isDeleting={isDeleting}
-                onCreateNew={() => setIsCreating(true)}
+                isApproving={isApproving}
+                isArchiving={isArchiving}
               />
             </CardContent>
           </Card>
@@ -270,14 +319,15 @@ export function DashboardAdmin() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ChallengeList
+              <ArchivedChallengesList
                 challenges={archivedChallenges.challenges}
                 isInitialLoading={archivedChallenges.isInitialLoading}
                 onEdit={handleEdit}
                 onDelete={handleDeleteWithOptimistic}
+                onApprove={handleApproveWithOptimistic}
                 onSendBackForReview={handleSendBackWithOptimistic}
                 isDeleting={isDeleting}
-                onCreateNew={() => setIsCreating(true)}
+                isApproving={isApproving}
               />
             </CardContent>
           </Card>
