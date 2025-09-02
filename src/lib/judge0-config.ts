@@ -1,4 +1,3 @@
-// Tipos para o Judge0
 export interface Judge0Language {
   id: number;
   name: string;
@@ -25,11 +24,9 @@ export interface Judge0Result {
   memory?: string;
 }
 
-// Configurações do Judge0
 export const JUDGE0_CONFIG = {
-  // IDs das linguagens (serão atualizados conforme a resposta da API)
   LANGUAGES: {
-    JAVASCRIPT: 54, // Será atualizado conforme a resposta da API
+    JAVASCRIPT: 54,
     PYTHON: 71,
     JAVA: 62,
     CPP: 54,
@@ -38,19 +35,16 @@ export const JUDGE0_CONFIG = {
     GO: 60,
     RUST: 73,
   } as const,
-  
-  // Configurações de execução
+
   EXECUTION: {
     CPU_TIME_LIMIT: 3,
     MEMORY_LIMIT: 128000,
     TIMEOUT_MS: 5000,
   } as const,
-  
-  // URLs
+
   API_URL: process.env.JUDGE0_API_URL || 'http://localhost:3000/api/judge0',
   API_KEY: process.env.JUDGE0_API_KEY,
-  
-  // Fallback URLs para diferentes configurações
+
   FALLBACK_URLS: [
     process.env.JUDGE0_API_URL || 'http://localhost:3000/api/judge0',
     'http://localhost:3000/api/judge0',
@@ -58,11 +52,9 @@ export const JUDGE0_CONFIG = {
     'http://judge0-ce:2358',
     'https://judge0-ce.p.rapidapi.com'
   ] as const,
-  
-  // Lista de IDs suportados (será atualizada dinamicamente)
+
   SUPPORTED_LANGUAGES: [54, 71, 62, 50, 51, 60, 73] as const,
-  
-  // Mapa de nomes das linguagens (será atualizado dinamicamente)
+
   LANGUAGE_MAP: {
     54: 'JavaScript',
     71: 'Python',
@@ -74,7 +66,6 @@ export const JUDGE0_CONFIG = {
   } as Record<number, string>,
 } as const;
 
-// Função para descobrir o ID correto da linguagem
 export async function discoverLanguageId(languageName: string): Promise<number | null> {
   try {
     const response = await fetch(`${JUDGE0_CONFIG.API_URL}/languages`);
@@ -91,21 +82,17 @@ export async function discoverLanguageId(languageName: string): Promise<number |
   }
 }
 
-// Função para atualizar configurações dinamicamente
 export async function updateLanguageIds(): Promise<void> {
   try {
     const response = await fetch(`${JUDGE0_CONFIG.API_URL}/languages`);
     const languages: Judge0Language[] = await response.json();
-    
-    // Atualiza o mapa de linguagens
+
     languages.forEach((lang) => {
       (JUDGE0_CONFIG.LANGUAGE_MAP as any)[lang.id] = lang.name;
     });
-    
-    // Atualiza a lista de IDs suportados
+
     (JUDGE0_CONFIG.SUPPORTED_LANGUAGES as any) = languages.map((lang) => lang.id);
-    
-    // Atualiza o ID do JavaScript especificamente
+
     const jsLanguage = languages.find((lang) => 
       lang.name.toLowerCase().includes('javascript')
     );
@@ -118,10 +105,8 @@ export async function updateLanguageIds(): Promise<void> {
   }
 }
 
-// Função para testar a conexão com o Judge0
 export async function testJudge0Connection(): Promise<boolean> {
   try {
-    // Tentar diferentes endpoints que existem no Judge0
     const endpoints = ['/languages', '/about', '/submissions']
     
     for (const endpoint of endpoints) {
@@ -144,7 +129,6 @@ export async function testJudge0Connection(): Promise<boolean> {
   }
 }
 
-// Função para listar todas as linguagens disponíveis
 export async function listAvailableLanguages(): Promise<Judge0Language[]> {
   try {
     const response = await fetch(`${JUDGE0_CONFIG.API_URL}/languages`);
@@ -159,7 +143,6 @@ export async function listAvailableLanguages(): Promise<Judge0Language[]> {
   }
 }
 
-// Função para executar código
 export async function executeCode(submission: Judge0Submission): Promise<Judge0Result> {
   try {
     const response = await fetch(`${JUDGE0_CONFIG.API_URL}/submissions?wait=true`, {
@@ -181,7 +164,6 @@ export async function executeCode(submission: Judge0Submission): Promise<Judge0R
   }
 }
 
-// Função para obter resultado de uma submissão
 export async function getSubmissionResult(submissionId: string): Promise<Judge0Result> {
   try {
     const response = await fetch(`${JUDGE0_CONFIG.API_URL}/submissions/${submissionId}`);
@@ -197,5 +179,4 @@ export async function getSubmissionResult(submissionId: string): Promise<Judge0R
   }
 }
 
-// Re-exportar executeCodeWithJudge0 do judge0.ts para evitar importações circulares
 export { executeCodeWithJudge0 } from './judge0'

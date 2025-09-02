@@ -24,21 +24,15 @@ export class ParallelTestRunner {
     this.completedResults = []
     this.runningJobs.clear()
 
-
-
-    // Executar todos os testes
     const testPromises = testCases.map(testCase => 
       this.executeSingleTest(code, testCase, functionName)
     )
 
-    // Aguardar todos os testes terminarem
     const results = await Promise.all(testPromises)
     
     const totalExecutionTime = Date.now() - this.startTime
     const passCount = results.filter(r => r.status === 'passed').length
     const failCount = results.filter(r => r.status === 'failed').length
-
-
 
     return {
       passCount,
@@ -120,7 +114,6 @@ export class ParallelTestRunner {
     testCase: TestCase,
     functionName: string
   ): string {
-    // Para JavaScript/TypeScript, adicionar o teste no final
     if (this.options.languageId === JUDGE0_LANGUAGES.JAVASCRIPT || 
         this.options.languageId === JUDGE0_LANGUAGES.TYPESCRIPT) {
       
@@ -132,17 +125,14 @@ const result = ${functionName}(...input);
 console.log(JSON.stringify(result));`
     }
 
-    // Para outras linguagens, implementar conforme necessário
     return userCode
   }
 
-  // Método para cancelar execuções em andamento
   cancelAll(): void {
 
     this.runningJobs.clear()
   }
 
-  // Método para obter progresso em tempo real
   getProgress(): { completed: number; total: number; percentage: number } {
     const total = this.completedResults.length + this.runningJobs.size
     const completed = this.completedResults.length
@@ -152,14 +142,13 @@ console.log(JSON.stringify(result));`
   }
 }
 
-// Factory para criar runners com configurações predefinidas
 export class TestRunnerFactory {
   static createRunner(challengeId: string, language: string): ParallelTestRunner {
     const languageId = language === 'typescript' ? JUDGE0_LANGUAGES.TYPESCRIPT : JUDGE0_LANGUAGES.JAVASCRIPT
     
     const options: ParallelTestRunnerOptions = {
-      maxConcurrentJobs: 5, // Limite de jobs simultâneos
-      timeoutMs: 10000,     // 10 segundos por teste
+      maxConcurrentJobs: 5, 
+      timeoutMs: 10000,    
       languageId
     }
 

@@ -36,7 +36,7 @@ export const CATEGORY_OPTIONS = [
 ] as const
 
 export const STATUS_OPTIONS = [
-  { value: "draft", label: "Rascunho", color: "bg-gray-100 text-gray-800" },
-  { value: "published", label: "Publicado", color: "bg-blue-100 text-blue-800" },
-  { value: "archived", label: "Arquivado", color: "bg-orange-100 text-orange-800" }
+  { value: "draft", label: "Em análise", color: "bg-yellow-100 text-yellow-800" },
+  { value: "published", label: "Publicado", color: "bg-green-100 text-green-800" },
+  { value: "archived", label: "Arquivado", color: "bg-gray-100 text-gray-800" }
 ] as const

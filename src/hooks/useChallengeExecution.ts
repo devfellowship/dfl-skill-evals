@@ -10,9 +10,32 @@ interface UseChallengeExecutionProps {
   functionName: string
 }
 
+interface TestCase {
+  input: any
+  expectedOutput: any
+  description: string
+  hidden: boolean
+}
+
+interface TestResult {
+  passCount: number
+  failCount: number
+  totalCount: number
+  details: Array<{
+    testCaseId: string
+    input: any
+    expectedOutput: any
+    actualOutput: any
+    status: string
+    executionTime: number
+    errorMessage?: string
+  }>
+  totalExecutionTime: number
+}
+
 export function useChallengeExecution({ problemId, functionName }: UseChallengeExecutionProps) {
   const [compilationError, setCompilationError] = useState<string | null>(null)
-  const [manualResults, setManualResults] = useState(null)
+  const [manualResults, setManualResults] = useState<TestResult | null>(null)
   const [manualLoading, setManualLoading] = useState(false)
 
   const {
@@ -44,7 +67,7 @@ export function useChallengeExecution({ problemId, functionName }: UseChallengeE
       resetTests()
       setManualResults(null)
       
-      let traditionalTestCases = []
+      let traditionalTestCases: TestCase[] = []
       
       try {
         const searchTitle = problemId.replace('-', ' ')
@@ -55,7 +78,7 @@ export function useChallengeExecution({ problemId, functionName }: UseChallengeE
           .single()
 
         if (challenge?.test_cases && Array.isArray(challenge.test_cases)) {
-          traditionalTestCases = challenge.test_cases.map(tc => ({
+          traditionalTestCases = challenge.test_cases.map((tc: any) => ({
             input: tc.input,
             expectedOutput: tc.expectedOutput,
             description: tc.description || '',
@@ -70,7 +93,7 @@ export function useChallengeExecution({ problemId, functionName }: UseChallengeE
         const seed = Date.now()
         const generatedTestCases = generateTestCases(problemId, seed, 10)
         
-        traditionalTestCases = generatedTestCases.map(tc => ({
+        traditionalTestCases = generatedTestCases.map((tc: any) => ({
           input: tc.input,
           expectedOutput: tc.expected_output,
           description: tc.description || '',
@@ -99,11 +122,11 @@ export function useChallengeExecution({ problemId, functionName }: UseChallengeE
       const result = await response.json()
       
       if (result.testResults && result.testResults.length > 0) {
-        const testSummary = {
-          passCount: result.testResults.filter(r => r.status === 'passed').length,
-          failCount: result.testResults.filter(r => r.status === 'failed').length,
+        const testSummary: TestResult = {
+          passCount: result.testResults.filter((r: any) => r.status === 'passed').length,
+          failCount: result.testResults.filter((r: any) => r.status === 'failed').length,
           totalCount: result.testResults.length,
-          details: result.testResults.map((r, index) => ({
+          details: result.testResults.map((r: any, index: number) => ({
             testCaseId: `test_${index}`,
             input: r.input,
             expectedOutput: r.expectedOutput,
@@ -126,12 +149,13 @@ export function useChallengeExecution({ problemId, functionName }: UseChallengeE
         } else if (result.error) {
           setCompilationError(`Erro: ${result.error}`)
         } else if (result.testResults && result.testResults.length > 0) {
-          const testSummary = {
-            passCount: result.testResults.filter(r => r.status === 'passed').length,
-            failCount: result.testResults.filter(r => r.status === 'failed').length,
+          const seed = Date.now()
+          const testSummary: TestResult = {
+            passCount: result.testResults.filter((r: any) => r.status === 'passed').length,
+            failCount: result.testResults.filter((r: any) => r.status === 'failed').length,
             totalCount: result.testResults.length,
-            details: result.testResults.map(r => ({
-              testCaseId: `test_${seed}_${result.testResults.indexOf(r)}`,
+            details: result.testResults.map((r: any, index: number) => ({
+              testCaseId: `test_${seed}_${index}`,
               input: r.input,
               expectedOutput: r.expectedOutput,
               actualOutput: r.actualOutput,

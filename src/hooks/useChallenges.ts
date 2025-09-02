@@ -14,14 +14,14 @@ export function useChallenges() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchChallenges = useCallback(async () => {
+  const fetchChallenges = useCallback(async (forceRefresh = false) => {
     try {
       setLoading(true)
       setError(null)
       
-      // Verificar cache primeiro
+      // Verificar cache primeiro (só se não for refresh forçado)
       const now = Date.now()
-      if (challengesCache && (now - cacheTimestamp) < CACHE_DURATION) {
+      if (!forceRefresh && challengesCache && (now - cacheTimestamp) < CACHE_DURATION) {
         setChallenges(challengesCache)
         setLoading(false)
         return
@@ -185,9 +185,74 @@ export function useChallenges() {
     }
   }
 
+  // Função para invalidar o cache
+  const invalidateCache = useCallback(() => {
+    challengesCache = null
+    cacheTimestamp = 0
+  }, [])
+
   useEffect(() => {
     fetchChallenges()
+    
+    // Configurar Supabase Realtime para escutar mudanças na tabela challenges
+    const channel = supabase
+      .channel('public:challenges')
+      .on('postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'challenges' },
+          payload => {
+            console.log('🔄 Supabase Realtime: Challenge atualizada:', payload.new)
+            
+            // Invalidar cache quando uma challenge é atualizada
+            challengesCache = null
+            cacheTimestamp = 0
+            
+            // Recarregar challenges
+            fetchChallenges(true)
+          }
+      )
+      .on('postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'challenges' },
+          payload => {
+            console.log('🔄 Supabase Realtime: Nova challenge criada:', payload.new)
+            
+            // Invalidar cache quando uma nova challenge é criada
+            challengesCache = null
+            cacheTimestamp = 0
+            
+            // Recarregar challenges
+            fetchChallenges(true)
+          }
+      )
+      .on('postgres_changes',
+          { event: 'DELETE', schema: 'public', table: 'challenges' },
+          payload => {
+            console.log('🔄 Supabase Realtime: Challenge deletada:', payload.old)
+            
+            // Invalidar cache quando uma challenge é deletada
+            challengesCache = null
+            cacheTimestamp = 0
+            
+            // Recarregar challenges
+            fetchChallenges(true)
+          }
+      )
+      .subscribe()
+
+    return () => {
+      console.log('🧹 Limpando subscription do Supabase Realtime')
+      supabase.removeChannel(channel)
+    }
   }, [])
+
+  // Função para forçar refresh manual
+  const forceRefresh = useCallback(() => {
+    console.log('🔄 Forçando refresh manual das challenges...')
+    challengesCache = null
+    cacheTimestamp = 0
+    fetchChallenges(true)
+  }, [])
+
+
 
   return {
     challenges,
@@ -198,5 +263,7 @@ export function useChallenges() {
     createChallenge,
     updateChallenge,
     deleteChallenge,
+    invalidateCache,
+    forceRefresh,
   }
 }

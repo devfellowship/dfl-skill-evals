@@ -108,7 +108,7 @@ export default function UpdateSlugsPage() {
                 <li>• As challenges existentes serão atualizadas com slugs únicos</li>
                 <li>• Os slugs são baseados no título da challenge</li>
                 <li>• Se houver conflitos, números serão adicionados automaticamente</li>
-                <li>• Após a atualização, as URLs funcionarão como /challenges/{slug}</li>
+                <li>• Após a atualização, as URLs funcionarão como /challenges/slug</li>
               </ul>
             </div>
 

@@ -16,7 +16,10 @@ Uma aplicação de desafios de programação com sistema de execução de códig
 
 - Node.js 18+ 
 - pnpm
-- **Docker** (necessário para Judge0 local) ou **VM Linux** (alternativa para Windows)
+- **Docker** (necessário para Judge0 local) com uma das opções:
+  - **Docker Desktop** (Windows/Mac)
+  - **WSL2 + Docker** (Windows - recomendado)
+  - **VM Linux + Docker** (Windows - alternativa)
 
 ## 🛠️ Instalação
 
@@ -101,6 +104,36 @@ Devido a problemas de compatibilidade com Docker no Windows, é recomendado exec
 
 **⚠️ Importante**: O Judge0 é obrigatório para o funcionamento da aplicação. Sem ele, as funcionalidades de execução de código não funcionarão.
 
+### Configuração com WSL2 (Alternativa Moderna para Windows)
+
+O WSL2 oferece uma experiência Linux nativa no Windows e é uma excelente alternativa:
+
+1. **Instale o WSL2**:
+   ```bash
+   wsl --install
+   ```
+
+2. **Instale o Docker Desktop** com suporte ao WSL2:
+   - Baixe o Docker Desktop para Windows
+   - Ative a integração com WSL2 nas configurações
+
+3. **No terminal WSL2**, navegue para a pasta do projeto:
+   ```bash
+   cd /mnt/c/Users/SeuUsuario/Desktop/devshaper-app/src/Judge0
+   ```
+
+4. **Execute o Docker Compose**:
+   ```bash
+   docker compose up -d
+   ```
+
+5. **Configure o .env.local** para usar localhost (o WSL2 compartilha a rede com o Windows):
+   ```env
+   JUDGE0_API_URL=http://localhost:2358
+   ```
+
+**💡 Vantagens do WSL2**: Melhor performance que VM, integração nativa com Windows, suporte completo ao Docker.
+
 ### Estrutura do Judge0
 
 - **PostgreSQL**: Banco de dados para armazenar submissões
@@ -110,7 +143,7 @@ Devido a problemas de compatibilidade com Docker no Windows, é recomendado exec
 
 ### Linguagens Suportadas
 
-- JavaScript (Node.js)
+- JavaScript (Node.js) -> atualmente está em uma versão ruim, por isso, estou transpilando do typescript escrito no codeEditor para javascript.
 - Python
 - Java
 - C/C++
@@ -118,6 +151,13 @@ Devido a problemas de compatibilidade com Docker no Windows, é recomendado exec
 - Go
 - Rust
 +60 outras
+
+## 🌐 **URLs Importantes**
+
+- **API Judge0**: `http://localhost:2358`
+- **Health Check**: `http://localhost:2358/about`
+- **Linguagens**: `http://localhost:2358/languages`
+
 
 ## 🏗️ Estrutura do Projeto
 

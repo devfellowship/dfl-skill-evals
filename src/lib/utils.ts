@@ -27,10 +27,6 @@ export function formatParticipants(count: number): string {
   if (count < 1000000) return `${(count / 1000).toFixed(1)}k`
   return `${(count / 1000000).toFixed(1)}M`
 }
-
-
-//Aqui ele vai gerar o link para acessar o desafio, por exemplo, se eu colocar o nome two sum, essa função vai deixar como link /pre-challenge-page/two-sum
-
 export function generateSlug(title: string): string {
   return title
     .toLowerCase()
@@ -41,10 +37,6 @@ export function generateSlug(title: string): string {
     .replace(/^-|-$/g, '')
 }
 
-/**
- * Converte slug de volta para um formato legível
- * Ex: "two-sum-problem" -> "Two Sum Problem"
- */
 export function slugToTitle(slug: string): string {
   return slug
     .split('-')

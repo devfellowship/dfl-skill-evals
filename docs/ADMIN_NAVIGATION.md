@@ -11,7 +11,7 @@ O `AdminNavigation` é um componente de navegação sequencial (breadcrumb) para
 import { AdminNavigation } from "@/components/atoms/AdminNavigation"
 ```
 
-### **Uso Básico:**
+### **Uso Básico: com mock**
 ```typescript
 export default function AdminPage() {
   return (
