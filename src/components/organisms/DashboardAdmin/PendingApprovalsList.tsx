@@ -77,7 +77,7 @@ export function PendingApprovalsList({
              {filteredChallenges.map(challenge => (
         <div
           key={challenge.id}
-          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/30 hover:border-border/60 transition-all duration-200 group w-full max-w-4xl"
+          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/30 hover:border-border/60 transition-all duration-200 group w-full"
         >
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
