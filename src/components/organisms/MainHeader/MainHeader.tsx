@@ -244,7 +244,7 @@ export function MainHeader({
             </DropdownMenu>
           ) : (
             <Button asChild variant="outline" className="flex items-center gap-2">
-              <Link href="/login">
+              <Link href="/auth/login">
                 <User className="w-4 h-4" />
                 Login
               </Link>
