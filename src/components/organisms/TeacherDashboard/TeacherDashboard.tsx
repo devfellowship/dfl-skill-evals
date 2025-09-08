@@ -11,7 +11,7 @@ import { TeacherStatsCards } from "@/components/molecules/TeacherStatsCards/Teac
 import { TeacherChallengeList } from "@/components/molecules/TeacherChallengeList/TeacherChallengeList"
 import { SearchButton } from "@/components/atoms/SearchButton/SearchButton"
 
-export function TeacherDashboardClient() {
+export function TeacherDashboard() {
   const { 
     getUserChallenges, 
     submitForApproval,
@@ -241,4 +241,3 @@ export function TeacherDashboardClient() {
     </div>
   )
 }
-

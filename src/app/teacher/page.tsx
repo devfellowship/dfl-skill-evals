@@ -1,12 +1,12 @@
 "use client"
 
-import { TeacherDashboardClient } from "./TeacherDashboardClient"
+import { TeacherDashboard } from "@/components/organisms/TeacherDashboard"
 import { AdminRouteWrapper } from "@/components/atoms/AdminRouteWrapper/AdminRouteWrapper"
 
-export default function TeacherDashboard() {
+export default function TeacherPage() {
   return (
     <AdminRouteWrapper allowedRoles={['mentor']}>
-      <TeacherDashboardClient />
+      <TeacherDashboard />
     </AdminRouteWrapper>
   )
 }
