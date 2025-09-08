@@ -1,10 +1,10 @@
 "use client"
 
 import { use } from "react"
-import { ChallengePage } from "@/components/organisms/ChallengePage/ChallengePage"
+import { UnifiedChallengePage } from "@/components/organisms/UnifiedChallengePage/UnifiedChallengePage"
 
 export default function ChallengePageRoute({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   
-  return <ChallengePage challengeId={id} />
+  return <UnifiedChallengePage mode="challenge" challengeId={id} />
 }

@@ -1,20 +1,5 @@
-"use client"
+import { AdminPage } from "@/components/organisms/AdminPage/AdminPage"
 
-import { DashboardAdmin } from "@/components/organisms/DashboardAdmin/DashboardAdmin"
-import { AdminRouteWrapper } from "@/components/atoms/AdminRouteWrapper/AdminRouteWrapper"
-import { AdminNavigation } from "@/components/atoms/AdminNavigation/AdminNavigation"
-
-export default function AdminPage() {
-  return (
-    <AdminRouteWrapper allowedRoles={['admin', 'mentor']}>
-      <AdminNavigation 
-        items={[
-          { label: "Dashboard Admin", href: "/admin" }
-        ]}
-        quickActions={[]}
-        showUserInfo={true}
-      />
-      <DashboardAdmin />
-    </AdminRouteWrapper>
-  )
+export default function AdminPageRoute() {
+  return <AdminPage />
 }
