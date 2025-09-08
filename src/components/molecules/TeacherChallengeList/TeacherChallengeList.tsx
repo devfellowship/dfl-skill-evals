@@ -3,7 +3,7 @@
 import { useMemo } from "react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
-import { Edit, Trash2, CheckCircle, Plus, Eye } from "lucide-react"
+import { Edit, Trash2, CheckCircle, Plus, Eye, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 
 interface TeacherChallenge {
@@ -19,16 +19,18 @@ interface TeacherChallenge {
 interface TeacherChallengeListProps {
   challenges: TeacherChallenge[]
   onDelete: (id: string) => void
+  onSendBackForReview?: (id: string) => void
   searchQuery?: string
 }
 
-export function TeacherChallengeList({ challenges, onDelete, searchQuery = "" }: TeacherChallengeListProps) {
+export function TeacherChallengeList({ challenges, onDelete, onSendBackForReview, searchQuery = "" }: TeacherChallengeListProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'published': return 'bg-green-100 text-green-800'
       case 'draft': return 'bg-gray-100 text-gray-800'
       case 'to_approve': return 'bg-yellow-100 text-yellow-800'
       case 'rejected': return 'bg-red-100 text-red-800'
+      case 'archived': return 'bg-gray-100 text-gray-800'
       default: return 'bg-gray-100 text-gray-800'
     }
   }
@@ -39,6 +41,7 @@ export function TeacherChallengeList({ challenges, onDelete, searchQuery = "" }:
       case 'draft': return 'Rascunho'
       case 'to_approve': return 'Aguardando Aprovação'
       case 'rejected': return 'Rejeitado'
+      case 'archived': return 'Arquivado'
       default: return status
     }
   }
@@ -116,14 +119,58 @@ export function TeacherChallengeList({ challenges, onDelete, searchQuery = "" }:
                 <CheckCircle className="w-4 h-4" />
               </Button>
             )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onDelete(challenge.id)}
-              className="text-red-600 hover:text-red-700 hover:bg-red-50 opacity-70 group-hover:opacity-100 transition-opacity duration-200"
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
+            
+            {/* Botão de exclusão - apenas para challenges em rascunho, rejeitadas ou arquivadas */}
+            {(challenge.status === 'draft' || challenge.status === 'rejected' || challenge.status === 'archived') && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onDelete(challenge.id)}
+                className="text-red-600 hover:text-red-700 hover:bg-red-50 opacity-70 group-hover:opacity-100 transition-opacity duration-200"
+                title="Excluir challenge"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            )}
+            
+            {/* Para challenges pendentes de aprovação - mostrar botão desabilitado */}
+            {challenge.status === 'to_approve' && (
+              <Button
+                variant="outline"
+                size="sm"
+                disabled
+                className="text-gray-400 opacity-50 cursor-not-allowed"
+                title="Não é possível excluir challenges pendentes de aprovação"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            )}
+            
+            {/* Para challenges publicadas - botão para enviar de volta para análise */}
+            {challenge.status === 'approved' && onSendBackForReview && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onSendBackForReview(challenge.id)}
+                className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 opacity-70 group-hover:opacity-100 transition-opacity duration-200"
+                title="Enviar de volta para análise (necessário para exclusão)"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+            )}
+            
+            {/* Para challenges publicadas sem função de envio - mostrar botão desabilitado */}
+            {challenge.status === 'approved' && !onSendBackForReview && (
+              <Button
+                variant="outline"
+                size="sm"
+                disabled
+                className="text-gray-400 opacity-50 cursor-not-allowed"
+                title="Challenges publicadas devem ser enviadas de volta para análise antes da exclusão"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            )}
           </div>
         </div>
       ))}

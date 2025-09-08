@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
-import type { TestCase, TestSummary } from '@/types/test-cases'
-import { TestCaseGeneratorFactory } from '@/lib/test-case-generator'
+import type { TestCase, TestSummary } from '@/types/challenges/test-cases'
+import { generateTestCases, testCaseGenerators } from '@/lib/test-case-generator'
 import { TestRunnerFactory } from '@/lib/parallel-test-runner'
 
 export function useTestRunner() {
@@ -23,28 +23,15 @@ export function useTestRunner() {
       setResults(null)
       setProgress(0)
 
-
-
-
-      const generator = TestCaseGeneratorFactory.createGenerator(challengeId)
-      const testCases = generator.generateTestCases(seed, testCount)
-
-
-
-
+      const testCases = generateTestCases(challengeId, seed, testCount)
       const runner = TestRunnerFactory.createRunner(challengeId, language)
-      
-
       const testSummary = await runner.runTests(
         code,
         testCases,
         getFunctionName(challengeId)
       )
-
       setResults(testSummary)
       setProgress(100)
-      
-
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido'
@@ -69,8 +56,7 @@ export function useTestRunner() {
     count: number = 10
   ): TestCase[] => {
     try {
-      const generator = TestCaseGeneratorFactory.createGenerator(challengeId)
-      return generator.generateTestCases(seed, count)
+      return generateTestCases(challengeId, seed, count)
     } catch (err) {
 
       return []
@@ -83,7 +69,8 @@ export function useTestRunner() {
     output: string
   ): boolean => {
     try {
-      const generator = TestCaseGeneratorFactory.createGenerator(challengeId)
+      const generator = testCaseGenerators[challengeId as keyof typeof testCaseGenerators]
+      if (!generator) return false
       return generator.validateOutput(input, output)
     } catch (err) {
 

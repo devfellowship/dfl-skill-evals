@@ -5,7 +5,7 @@ import { AssessmentGrid } from "@/components/organisms/AssessmentGrid/Assessment
 import { MainHeader } from "@/components/organisms/MainHeader/MainHeader"
 import { useChallenges } from "@/hooks/useChallenges"
 import { MainChallengeSorter, MainSortType } from "@/lib/main-challenge-sorter"
-import type { SearchFilters } from "@/types"
+import type { SearchFilters } from "@/types/challenges/challenge"
 
 export default function AssessmentLibrary() {
   const { challenges, loading: challengesLoading, error: challengesError } = useChallenges()

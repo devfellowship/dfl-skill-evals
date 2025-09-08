@@ -47,8 +47,9 @@ export function SearchButton({
 
   if (isExpanded) {
     return (
-      <div className="flex items-center gap-2">
+      <div className="relative w-full">
         <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder={placeholder}
             value={searchQuery}
@@ -56,42 +57,31 @@ export function SearchButton({
             onKeyPress={handleKeyPress}
             onKeyDown={handleKeyPress}
             autoFocus
-            className="w-64 pr-8"
+            className="w-full pl-10 pr-10 h-10 border-0 bg-transparent focus:ring-0 focus:outline-none text-sm"
           />
           <Button
             variant="ghost"
             size="sm"
             onClick={handleClear}
-            className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-muted"
           >
             <X className="w-3 h-3" />
           </Button>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleSearch}
-          disabled={!searchQuery.trim()}
-        >
-          <Search className="w-4 h-4" />
-        </Button>
+        <div className="absolute inset-0 -z-10 rounded-md border border-border bg-background" />
       </div>
     )
   }
 
   return (
-    <Button
-      variant="outline"
+    <div 
       onClick={handleToggle}
-      className="flex items-center gap-2"
+      className="flex items-center gap-3 w-full max-w-md px-4 py-2 text-muted-foreground border border-border rounded-md hover:border-muted-foreground/50 transition-colors cursor-pointer"
     >
       <Search className="w-4 h-4" />
-      Pesquisar
-      {currentQuery && (
-        <span className="ml-1 text-xs bg-blue-100 text-blue-800 px-1 rounded">
-          "{currentQuery}"
-        </span>
-      )}
-    </Button>
+      <span className="text-sm">
+        {currentQuery ? `"${currentQuery}"` : placeholder}
+      </span>
+    </div>
   )
 }

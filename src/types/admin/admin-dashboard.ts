@@ -12,6 +12,7 @@ export interface AdminChallenge {
   initialCode?: string
   testCases?: any[]
   orderIndex?: number
+  imageUrl?: string
 }
 
 export interface ChallengeFormData {
@@ -23,6 +24,7 @@ export interface ChallengeFormData {
   status: "draft" | "published" | "archived"
   initialCode: string
   testCases: any[]
+  imageUrl?: string
 }
 
 export const DIFFICULTY_OPTIONS = [

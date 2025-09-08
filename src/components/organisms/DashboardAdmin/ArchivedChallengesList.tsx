@@ -2,7 +2,7 @@ import { useMemo } from "react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { Edit, Trash2, Eye, CheckCircle, RefreshCw, Archive } from "lucide-react"
-import { AdminChallenge as Challenge, DIFFICULTY_OPTIONS, STATUS_OPTIONS } from "@/types/admin"
+import { AdminChallenge as Challenge, DIFFICULTY_OPTIONS, STATUS_OPTIONS } from "@/types/admin/admin-dashboard"
 
 interface ArchivedChallengesListProps {
   challenges: Challenge[]
@@ -72,7 +72,7 @@ export function ArchivedChallengesList({
               <Badge className={getDifficultyColor(challenge.difficulty)}>
                 {DIFFICULTY_OPTIONS.find(opt => opt.value === challenge.difficulty)?.label}
               </Badge>
-              <Badge className="bg-gray-100 text-gray-800">{challenge.category || "Algoritmos"}</Badge>
+              <Badge className="bg-gray-100 text-gray-800">{Array.isArray(challenge.category) ? challenge.category.join(', ') : challenge.category || "Algoritmos"}</Badge>
             </div>
             <p className="text-muted-foreground text-sm mb-2 group-hover:text-foreground transition-colors duration-200">
               {challenge.description}

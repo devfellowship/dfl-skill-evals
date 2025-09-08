@@ -35,7 +35,7 @@ export function useChallengeOperations() {
           difficulty: difficultyMap[challengeData.difficulty] || 2,
           category: challengeData.category,
           function_name: challengeData.function_name,
-          initial_code: challengeData.initial_code || "// Seu código aqui",
+          initial_code: challengeData.initial_code || "",
           test_cases: challengeData.test_cases || [],
           status: 'to_approve',
           is_public: false,
@@ -74,10 +74,8 @@ export function useChallengeOperations() {
   }
 
   const handleUpdate = async (id: string, updateData: any) => {
-    console.log('🚀 Iniciando atualização:', id, updateData)
     setIsSubmitting(true)
     try {
-      // Buscar o status atual da challenge
       const { data: currentChallenge, error: fetchError } = await supabase
         .from('challenges')
         .select('status')
@@ -89,11 +87,9 @@ export function useChallengeOperations() {
         throw new Error('Erro ao buscar challenge atual')
       }
 
-      // Se a challenge estava aprovada e está sendo atualizada, mudar para "to_approve"
       let newStatus = updateData.status
       if (currentChallenge.status === 'approved' && updateData.status === 'approved') {
         newStatus = 'to_approve'
-        console.log('🔄 Challenge aprovada sendo atualizada, mudando status para "to_approve"')
       }
 
       const { data: challenge, error: updateError } = await supabase
@@ -107,6 +103,7 @@ export function useChallengeOperations() {
           initial_code: updateData.initial_code,
           test_cases: updateData.test_cases,
           status: newStatus,
+          image_url: updateData.imageUrl,
           slug: updateData.slug
         })
         .eq('id', id)
@@ -123,12 +120,10 @@ export function useChallengeOperations() {
         throw new Error(updateError.message || 'Erro ao atualizar challenge')
       }
 
-      console.log('✅ Challenge atualizado no banco:', challenge)
       toast.success("Challenge atualizado com sucesso!")
       
       try {
         broadcastChallengeUpdated(challenge)
-        console.log('📡 Broadcast enviado com sucesso')
       } catch (broadcastError) {
         console.warn('⚠️ Falha no broadcast, recarregando dados:', broadcastError)
         loadAllChallenges()
@@ -251,7 +246,7 @@ export function useChallengeOperations() {
         throw new Error(rejectError.message || 'Erro ao rejeitar challenge')
       }
 
-      toast.success("Challenge rejeitado e retornado ao professor")
+      toast.success("Challenge rejeitado e retornado ao mentor")
       
       try {
         broadcastChallengeUpdated(challenge)
@@ -296,6 +291,7 @@ export function useChallengeOperations() {
       toast.success("Challenge arquivado com sucesso!")
       
       try {
+        console.log('📡 Enviando broadcast - challenge-updated (archive):', challenge)
         broadcastChallengeUpdated(challenge)
       } catch (broadcastError) {
         console.warn('⚠️ Falha no broadcast, recarregando dados:', broadcastError)

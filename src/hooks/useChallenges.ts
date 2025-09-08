@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Tables } from '@/lib/supabase'
-import type { Challenge } from '@/types'
+import type { Challenge } from '@/types/challenges/challenge'
 
 
 
@@ -29,7 +29,7 @@ export function useChallenges() {
       
       const { data, error: fetchError } = await supabase
         .from('challenges')
-        .select('*')
+        .select('*, image_url')
         .eq('status', 'approved')
         .eq('is_public', true)
         .order('order_index', { ascending: true })
@@ -59,7 +59,7 @@ export function useChallenges() {
         participants: 500 + index * 50,
         rating: parseFloat((4.2 + (index * 0.1)).toFixed(1)),
         trending: index < 2,
-        image: undefined
+        image: challenge.image_url
       }))
       
 
@@ -149,7 +149,7 @@ export function useChallenges() {
         participants: Math.floor(Math.random() * 1000) + 100,
         rating: parseFloat((Math.random() * 2 + 3).toFixed(1)),
         trending: Math.random() > 0.8,
-        image: undefined
+        image: data.image_url
       }
 
       // Atualizar a lista local
@@ -200,8 +200,6 @@ export function useChallenges() {
       .on('postgres_changes',
           { event: 'UPDATE', schema: 'public', table: 'challenges' },
           payload => {
-            console.log('🔄 Supabase Realtime: Challenge atualizada:', payload.new)
-            
             // Invalidar cache quando uma challenge é atualizada
             challengesCache = null
             cacheTimestamp = 0
@@ -213,8 +211,6 @@ export function useChallenges() {
       .on('postgres_changes',
           { event: 'INSERT', schema: 'public', table: 'challenges' },
           payload => {
-            console.log('🔄 Supabase Realtime: Nova challenge criada:', payload.new)
-            
             // Invalidar cache quando uma nova challenge é criada
             challengesCache = null
             cacheTimestamp = 0
@@ -226,8 +222,6 @@ export function useChallenges() {
       .on('postgres_changes',
           { event: 'DELETE', schema: 'public', table: 'challenges' },
           payload => {
-            console.log('🔄 Supabase Realtime: Challenge deletada:', payload.old)
-            
             // Invalidar cache quando uma challenge é deletada
             challengesCache = null
             cacheTimestamp = 0
@@ -239,14 +233,12 @@ export function useChallenges() {
       .subscribe()
 
     return () => {
-      console.log('🧹 Limpando subscription do Supabase Realtime')
       supabase.removeChannel(channel)
     }
   }, [])
 
   // Função para forçar refresh manual
   const forceRefresh = useCallback(() => {
-    console.log('🔄 Forçando refresh manual das challenges...')
     challengesCache = null
     cacheTimestamp = 0
     fetchChallenges(true)

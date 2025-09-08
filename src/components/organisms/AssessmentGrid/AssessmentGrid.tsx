@@ -1,6 +1,6 @@
 import React from "react"
 import { AssessmentCard } from "@/components/organisms/AssessmentCard/AssessmentCard"
-import type { Challenge } from "@/types"
+import type { Challenge } from "@/types/challenges/challenge"
 
 interface AssessmentGridProps {
   assessments: Challenge[]

@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { DifficultyIndicator } from "@/components/molecules/DifficultyIndicator/DifficultyIndicator"
-import { AdminChallenge as Challenge, ChallengeFormData, DIFFICULTY_OPTIONS, CATEGORY_OPTIONS, STATUS_OPTIONS } from "@/types/admin"
+import { BackgroundImageSelector } from "@/components/atoms/BackgroundImageSelector/BackgroundImageSelector"
+import { AdminChallenge as Challenge, ChallengeFormData, DIFFICULTY_OPTIONS, CATEGORY_OPTIONS, STATUS_OPTIONS } from "@/types/admin/admin-dashboard"
 
 interface ChallengeFormProps {
   isCreating: boolean
@@ -40,13 +41,13 @@ export function ChallengeForm({
     functionName: "",
     status: "draft",
     initialCode: "",
-    testCases: []
+    testCases: [],
+    imageUrl: ""
   })
 
 
   useEffect(() => {
     if (editingChallenge) {
-      console.log('🔄 Carregando dados da challenge para edição:', editingChallenge)
       const editFormData = {
         title: editingChallenge.title || "",
         description: editingChallenge.description || "",
@@ -55,9 +56,9 @@ export function ChallengeForm({
         functionName: editingChallenge.functionName || "",
         status: editingChallenge.status || "draft",
         initialCode: editingChallenge.initialCode || "",
-        testCases: editingChallenge.testCases || []
+        testCases: editingChallenge.testCases || [],
+        imageUrl: editingChallenge.imageUrl || ""
       }
-      console.log('📝 Dados do formulário carregados:', editFormData)
       setFormData(editFormData)
     } else {
       setFormData({
@@ -185,6 +186,13 @@ export function ChallengeForm({
           </div>
 
           <div className="space-y-2">
+            <BackgroundImageSelector
+              currentImage={formData.imageUrl}
+              onImageSelect={(imageUrl) => handleInputChange("imageUrl", imageUrl || "")}
+            />
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="description">Descrição *</Label>
             <Textarea
               id="description"
@@ -217,7 +225,7 @@ export function ChallengeForm({
 
         </form>
         
-        {/* Botões movidos para o final */}
+        {}
         <div className="flex gap-2 pt-6 border-t mt-6">
           <Button 
             type="button" 

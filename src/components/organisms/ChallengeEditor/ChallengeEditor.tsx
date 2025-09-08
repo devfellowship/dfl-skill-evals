@@ -1,6 +1,6 @@
 import { CodeEditor } from "@/components/organisms/CodeEditor/CodeEditor"
 import { ChallengeControls } from "@/components/organisms/ChallengeControls/ChallengeControls"
-import type { ChallengeEditorProps } from "@/types/challenge-page"
+import type { ChallengeEditorProps } from "@/types/challenges/challenge-page"
 
 export function ChallengeEditor({
   code,
@@ -17,18 +17,22 @@ export function ChallengeEditor({
   return (
     <div className="flex flex-col h-full">
       <CodeEditor
-        code={code}
+        value={code}
+        onChange={onCodeChange}
         language={language}
-        onCodeChange={onCodeChange}
         onLanguageChange={onLanguageChange}
+        onRun={onRun}
+        isRunning={isLoading}
+        showRunButton={true}
       />
       <ChallengeControls
-        isLoading={isLoading}
-        progress={progress}
-        compilationError={compilationError}
-        onRun={onRun}
-        onCancel={onCancel}
-        onReset={onReset}
+        language={language}
+        setLanguage={onLanguageChange}
+        isRunning={isLoading}
+        onRunTests={onRun}
+        onCancelTests={onCancel}
+        onGenerateTestCases={() => {}}
+        onRunSingleTest={() => {}}
       />
     </div>
   )

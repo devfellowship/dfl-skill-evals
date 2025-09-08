@@ -5,7 +5,8 @@ import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { DifficultyIndicator } from "@/components/molecules/DifficultyIndicator/DifficultyIndicator"
-import type { Challenge } from "@/types"
+import { ChallengeImage } from "@/components/atoms/ChallengeImage/ChallengeImage"
+import type { Challenge } from "@/types/challenges/challenge"
 import { formatParticipants, generateSlug } from "@/lib/utils"
 
 interface AssessmentCardProps {
@@ -21,22 +22,13 @@ export const AssessmentCard = React.forwardRef<
     <Card className="group overflow-hidden border border-border/50 bg-background transition-all duration-200 hover:border-border hover:shadow-md">
       <CardContent className="p-0">
         <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-primary/5 to-primary/10">
-          {assessment.image ? (
-            <img 
-              src={assessment.image} 
-              alt={assessment.title}
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center">
-                <Code className="mx-auto h-8 w-8 text-primary/60 mb-2" />
-                <p className="text-sm font-medium text-muted-foreground">
-                  {assessment.category}
-                </p>
-              </div>
-            </div>
-          )}
+          <ChallengeImage
+            imageUrl={assessment.image}
+            category={[assessment.category]}
+            difficulty={assessment.difficulty.toString()}
+            title={assessment.title}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
           {assessment.trending && (
             <div className="absolute top-3 right-3">
               <Badge variant="secondary" className="bg-orange-100 text-orange-700 text-xs">

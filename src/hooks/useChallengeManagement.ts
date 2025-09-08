@@ -19,6 +19,7 @@ export interface CreateChallengeData {
   course_id?: string
   module_id?: string
   tags?: string[]
+  imageUrl?: string
 
 }
 
@@ -42,18 +43,11 @@ export function useChallengeManagement() {
       setLoading(true)
       setError(null)
 
-      console.log('🚀 Iniciando criação de challenge...')
-      console.log('📝 Dados recebidos:', data)
-
 
       if (!supabase) {
         throw new Error('Cliente Supabase não inicializado')
       }
 
-      console.log('🔧 Cliente Supabase:', supabase)
-
-
-      console.log('🔍 Buscando slugs existentes...')
       const { data: existingChallenges, error: slugError } = await supabase
         .from('challenges')
         .select('slug')
@@ -65,7 +59,6 @@ export function useChallengeManagement() {
       
       const existingSlugs = existingChallenges?.map(c => c.slug) || []
       const uniqueSlug = generateUniqueSlug(data.title, existingSlugs)
-      console.log('🏷️ Slug gerado:', uniqueSlug)
 
       const challengeData: Inserts<'challenges'> = {
         title: data.title,
@@ -81,16 +74,12 @@ export function useChallengeManagement() {
         constraints: data.constraints || [],
         hints: data.hints || [],
         tags: data.tags || [],
-
         max_score: 100,
         is_public: false,
         order_index: 0,
         status: 'to_approve',
       }
 
-      console.log('💾 Dados da challenge preparados:', challengeData)
-
-      console.log('📤 Enviando para o Supabase...')
       const { data: challenge, error: createError } = await supabase
         .from('challenges')
         .insert([challengeData])
@@ -102,7 +91,6 @@ export function useChallengeManagement() {
         throw createError
       }
 
-      console.log('✅ Challenge criada com sucesso:', challenge)
 
       return challenge
     } catch (err) {
@@ -138,8 +126,6 @@ export function useChallengeManagement() {
       setLoading(true)
       setError(null)
 
-      console.log('🚀 Atualizando challenge:', id)
-      console.log('📝 Dados recebidos:', updates)
 
 
       const mappedUpdates: any = {}
@@ -159,29 +145,27 @@ export function useChallengeManagement() {
 
       if (updates.function_name !== undefined) {
         mappedUpdates.function_name = updates.function_name
-        console.log('🔍 Mapeando function_name:', updates.function_name)
       }
       if (updates.functionName !== undefined) {
         mappedUpdates.function_name = updates.functionName
-        console.log('🔍 Mapeando functionName -> function_name:', updates.functionName)
       }
       
       if (updates.initial_code !== undefined) {
         mappedUpdates.initial_code = updates.initial_code
-        console.log('🔍 Mapeando initial_code:', updates.initial_code)
       }
       if (updates.initialCode !== undefined) {
         mappedUpdates.initial_code = updates.initialCode
-        console.log('🔍 Mapeando initialCode -> initial_code:', updates.initialCode)
       }
       
       if (updates.test_cases !== undefined) {
         mappedUpdates.test_cases = updates.test_cases
-        console.log('🔍 Mapeando test_cases:', updates.test_cases)
       }
       if (updates.testCases !== undefined) {
         mappedUpdates.test_cases = updates.testCases
-        console.log('🔍 Mapeando testCases -> test_cases:', updates.testCases)
+      }
+      
+      if (updates.imageUrl !== undefined) {
+        mappedUpdates.image_url = updates.imageUrl
       }
       
       // Mapear status do frontend para o formato do banco
@@ -214,18 +198,10 @@ export function useChallengeManagement() {
           // Se for um número, usar diretamente
           mappedUpdates.difficulty = updates.difficulty
         }
-        console.log('🔍 Mapeando difficulty:', updates.difficulty, '->', mappedUpdates.difficulty)
       }
-
-      console.log('💾 Dados mapeados para atualização:', mappedUpdates)
-      console.log('🔍 ID do challenge:', id)
-      console.log('🔍 Tipo do ID:', typeof id)
-      console.log('🔍 Chaves dos dados mapeados:', Object.keys(mappedUpdates))
-      console.log('🔍 Valores dos dados mapeados:', Object.values(mappedUpdates))
 
       // Sempre atualizar a data de modificação
       mappedUpdates.updated_at = new Date().toISOString()
-      console.log('🔍 Adicionando updated_at:', mappedUpdates.updated_at)
 
       // Verificar se o objeto mappedUpdates não está vazio
       if (Object.keys(mappedUpdates).length === 0) {
@@ -260,8 +236,6 @@ export function useChallengeManagement() {
       }
 
       console.log('✅ Challenge atualizado com sucesso:', challenge)
-      
-      // Supabase Realtime irá notificar automaticamente as mudanças
       
       return challenge
     } catch (err) {
@@ -321,7 +295,6 @@ export function useChallengeManagement() {
       setLoading(true)
       setError(null)
 
-      console.log('🚀 Aprovando challenge:', challengeId)
 
       // Simplificando para apenas os campos que existem na tabela
       const { data: challenge, error: approveError } = await supabase
@@ -339,7 +312,6 @@ export function useChallengeManagement() {
         throw approveError
       }
 
-      console.log('✅ Challenge aprovado:', challenge)
       
       // Supabase Realtime irá notificar automaticamente as mudanças
       
@@ -359,7 +331,6 @@ export function useChallengeManagement() {
       setLoading(true)
       setError(null)
 
-      console.log('🚀 Rejeitando challenge:', challengeId, 'Motivo:', reason)
 
       // Simplificando para apenas os campos que existem na tabela
       const { data: challenge, error: rejectError } = await supabase
@@ -377,7 +348,6 @@ export function useChallengeManagement() {
         throw rejectError
       }
 
-      console.log('✅ Challenge rejeitado:', challenge)
       
       // Supabase Realtime irá notificar automaticamente as mudanças
       
@@ -397,7 +367,6 @@ export function useChallengeManagement() {
       setLoading(true)
       setError(null)
 
-      console.log('🚀 Arquivando challenge:', challengeId)
 
       // Simplificando para apenas os campos que existem na tabela
       const { data: challenge, error: archiveError } = await supabase
@@ -415,7 +384,6 @@ export function useChallengeManagement() {
         throw archiveError
       }
 
-      console.log('✅ Challenge arquivado:', challenge)
       
       // Supabase Realtime irá notificar automaticamente as mudanças
       
@@ -436,7 +404,6 @@ export function useChallengeManagement() {
       setLoading(true)
       setError(null)
 
-      console.log('🚀 Enviando challenge de volta para análise:', challengeId)
 
       const { data: challenge, error: sendBackError } = await supabase
         .from('challenges')
@@ -453,7 +420,6 @@ export function useChallengeManagement() {
         throw sendBackError
       }
 
-      console.log('✅ Challenge enviado de volta para análise:', challenge)
       
       // Supabase Realtime irá notificar automaticamente as mudanças
       
@@ -473,6 +439,32 @@ export function useChallengeManagement() {
       setLoading(true)
       setError(null)
 
+      // Primeiro, buscar o challenge para verificar o status
+      const { data: challenge, error: fetchError } = await supabase
+        .from('challenges')
+        .select('status, title')
+        .eq('id', challengeId)
+        .single()
+
+      if (fetchError) {
+        console.error('❌ Erro ao buscar challenge:', fetchError)
+        throw new Error('Erro ao buscar challenge')
+      }
+
+      // Verificar se o challenge pode ser excluído
+      if (challenge.status === 'to_approve') {
+        throw new Error('Não é possível excluir challenges pendentes de aprovação')
+      }
+
+      if (challenge.status === 'approved') {
+        throw new Error('Challenges publicadas devem ser enviadas de volta para análise antes da exclusão')
+      }
+
+      // Apenas challenges em rascunho, rejeitadas ou arquivadas podem ser excluídas
+      if (challenge.status !== 'draft' && challenge.status !== 'rejected' && challenge.status !== 'archived') {
+        throw new Error('Apenas challenges em rascunho, rejeitadas ou arquivadas podem ser excluídas')
+      }
+
       const { error: deleteError } = await supabase
         .from('challenges')
         .delete()
@@ -480,11 +472,11 @@ export function useChallengeManagement() {
 
       if (deleteError) throw deleteError
 
-      // Supabase Realtime irá notificar automaticamente as mudanças
-
+      console.log(`✅ Challenge "${challenge.title}" excluído com sucesso`)
       return true
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao deletar challenge'
+      console.error('❌ Erro em deleteChallenge:', err)
       setError(errorMessage)
       return false
     } finally {
@@ -498,7 +490,6 @@ export function useChallengeManagement() {
       setLoading(true)
       setError(null)
 
-      console.log('🔍 Buscando TODAS as challenges (todos os status)...')
 
       const { data: challenges, error: fetchError } = await supabase
         .from('challenges')
@@ -510,7 +501,6 @@ export function useChallengeManagement() {
         throw fetchError
       }
 
-      console.log('✅ Todas as challenges encontradas:', challenges)
       return challenges || []
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao buscar challenges'
@@ -543,8 +533,6 @@ export function useChallengeManagement() {
 
       if (fetchError) throw fetchError
 
-      console.log('📚 Challenges encontradas:', challenges?.length || 0)
-      console.log('📊 Status das challenges:', challenges?.map(c => ({ id: c.id, status: c.status, title: c.title })))
 
       return challenges || []
     } catch (err) {
@@ -562,7 +550,6 @@ export function useChallengeManagement() {
       setLoading(true)
       setError(null)
 
-      console.log('🔍 Buscando challenges pendentes de aprovação...')
       
       // Primeiro, vamos buscar apenas os campos básicos para debug
       const { data: challenges, error: fetchError } = await supabase
@@ -576,7 +563,6 @@ export function useChallengeManagement() {
         throw fetchError
       }
 
-      console.log('✅ Challenges pendentes encontrados:', challenges)
       return challenges || []
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao buscar challenges pendentes'
@@ -594,7 +580,6 @@ export function useChallengeManagement() {
       setLoading(true)
       setError(null)
 
-      console.log('🔍 Buscando challenges arquivados...')
       
       const { data: challenges, error: fetchError } = await supabase
         .from('challenges')
@@ -607,7 +592,6 @@ export function useChallengeManagement() {
         throw fetchError
       }
 
-      console.log('✅ Challenges arquivados encontrados:', challenges)
       return challenges || []
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao buscar challenges arquivados'

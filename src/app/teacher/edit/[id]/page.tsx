@@ -266,11 +266,11 @@ export default function EditChallenge() {
   }
 
   if (!challenge) {
-    return <NotFoundState />
+    return <NotFoundState title="Challenge não encontrado" message="O challenge solicitado não foi encontrado." />
   }
 
   return (
-    <AdminRouteWrapper>
+    <AdminRouteWrapper allowedRoles={['admin', 'mentor']}>
       <div className="min-h-screen bg-background">
         <AdminNavigation 
           items={[

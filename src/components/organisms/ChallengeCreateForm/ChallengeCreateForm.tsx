@@ -12,7 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Save, ArrowLeft, Plus, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
-import { DIFFICULTY_OPTIONS } from "@/types/admin"
+import { DIFFICULTY_OPTIONS } from "@/types/admin/admin-dashboard"
+import { BackgroundImageSelector } from "@/components/atoms/BackgroundImageSelector/BackgroundImageSelector"
 
 const CATEGORY_OPTIONS = [
   "Algoritmos",
@@ -35,7 +36,7 @@ interface TestCase {
 interface Example {
   input: string
   output: string
-  explanation?: string
+  explanation: string
 }
 
 export function ChallengeCreateForm() {
@@ -50,7 +51,8 @@ export function ChallengeCreateForm() {
     functionName: "",
     initialCode: "",
     testCases: [],
-    examples: []
+    examples: [],
+    imageUrl: ""
   })
 
   const [testCase, setTestCase] = useState<TestCase>({
@@ -82,9 +84,13 @@ export function ChallengeCreateForm() {
 
   const addTestCase = () => {
     if (testCase.input.trim() && testCase.expectedOutput.trim()) {
+      const newTestCase = {
+        input: testCase.input.trim(),
+        expectedOutput: testCase.expectedOutput.trim()
+      }
       setFormData(prev => ({
         ...prev,
-        testCases: [...prev.testCases, testCase]
+        testCases: [...prev.testCases, newTestCase]
       }))
       setTestCase({ input: "", expectedOutput: "" })
     }
@@ -99,9 +105,14 @@ export function ChallengeCreateForm() {
 
   const addExample = () => {
     if (example.input.trim() && example.output.trim()) {
+      const newExample = {
+        input: example.input.trim(),
+        output: example.output.trim(),
+        explanation: example.explanation.trim()
+      }
       setFormData(prev => ({
         ...prev,
-        examples: [...(prev.examples || []), example]
+        examples: [...(prev.examples || []), newExample]
       }))
       setExample({ input: "", output: "", explanation: "" })
     }
@@ -223,6 +234,18 @@ export function ChallengeCreateForm() {
               </div>
             )}
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Imagem de Fundo do Challenge</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <BackgroundImageSelector
+            currentImage={formData.imageUrl}
+            onImageSelect={(url) => handleInputChange("imageUrl", url)}
+          />
         </CardContent>
       </Card>
 

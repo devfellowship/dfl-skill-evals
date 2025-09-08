@@ -7,27 +7,14 @@ import { Users, BookOpen } from "lucide-react"
 
 export default function CreateChallengePage() {
   return (
-    <AdminRouteWrapper>
+    <AdminRouteWrapper allowedRoles={['admin', 'mentor']}>
       <div className="min-h-screen bg-background">
         <AdminNavigation
           items={[
             { label: "Dashboard Teacher", href: "/teacher" },
             { label: "Criar Challenge", href: "/teacher/create" }
           ]}
-          quickActions={[
-            {
-              label: "Dashboard Admin",
-              href: "/admin",
-              icon: <Users className="h-4 w-4" />,
-              variant: "outline"
-            },
-            {
-              label: "Dashboard Teacher",
-              href: "/teacher",
-              icon: <BookOpen className="h-4 w-4" />,
-              variant: "outline"
-            }
-          ]}
+          quickActions={[]}
           showBackButton={true}
           backHref="/teacher"
           backLabel="Voltar ao Dashboard"
@@ -37,9 +24,9 @@ export default function CreateChallengePage() {
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-primary">Criar Novo Challenge</h1>
+            <h1 className="text-3xl font-bold text-primary">Criar Novo Desafio</h1>
             <p className="text-muted-foreground mt-2">
-              Crie um novo challenge para seus alunos resolverem
+              Crie um novo desafio para seus alunos resolverem
             </p>
           </div>
 

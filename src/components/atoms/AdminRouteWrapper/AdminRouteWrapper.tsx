@@ -1,44 +1,64 @@
-"use client"
+'use client'
 
-import { ReactNode } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useAuth } from '@/components/providers/AuthProvider'
+import { useUserRole } from '@/hooks/useUserRole'
+import { Loader2 } from 'lucide-react'
 
 interface AdminRouteWrapperProps {
   children: ReactNode
-  fallback?: ReactNode
+  allowedRoles: string[]
 }
 
-export function AdminRouteWrapper({ children, fallback }: AdminRouteWrapperProps) {
+export function AdminRouteWrapper({ children, allowedRoles }: AdminRouteWrapperProps) {
+  const { user, loading: authLoading } = useAuth()
+  const { role, isLoading: roleLoading } = useUserRole()
   const router = useRouter()
-  const [isAuthorized, setIsAuthorized] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isChecking, setIsChecking] = useState(true)
 
   useEffect(() => {
+    const checkAccess = async () => {
+      if (authLoading || roleLoading) {
+        return
+      }
 
+      if (!user) {
+        router.push('/login')
+        return
+      }
 
-    setIsAuthorized(true)
-    setIsLoading(false)
-  }, [])
+      if (!role) {
+        return
+      }
 
-  if (isLoading) {
+      if (!allowedRoles.includes(role)) {
+        router.push('/dashboard')
+        return
+      }
+
+      setIsChecking(false)
+    }
+
+    checkAccess()
+  }, [user, role, authLoading, roleLoading, allowedRoles, router])
+
+  if (authLoading || roleLoading || isChecking) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Verificando permissões...</p>
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Verificando permissões...</p>
         </div>
       </div>
     )
   }
 
-  if (!isAuthorized) {
-    if (fallback) {
-      return <>{fallback}</>
-    }
-    
+  if (!user) {
+    return null
+  }
 
-    router.push('/')
+  if (!allowedRoles.includes(role)) {
     return null
   }
 

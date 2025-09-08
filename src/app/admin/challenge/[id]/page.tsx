@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
@@ -8,8 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, Edit, CheckCircle, XCircle, Clock, Code, TestTube, BookOpen, FileText } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import { AdminChallenge } from "@/types/admin"
+import { AdminChallenge } from "@/types/admin/admin-dashboard"
 import { DifficultyIndicator } from "@/components/molecules/DifficultyIndicator/DifficultyIndicator"
+import { AdminRouteWrapper } from "@/components/atoms/AdminRouteWrapper/AdminRouteWrapper"
+import type { RealtimeChannel } from '@supabase/supabase-js'
 
 export default function AdminChallengeView() {
   const params = useParams()
@@ -17,12 +19,59 @@ export default function AdminChallengeView() {
   const [challenge, setChallenge] = useState<AdminChallenge | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const channelRef = useRef<RealtimeChannel | null>(null)
 
   useEffect(() => {
     if (params.id) {
       loadChallenge(params.id as string)
+      setupRealtimeSubscription(params.id as string)
+    }
+
+    return () => {
+      if (channelRef.current) {
+        console.log('📡 Removendo canal realtime da página individual')
+        supabase.removeChannel(channelRef.current)
+        channelRef.current = null
+      }
     }
   }, [params.id])
+
+  const adaptChallenge = (raw: any): AdminChallenge => {
+    const mapStatus = raw.status === 'approved'
+      ? 'published'
+      : raw.status === 'to_approve' || raw.status === 'rejected'
+      ? 'draft'
+      : raw.status === 'archived'
+      ? 'archived'
+      : 'draft'
+
+    const mapDifficulty = (difficulty: number) => {
+      switch (difficulty) {
+        case 1: return 'easy'
+        case 2: return 'medium'
+        case 3: return 'hard'
+        case 4: return 'expert'
+        default: return 'easy'
+      }
+    }
+
+    return {
+      id: raw.id,
+      slug: raw.slug,
+      title: raw.title,
+      description: raw.description,
+      difficulty: mapDifficulty(raw.difficulty),
+      category: Array.isArray(raw.category) ? raw.category : (raw.category ? [raw.category] : ['Algoritmos']),
+      functionName: raw.function_name,
+      status: mapStatus,
+      createdAt: raw.created_at ? new Date(raw.created_at).toLocaleDateString('pt-BR') : 'Data não disponível',
+      updatedAt: raw.updated_at ? new Date(raw.updated_at).toLocaleDateString('pt-BR') : 'Data não disponível',
+      initialCode: raw.initial_code ?? '',
+      testCases: raw.test_cases ?? [],
+      orderIndex: raw.order_index ?? null,
+      imageUrl: raw.image_url ?? null
+    }
+  }
 
   const loadChallenge = async (id: string) => {
     try {
@@ -40,21 +89,7 @@ export default function AdminChallengeView() {
       }
 
       if (data) {
-        const adaptedChallenge: AdminChallenge = {
-          id: data.id,
-          slug: data.slug,
-          title: data.title,
-          description: data.description,
-          difficulty: data.difficulty === 1 ? 'easy' : data.difficulty === 2 ? 'medium' : data.difficulty === 3 ? 'hard' : 'expert',
-          category: Array.isArray(data.category) ? data.category : (data.category ? [data.category] : ['Algoritmos']),
-          functionName: data.function_name,
-          status: data.status === 'approved' ? 'published' : data.status === 'to_approve' || data.status === 'rejected' ? 'draft' : 'archived',
-          createdAt: data.created_at ? new Date(data.created_at).toLocaleDateString('pt-BR') : 'Data não disponível',
-          updatedAt: data.updated_at ? new Date(data.updated_at).toLocaleDateString('pt-BR') : 'Data não disponível',
-          initialCode: data.initial_code ?? '',
-          testCases: data.test_cases ?? [],
-          orderIndex: data.order_index ?? null
-        }
+        const adaptedChallenge = adaptChallenge(data)
         setChallenge(adaptedChallenge)
       }
     } catch (err) {
@@ -63,6 +98,48 @@ export default function AdminChallengeView() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const setupRealtimeSubscription = (challengeId: string) => {
+
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current)
+    }
+
+
+    const channel = supabase.channel(`challenge-${challengeId}`, {
+      config: {
+        broadcast: { self: true }
+      }
+    })
+    
+    channelRef.current = channel
+    console.log('📡 Configurando realtime para challenge individual:', challengeId)
+
+    channel
+      .on('broadcast', { event: 'challenge-updated' }, ({ payload }) => {
+        console.log('📡 Broadcast recebido na página individual - challenge-updated:', payload)
+        if (payload.challenge && payload.challenge.id === challengeId) {
+          const adaptedChallenge = adaptChallenge(payload.challenge)
+          setChallenge(adaptedChallenge)
+          console.log('✅ Challenge atualizado na página individual')
+        }
+      })
+      .on('broadcast', { event: 'challenge-deleted' }, ({ payload }) => {
+        console.log('📡 Broadcast recebido na página individual - challenge-deleted:', payload)
+        if (payload.challengeId === challengeId) {
+          console.log('⚠️ Challenge foi deletado, redirecionando...')
+          router.push('/admin')
+        }
+      })
+      .subscribe((status) => {
+        console.log('📡 Status do canal realtime da página individual:', status)
+        if (status === 'CHANNEL_ERROR') {
+          console.warn('⚠️ Erro no canal da página individual')
+        } else if (status === 'SUBSCRIBED') {
+          console.log('✅ Canal realtime da página individual conectado com sucesso')
+        }
+      })
   }
 
   const getStatusColor = (status: string) => {
@@ -123,8 +200,9 @@ export default function AdminChallengeView() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <AdminRouteWrapper allowedRoles={['admin']}>
+      <div className="min-h-screen bg-background p-6">
+        <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -150,8 +228,6 @@ export default function AdminChallengeView() {
             Editar
           </Button>
         </div>
-
-        {/* Challenge Details */}
         <Tabs defaultValue="description" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="description" className="flex items-center gap-2">
@@ -295,8 +371,9 @@ export default function AdminChallengeView() {
             </Card>
           </TabsContent>
         </Tabs>
+        </div>
       </div>
-    </div>
+    </AdminRouteWrapper>
   )
 }
 

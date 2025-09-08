@@ -20,7 +20,7 @@ export function ChallengeControls({
   onRunTests,
   onCancelTests,
   onGenerateTestCases,
-  onRunSingleTest
+  onRunSingleTest,
 }: ChallengeControlsProps) {
   return (
     <div className="flex flex-col space-y-4">
@@ -62,7 +62,7 @@ export function ChallengeControls({
         <Button
           onClick={onGenerateTestCases}
           disabled={isRunning}
-          variant="secondary"
+          variant="outline"
           className="flex items-center gap-2"
         >
           <RefreshCw className="w-4 h-4" />

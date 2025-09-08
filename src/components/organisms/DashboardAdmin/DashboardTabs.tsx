@@ -1,0 +1,146 @@
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Code, TestTube, CheckCircle, Archive, Users } from "lucide-react"
+import { ChallengeForm } from "./ChallengeForm"
+import { ChallengeList } from "./ChallengeList"
+import { PendingApprovalsList } from "./PendingApprovalsList"
+import { ArchivedChallengesList } from "./ArchivedChallengesList"
+import { UserManagement } from "@/components/organisms/UserManagement/UserManagement"
+import { AdminChallenge as Challenge, ChallengeFormData } from "@/types/admin/admin-dashboard"
+
+interface DashboardTabsProps {
+  activeTab: string
+  onTabChange: (tab: string) => void
+  isCreating: boolean
+  editingChallenge: Challenge | null
+  onSubmit: (formData: ChallengeFormData) => Promise<void>
+  onCancel: () => void
+  isSubmitting: boolean
+  published: Challenge[]
+  pending: Challenge[]
+  archived: Challenge[]
+  isInitialLoading: boolean
+  onEdit: (challenge: Challenge) => void
+  onDelete: (id: string) => Promise<void>
+  onApprove: (id: string) => Promise<void>
+  onReject: (id: string) => Promise<void>
+  onArchive: (id: string) => Promise<void>
+  onSendBackForReview: (id: string) => Promise<void>
+  onCompare: (id: string) => void
+  onCreateNew: () => void
+  searchQuery: string
+  isDeleting: string | null
+  isApproving: string | null
+  isArchiving: string | null
+}
+
+export function DashboardTabs({
+  activeTab,
+  onTabChange,
+  isCreating,
+  editingChallenge,
+  onSubmit,
+  onCancel,
+  isSubmitting,
+  published,
+  pending,
+  archived,
+  isInitialLoading,
+  onEdit,
+  onDelete,
+  onApprove,
+  onReject,
+  onArchive,
+  onSendBackForReview,
+  onCompare,
+  onCreateNew,
+  searchQuery,
+  isDeleting,
+  isApproving,
+  isArchiving
+}: DashboardTabsProps) {
+  return (
+    <Tabs defaultValue="challenges" value={activeTab} onValueChange={onTabChange} className="space-y-4">
+      <TabsList className="grid w-full grid-cols-4">
+        <TabsTrigger value="challenges" className="flex items-center gap-2">
+          <Code className="w-4 h-4" />
+          Challenges
+        </TabsTrigger>
+        <TabsTrigger value="approvals" className="flex items-center gap-2">
+          <CheckCircle className="w-4 h-4" />
+          Aprovações
+        </TabsTrigger>
+        <TabsTrigger value="users" className="flex items-center gap-2">
+          <Users className="w-4 h-4" />
+          Usuários
+        </TabsTrigger>
+        <TabsTrigger value="archived" className="flex items-center gap-2">
+          <Archive className="w-4 h-4" />
+          Arquivados
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="challenges" className="space-y-6">
+        <ChallengeForm
+          isCreating={isCreating}
+          editingChallenge={editingChallenge}
+          onSubmit={onSubmit}
+          onCancel={onCancel}
+          isSubmitting={isSubmitting}
+        />
+        <ChallengeList
+          challenges={published}
+          isInitialLoading={isInitialLoading}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onSendBackForReview={onSendBackForReview}
+          onArchive={onArchive}
+          isDeleting={isDeleting}
+          isArchiving={isArchiving}
+          onCreateNew={onCreateNew}
+          searchQuery={searchQuery}
+        />
+      </TabsContent>
+
+      <TabsContent value="approvals" className="space-y-6">
+        <ChallengeForm
+          isCreating={isCreating}
+          editingChallenge={editingChallenge}
+          onSubmit={onSubmit}
+          onCancel={onCancel}
+          isSubmitting={isSubmitting}
+        />
+        <PendingApprovalsList
+          challenges={pending}
+          isInitialLoading={isInitialLoading}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onApprove={onApprove}
+          onReject={onReject}
+          onArchive={onArchive}
+          onCompare={onCompare}
+          isDeleting={isDeleting}
+          isApproving={isApproving}
+          isArchiving={isArchiving}
+          searchQuery={searchQuery}
+        />
+      </TabsContent>
+
+      <TabsContent value="users" className="space-y-6">
+        <UserManagement />
+      </TabsContent>
+
+      <TabsContent value="archived" className="space-y-6">
+        <ArchivedChallengesList
+          challenges={archived}
+          isInitialLoading={isInitialLoading}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onApprove={onApprove}
+          onSendBackForReview={onSendBackForReview}
+          isDeleting={isDeleting}
+          isApproving={isApproving}
+        />
+      </TabsContent>
+    </Tabs>
+  )
+}

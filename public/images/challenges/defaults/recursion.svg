@@ -1,0 +1,15 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" rx="20" fill="#6366F1"/>
+  <circle cx="100" cy="60" r="15" fill="white"/>
+  <circle cx="60" cy="100" r="12" fill="white"/>
+  <circle cx="140" cy="100" r="12" fill="white"/>
+  <circle cx="40" cy="140" r="10" fill="white"/>
+  <circle cx="80" cy="140" r="10" fill="white"/>
+  <circle cx="120" cy="140" r="10" fill="white"/>
+  <circle cx="160" cy="140" r="10" fill="white"/>
+  <path d="M100 75L60 100M100 75L140 100M60 100L40 140M60 100L80 140M140 100L120 140M140 100L160 140" stroke="white" stroke-width="2"/>
+  <text x="100" y="180" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="12" font-weight="bold">RECURSION</text>
+</svg>
+
+
+

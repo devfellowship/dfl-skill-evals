@@ -2,7 +2,7 @@ import { useMemo, useState } from "react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { Edit, Trash2, Eye, RefreshCw, Plus, Archive } from "lucide-react"
-import { AdminChallenge as Challenge, DIFFICULTY_OPTIONS, STATUS_OPTIONS } from "@/types/admin"
+import { AdminChallenge as Challenge, DIFFICULTY_OPTIONS, STATUS_OPTIONS } from "@/types/admin/admin-dashboard"
 import { SortButton } from "@/components/atoms/SortButton/SortButton"
 import { ChallengeSorter, SortType } from "@/lib/challenge-sorter"
 
@@ -116,7 +116,7 @@ export function ChallengeList({
               {challenge.description}
             </p>
             <div className="flex items-center gap-4 text-xs text-muted-foreground/70 group-hover:text-muted-foreground transition-colors duration-200">
-              <span>📁 {challenge.category}</span>
+              <span>📁 {Array.isArray(challenge.category) ? challenge.category.join(', ') : challenge.category}</span>
               <span>⚡ {challenge.functionName}</span>
               <span>📅 Criado: {challenge.createdAt}</span>
               {challenge.createdAt !== challenge.updatedAt && (
@@ -144,7 +144,7 @@ export function ChallengeList({
                           <Eye className="w-4 h-4" />
                         </Button>
 
-            {/* Botão "Voltar para Análise" apenas para challenges aprovadas */}
+            {}
             {challenge.status === 'published' && (
               <Button
                 variant="outline"
@@ -157,7 +157,7 @@ export function ChallengeList({
               </Button>
             )}
 
-            {/* Botão "Arquivar" apenas para challenges aprovadas */}
+            {}
             {challenge.status === 'published' && (
               <Button
                 variant="outline"
