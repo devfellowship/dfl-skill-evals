@@ -1,10 +1,10 @@
 export interface AssessmentGridProps {
-  assessments: Challenge[]
+  assessments: any[]
   isLoading?: boolean
 }
 
 export interface ProblemPanelProps {
-  problem: Problem
+  problem: any
 }
 
 export interface TestResultsPanelProps {

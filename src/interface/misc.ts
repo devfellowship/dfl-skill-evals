@@ -9,11 +9,11 @@ export interface DifficultyIndicatorProps {
 }
 
 export interface ProblemExamplesProps {
-  examples: Example[]
+  examples: any[]
 }
 
 export interface ProblemExampleProps {
-  example: Example
+  example: any
   index: number
 }
 
@@ -34,7 +34,7 @@ export interface SearchFilters {
 }
 
 export interface TeacherChallengeListProps {
-  challenges: TeacherChallenge[]
+  challenges: any[]
   onDelete: (id: string) => void
 }
 
@@ -59,6 +59,7 @@ export interface ChallengeCreateFormProps {
   initialData?: any
 }
 
-export interface ChallengeDetails extends any {
+export interface ChallengeDetails {
   // Campos adicionais processados
+  [key: string]: any
 }

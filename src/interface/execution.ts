@@ -6,7 +6,7 @@ export interface CodeExecutionPanelProps {
 export interface UseChallengeExecutionProps {
   problemId: string
   functionName: string
-  testCases: TestCase[]
+  testCases: any[]
 }
 
 export interface TestResult {
