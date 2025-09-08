@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { Button } from '@/components/atoms/Button/Button'
-import { Card } from '@/components/atoms/Card/Card'
+import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/atoms/Badge/Badge'
 import { Input } from '@/components/atoms/Input/Input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
@@ -46,7 +46,6 @@ export function UserManagement() {
   const [saving, setSaving] = useState(false)
   const [formData, setFormData] = useState<Partial<User>>({})
 
-
   async function fetchUsers() {
     try {
       setLoading(true)
@@ -67,7 +66,6 @@ export function UserManagement() {
       const data = await res.json()
       setUsers(data.users || [])
     } catch (e: any) {
-      console.error(e)
       toast.error(e.message || 'Erro ao buscar usuários')
     } finally {
       setLoading(false)
@@ -84,7 +82,6 @@ export function UserManagement() {
     setSelected(u)
     setFormData({ ...u })
   }
-
 
   async function saveProfile() {
     if (!selected) return
@@ -118,7 +115,6 @@ export function UserManagement() {
       toast.success('Perfil atualizado com sucesso!')
       setSelected(null)
     } catch (e: any) {
-      console.error(e)
       toast.error(e.message || 'Erro ao salvar perfil')
     } finally {
       setSaving(false)
@@ -147,7 +143,6 @@ export function UserManagement() {
       
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
-        console.error('Erro da API:', err)
         throw new Error(err.error || 'Erro ao resetar senha')
       }
       
@@ -155,7 +150,6 @@ export function UserManagement() {
       
       toast.success(`Senha resetada! Nova senha temporária: ${tempPassword}`)
     } catch (e: any) {
-      console.error('Erro completo:', e)
       toast.error(e.message || 'Erro ao resetar senha')
     } finally {
       setCredSaving(false)
@@ -178,7 +172,6 @@ export function UserManagement() {
         </div>
         <Button onClick={fetchUsers} variant="outline">Atualizar</Button>
       </div>
-
 
       <Card className="p-4">
         <div className="grid gap-3 md:grid-cols-[1fr,160px,160px,120px]">

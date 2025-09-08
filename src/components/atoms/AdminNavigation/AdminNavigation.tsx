@@ -73,7 +73,6 @@ export function AdminNavigation({
       toast.success('Logout realizado com sucesso!')
       router.push('/')
     } catch (error) {
-      console.error('Erro ao fazer logout:', error)
       toast.error('Erro ao fazer logout')
     }
   }

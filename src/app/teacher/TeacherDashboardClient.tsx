@@ -54,8 +54,7 @@ export function TeacherDashboardClient() {
       
       setTeacherStats(stats)
     } catch (error) {
-      console.error('Erro ao carregar challenges:', error)
-    }
+      }
   }
 
   const updateStatsAfterDeletion = (deletedChallenge: any) => {
@@ -70,15 +69,11 @@ export function TeacherDashboardClient() {
   const handleDeleteChallenge = async (id: string) => {
     if (confirm('Tem certeza que deseja excluir este challenge?')) {
       try {
-        // Busca o challenge antes de excluir para atualizar as estatísticas
         const challengeToDelete = myChallenges.find(c => c.id === id)
         
         const success = await deleteChallenge(id)
         if (success) {
-          // Remove da lista local imediatamente
           setMyChallenges(prev => prev.filter(c => c.id !== id))
-          
-          // Atualiza as estatísticas localmente
           if (challengeToDelete) {
             updateStatsAfterDeletion(challengeToDelete)
           }
@@ -88,7 +83,6 @@ export function TeacherDashboardClient() {
           alert('Não foi possível excluir o challenge. Verifique se ele está em um status válido para exclusão.')
         }
       } catch (error) {
-        console.error('Erro ao excluir challenge:', error)
         const errorMessage = error instanceof Error ? error.message : 'Erro ao excluir challenge. Tente novamente.'
         alert(errorMessage)
       }
@@ -100,12 +94,10 @@ export function TeacherDashboardClient() {
       try {
         const success = await sendBackForReview(id)
         if (success) {
-          // Recarrega os challenges para atualizar o status
           loadChallenges()
           alert('Challenge enviado de volta para análise com sucesso!')
         }
       } catch (error) {
-        console.error('Erro ao enviar challenge de volta:', error)
         alert('Erro ao enviar challenge de volta. Tente novamente.')
       }
     }

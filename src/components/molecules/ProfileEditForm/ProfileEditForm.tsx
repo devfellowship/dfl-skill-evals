@@ -53,7 +53,6 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
       const { error } = await updateProfile(formData)
       
       if (error) {
-        console.error('ProfileEditForm: Erro ao salvar:', error)
         toast.error(error.message || PROFILE_MESSAGES.UNEXPECTED_ERROR)
         return
       }
@@ -62,7 +61,6 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
       setIsEditing(false)
       onClose?.()
     } catch (error) {
-      console.error('Erro ao salvar:', error)
       toast.error(PROFILE_MESSAGES.UNEXPECTED_ERROR)
     } finally {
       setSaving(false)
@@ -97,7 +95,6 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
         confirmPassword: ''
       })
     } catch (error) {
-      console.error('Erro ao alterar senha:', error)
       toast.error(PROFILE_MESSAGES.UNEXPECTED_ERROR)
     } finally {
       setPasswordSaving(false)
@@ -125,7 +122,6 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
       const { error } = await changeEmail(emailData.newEmail)
       
       if (error) {
-        console.error('Erro ao alterar email:', error)
         toast.error(error.message || PROFILE_MESSAGES.UNEXPECTED_ERROR)
         return
       }
@@ -136,7 +132,6 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
         newEmail: ''
       })
     } catch (error) {
-      console.error('Erro ao alterar email:', error)
       toast.error(PROFILE_MESSAGES.UNEXPECTED_ERROR)
     } finally {
       setEmailSaving(false)

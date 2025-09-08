@@ -97,8 +97,7 @@ export function MainHeader({
     try {
       await signOut()
     } catch (error) {
-      console.error('Erro ao fazer logout:', error)
-    }
+      }
   }
   const getUserDisplayName = () => {
     if (!user) return 'Usuário'
@@ -120,7 +119,6 @@ export function MainHeader({
     const name = getUserDisplayName()
     return name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
   }
-
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -194,7 +192,7 @@ export function MainHeader({
                   variant="outline"
                   className="px-4 py-2 text-sm"
                 >
-                  <Link href="/teacher">
+                  <Link href="/admin">
                     Mentor
                   </Link>
                 </Button>
@@ -213,7 +211,6 @@ export function MainHeader({
               )}
             </div>
           )}
-
 
           {user ? (
             <DropdownMenu>

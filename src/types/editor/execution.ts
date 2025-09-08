@@ -9,7 +9,7 @@ export type LanguageId = typeof JUDGE0_LANGUAGES[keyof typeof JUDGE0_LANGUAGES]
 
 export type { Judge0Language, Judge0Submission, Judge0Result }
 
-export interface TestCase {
+export interface ExecutionTestCase {
   input: string
   expectedOutput: string
   description?: string
@@ -18,7 +18,7 @@ export interface TestCase {
 
 export interface ExecutionRequest {
   code: string
-  testCases: TestCase[]
+  testCases: ExecutionTestCase[]
   languageId: LanguageId
   timeoutMs?: number
   functionName: string 

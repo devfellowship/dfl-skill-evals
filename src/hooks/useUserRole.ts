@@ -54,7 +54,6 @@ export function useUserRole(): UserRoleInfo {
         const newRoleInfo = getRoleInfo(role)
         setRoleInfo(newRoleInfo)
       } catch (error) {
-        console.error('Erro ao buscar role do usuário:', error)
         setRoleInfo(getDefaultRoleInfo())
       }
     }

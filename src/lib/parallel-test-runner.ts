@@ -95,8 +95,6 @@ export class ParallelTestRunner {
     } catch (error) {
       const executionTime = Date.now() - testStartTime
       
-      console.error(`❌ Erro no teste ${testCase.id}:`, error)
-      
       return {
         testCaseId: testCase.id,
         input: testCase.input,
@@ -119,10 +117,9 @@ export class ParallelTestRunner {
       
       return `${userCode}
 
-
 const input = ${testCase.input};
 const result = ${functionName}(...input);
-console.log(JSON.stringify(result));`
+);`
     }
 
     return userCode

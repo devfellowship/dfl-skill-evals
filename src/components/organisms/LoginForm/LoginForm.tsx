@@ -52,14 +52,13 @@ export function LoginForm() {
           if (profile?.role === 'admin') {
             router.push('/admin')
           } else if (profile?.role === 'mentor') {
-            router.push('/teacher')
+            router.push('/admin')
           } else {
             router.push('/')
           }
         }
       }
     } catch (error) {
-      console.error('Erro no login:', error)
       setError('Erro ao fazer login. Tente novamente.')
       toast.error('Erro ao fazer login. Tente novamente.')
     } finally {

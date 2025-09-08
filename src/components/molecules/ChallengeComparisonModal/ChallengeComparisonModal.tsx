@@ -73,7 +73,6 @@ export function ChallengeComparisonModal({
         .single()
 
       if (currentError) {
-        console.error('Erro ao carregar challenge atual:', currentError)
         return
       }
 
@@ -109,8 +108,7 @@ export function ChallengeComparisonModal({
         setComparison(comparisonResult)
       }
     } catch (err) {
-      console.error('Erro ao carregar dados:', err)
-    } finally {
+      } finally {
       setLoading(false)
     }
   }

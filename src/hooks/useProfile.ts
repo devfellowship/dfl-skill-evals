@@ -43,7 +43,6 @@ export const useProfile = () => {
 
       setProfile(data)
     } catch (err) {
-      console.error('Erro ao buscar perfil:', err)
       setError(err instanceof Error ? err.message : 'Erro ao buscar perfil')
     } finally {
       setLoading(false)
@@ -82,7 +81,6 @@ export const useProfile = () => {
       
       return updatedProfile
     } catch (err) {
-      console.error('Erro ao atualizar perfil:', err)
       setError(err instanceof Error ? err.message : 'Erro ao atualizar perfil')
       throw err
     }
@@ -104,7 +102,6 @@ export const useProfile = () => {
 
       return true
     } catch (err) {
-      console.error('Erro ao alterar senha:', err)
       setError(err instanceof Error ? err.message : 'Erro ao alterar senha')
       throw err
     }
@@ -134,7 +131,6 @@ export const useProfile = () => {
 
       return true
     } catch (err) {
-      console.error('Erro ao alterar email:', err)
       setError(err instanceof Error ? err.message : 'Erro ao alterar email')
       throw err
     }

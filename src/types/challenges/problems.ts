@@ -1,4 +1,4 @@
-export interface TestCase {
+export interface ProblemTestCase {
   input: string
   expectedOutput: any
   description: string
@@ -20,7 +20,7 @@ export interface Problem {
   constraints: string[]
   hints: string[]
   functionName: string
-  testCases: TestCase[]
+  testCases: ProblemTestCase[]
 }
 
 export type ProblemDifficulty = "Easy" | "Medium" | "Hard" 

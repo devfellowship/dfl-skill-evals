@@ -91,10 +91,9 @@ ${userCode}
 // Teste - ${timestamp}
 try {
   const result_${timestamp} = ${functionName}(${paramsString});
-  console.log(JSON.stringify(result_${timestamp}));
+  );
 } catch (error_${timestamp}) {
-  console.log("ERROR: " + error_${timestamp}.message);
-}`
+  }`
     
     return executableCode
   }
@@ -125,15 +124,14 @@ ${cleanCode}
 // Teste - ${timestamp}
 try {
   const result_${timestamp} = ${functionName}(${paramsString});
-  console.log(JSON.stringify(result_${timestamp}));
+  );
 } catch (error_${timestamp}) {
-  console.log("ERROR: " + error_${timestamp}.message);
-}`
+  }`
   }
   
   return `// Código do usuário
 ${userCode}
 
 // Teste
-console.log(JSON.stringify(${functionName}(${paramsString})));`
+));`
 }

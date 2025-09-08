@@ -47,7 +47,6 @@ export default function TeacherChallengeView() {
         .single()
 
       if (error) {
-        console.error('Erro ao carregar challenge:', error)
         setError('Erro ao carregar challenge')
         return
       }
@@ -70,7 +69,6 @@ export default function TeacherChallengeView() {
         setChallenge(adaptedChallenge)
       }
     } catch (err) {
-      console.error('Erro ao carregar challenge:', err)
       setError('Erro ao carregar challenge')
     } finally {
       setLoading(false)

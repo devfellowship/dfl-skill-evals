@@ -57,7 +57,6 @@ export function useChallengesGlobal() {
         .order('created_at', { ascending: false })
 
       if (fetchError) {
-        console.error('❌ Erro ao buscar challenges:', fetchError)
         throw fetchError
       }
       
@@ -68,7 +67,6 @@ export function useChallengesGlobal() {
         setChallenges([])
       }
     } catch (err) {
-      console.error('❌ Erro ao carregar challenges:', err)
       setChallenges([])
     } finally {
       setIsInitialLoading(false)
@@ -78,16 +76,13 @@ export function useChallengesGlobal() {
   const startPolling = useCallback(() => {
     if (pollingRef.current) return
     
-    console.log('📡 Iniciando polling como fallback')
     pollingRef.current = setInterval(() => {
-      console.log('📡 Executando polling...')
       loadAllChallenges()
     }, 5000) // Polling a cada 5 segundos
   }, [loadAllChallenges])
 
   const stopPolling = useCallback(() => {
     if (pollingRef.current) {
-      console.log('📡 Parando polling')
       clearInterval(pollingRef.current)
       pollingRef.current = null
     }
@@ -102,10 +97,6 @@ export function useChallengesGlobal() {
       }
     })
     channelRef.current = channel
-    console.log('📡 Criando canal realtime:', channel)
-
-
-
     channel
       .on('broadcast', { event: 'challenge-created' }, ({ payload }) => {
 
@@ -115,7 +106,6 @@ export function useChallengesGlobal() {
         setBroadcastWorking(true)
       })
       .on('broadcast', { event: 'challenge-updated' }, ({ payload }) => {
-        console.log('📡 Broadcast recebido - challenge-updated:', payload)
         const adaptedChallenge = adaptChallenge(payload.challenge)
         setChallenges(prev => prev.map(ch => 
           ch.id === adaptedChallenge.id ? adaptedChallenge : ch
@@ -130,13 +120,10 @@ export function useChallengesGlobal() {
         setBroadcastWorking(true)
       })
       .subscribe((status) => {
-        console.log('📡 Status do canal realtime:', status)
         if (status === 'CHANNEL_ERROR') {
-          console.warn('⚠️ Erro no canal, iniciando polling...')
           setBroadcastWorking(false)
           startPolling()
         } else if (status === 'SUBSCRIBED') {
-          console.log('✅ Canal realtime conectado com sucesso')
           setBroadcastWorking(true)
           stopPolling()
         }
@@ -144,14 +131,12 @@ export function useChallengesGlobal() {
 
     const broadcastTimeout = setTimeout(() => {
       if (!broadcastWorking) {
-        console.warn('⚠️ Broadcast não funcionando, iniciando polling...')
         startPolling()
       }
     }, 5000) // 5 segundos de timeout
 
     return () => {
       if (channelRef.current) {
-        console.log('📡 Removendo canal realtime')
         supabase.removeChannel(channelRef.current)
         channelRef.current = null
       }
@@ -202,22 +187,18 @@ export function useChallengesGlobal() {
         payload: { challenge }
       })
     } else {
-      console.warn('⚠️ Canal não disponível para broadcast')
-    }
+      }
   }, [])
 
   const broadcastChallengeUpdated = useCallback((challenge: any) => {
     if (channelRef.current) {
-      console.log('📡 Enviando broadcast challenge-updated:', challenge)
-      console.log('📡 Status do canal:', channelRef.current.state)
       channelRef.current.send({
         type: 'broadcast',
         event: 'challenge-updated',
         payload: { challenge }
       })
     } else {
-      console.warn('⚠️ Canal não disponível para broadcast')
-    }
+      }
   }, [])
 
   const broadcastChallengeDeleted = useCallback((challengeId: string) => {
@@ -228,8 +209,7 @@ export function useChallengesGlobal() {
         payload: { challengeId }
       })
     } else {
-      console.warn('⚠️ Canal não disponível para broadcast')
-    }
+      }
   }, [])
 
   return {

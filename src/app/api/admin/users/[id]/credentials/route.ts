@@ -43,7 +43,6 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
 
     if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      console.error('SUPABASE_SERVICE_ROLE_KEY não está configurada')
       return NextResponse.json({ 
         error: 'Configuração do servidor incompleta. Service role key não encontrada.' 
       }, { status: 500 })
@@ -58,7 +57,6 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const { data: authUser, error: updateError } = await admin.auth.admin.updateUserById(userId, updateData)
 
     if (updateError) {
-      console.error('Erro ao atualizar credenciais:', updateError)
       return NextResponse.json({ 
         error: `Erro ao atualizar credenciais: ${updateError.message}` 
       }, { status: 500 })
@@ -84,7 +82,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         }
       })
     } catch (logError) {
-      console.warn('Erro ao registrar log (não crítico):', logError)
+      :', logError)
     }
 
     return NextResponse.json({ 
@@ -92,7 +90,6 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       user: authUser 
     })
   } catch (error) {
-    console.error('Erro na API de atualização de credenciais:', error)
     return NextResponse.json({ 
       error: `Erro interno do servidor: ${error instanceof Error ? error.message : 'Erro desconhecido'}` 
     }, { status: 500 })

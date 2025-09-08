@@ -45,12 +45,6 @@ export function useChallengeOperations() {
         .single()
 
       if (createError) {
-        console.error('❌ Erro ao criar challenge:', {
-          message: createError.message,
-          details: createError.details,
-          hint: createError.hint,
-          code: createError.code
-        })
         throw new Error(createError.message || 'Erro ao criar challenge')
       }
 
@@ -59,14 +53,12 @@ export function useChallengeOperations() {
       try {
         broadcastChallengeCreated(challenge)
       } catch (broadcastError) {
-        console.warn('⚠️ Falha no broadcast, recarregando dados:', broadcastError)
         loadAllChallenges()
       }
       
       return challenge
     } catch (err) {
       toast.error("Erro ao criar challenge")
-      console.error(err)
       return null
     } finally {
       setIsSubmitting(false)
@@ -83,7 +75,6 @@ export function useChallengeOperations() {
         .single()
 
       if (fetchError) {
-        console.error('❌ Erro ao buscar challenge atual:', fetchError)
         throw new Error('Erro ao buscar challenge atual')
       }
 
@@ -111,12 +102,6 @@ export function useChallengeOperations() {
         .single()
 
       if (updateError) {
-        console.error('❌ Erro ao atualizar challenge:', {
-          message: updateError.message,
-          details: updateError.details,
-          hint: updateError.hint,
-          code: updateError.code
-        })
         throw new Error(updateError.message || 'Erro ao atualizar challenge')
       }
 
@@ -125,14 +110,12 @@ export function useChallengeOperations() {
       try {
         broadcastChallengeUpdated(challenge)
       } catch (broadcastError) {
-        console.warn('⚠️ Falha no broadcast, recarregando dados:', broadcastError)
         loadAllChallenges()
       }
       
       return challenge
     } catch (err) {
       toast.error("Erro ao atualizar challenge")
-      console.error(err)
       return null
     } finally {
       setIsSubmitting(false)
@@ -152,12 +135,6 @@ export function useChallengeOperations() {
         .eq('id', id)
 
       if (deleteError) {
-        console.error('❌ Erro ao deletar challenge:', {
-          message: deleteError.message,
-          details: deleteError.details,
-          hint: deleteError.hint,
-          code: deleteError.code
-        })
         throw new Error(deleteError.message || 'Erro ao deletar challenge')
       }
 
@@ -166,14 +143,12 @@ export function useChallengeOperations() {
       try {
         broadcastChallengeDeleted(id)
       } catch (broadcastError) {
-        console.warn('⚠️ Falha no broadcast, recarregando dados:', broadcastError)
         loadAllChallenges()
       }
       
       return true
     } catch (err) {
       toast.error("Erro ao excluir challenge")
-      console.error(err)
       return null
     } finally {
       setIsDeleting(null)
@@ -194,12 +169,6 @@ export function useChallengeOperations() {
         .single()
 
       if (approveError) {
-        console.error('❌ Erro ao aprovar challenge:', {
-          message: approveError.message,
-          details: approveError.details,
-          hint: approveError.hint,
-          code: approveError.code
-        })
         throw new Error(approveError.message || 'Erro ao aprovar challenge')
       }
 
@@ -208,14 +177,12 @@ export function useChallengeOperations() {
       try {
         broadcastChallengeUpdated(challenge)
       } catch (broadcastError) {
-        console.warn('⚠️ Falha no broadcast, recarregando dados:', broadcastError)
         loadAllChallenges()
       }
       
       return challenge
     } catch (err) {
       toast.error("Erro ao aprovar challenge")
-      console.error(err)
       return null
     } finally {
       setIsApproving(null)
@@ -237,12 +204,6 @@ export function useChallengeOperations() {
         .single()
 
       if (rejectError) {
-        console.error('❌ Erro ao rejeitar challenge:', {
-          message: rejectError.message,
-          details: rejectError.details,
-          hint: rejectError.hint,
-          code: rejectError.code
-        })
         throw new Error(rejectError.message || 'Erro ao rejeitar challenge')
       }
 
@@ -251,14 +212,12 @@ export function useChallengeOperations() {
       try {
         broadcastChallengeUpdated(challenge)
       } catch (broadcastError) {
-        console.warn('⚠️ Falha no broadcast, recarregando dados:', broadcastError)
         loadAllChallenges()
       }
       
       return challenge
     } catch (err) {
       toast.error("Erro ao rejeitar challenge")
-      console.error(err)
       return null
     } finally {
       setIsSubmitting(false)
@@ -279,29 +238,20 @@ export function useChallengeOperations() {
         .single()
 
       if (archiveError) {
-        console.error('❌ Erro ao arquivar challenge:', {
-          message: archiveError.message,
-          details: archiveError.details,
-          hint: archiveError.hint,
-          code: archiveError.code
-        })
         throw new Error(archiveError.message || 'Erro ao arquivar challenge')
       }
 
       toast.success("Challenge arquivado com sucesso!")
       
       try {
-        console.log('📡 Enviando broadcast - challenge-updated (archive):', challenge)
         broadcastChallengeUpdated(challenge)
       } catch (broadcastError) {
-        console.warn('⚠️ Falha no broadcast, recarregando dados:', broadcastError)
         loadAllChallenges()
       }
       
       return challenge
     } catch (err) {
       toast.error("Erro ao arquivar challenge")
-      console.error(err)
       return null
     } finally {
       setIsArchiving(null)
@@ -326,12 +276,6 @@ export function useChallengeOperations() {
         .single()
 
       if (sendBackError) {
-        console.error('❌ Erro ao enviar challenge de volta:', {
-          message: sendBackError.message,
-          details: sendBackError.details,
-          hint: sendBackError.hint,
-          code: sendBackError.code
-        })
         throw new Error(sendBackError.message || 'Erro ao enviar challenge de volta')
       }
 
@@ -340,21 +284,17 @@ export function useChallengeOperations() {
       try {
         broadcastChallengeUpdated(challenge)
       } catch (broadcastError) {
-        console.warn('⚠️ Falha no broadcast, recarregando dados:', broadcastError)
         loadAllChallenges()
       }
       
       return challenge
     } catch (err) {
       toast.error("Erro ao enviar challenge de volta")
-      console.error(err)
       return null
     } finally {
       setIsSubmitting(false)
     }
   }
-
-
 
   return {
     isSubmitting,

@@ -51,7 +51,6 @@ export default function ChallengePage() {
         toast.error("Challenge não encontrada")
       }
     } catch (err) {
-      console.error('Erro ao carregar challenge:', err)
       toast.error("Erro ao carregar challenge")
     }
   }

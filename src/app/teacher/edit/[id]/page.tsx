@@ -70,7 +70,6 @@ export default function EditChallenge() {
   const [isLoading, setIsLoading] = useState(true)
   const [challenge, setChallenge] = useState<any>(null)
 
-
   useEffect(() => {
     if (challengeId) {
       loadChallenge()
@@ -106,7 +105,6 @@ export default function EditChallenge() {
 
         })
 
-
         if (challengeData.test_cases) {
           setTestCases(challengeData.test_cases.map((tc: any) => ({
             input: tc.input || '',
@@ -125,7 +123,6 @@ export default function EditChallenge() {
         }
       }
     } catch (error) {
-      console.error('Erro ao carregar challenge:', error)
       toast.error('Erro ao carregar challenge')
     } finally {
       setIsLoading(false)
@@ -138,7 +135,6 @@ export default function EditChallenge() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
 
     if (!formData.title.trim()) {
       toast.error('Título é obrigatório')
@@ -166,8 +162,6 @@ export default function EditChallenge() {
       examples: examples.filter(ex => ex.input && ex.output),
     }
 
-
-
     try {
       const result = await updateChallenge(challengeId, challengeData)
       if (result) {
@@ -177,7 +171,6 @@ export default function EditChallenge() {
         toast.error('Erro ao atualizar challenge')
       }
     } catch (error) {
-      console.error('Erro no handleSubmit:', error)
       toast.error('Erro ao atualizar challenge')
     }
   }
@@ -301,7 +294,6 @@ export default function EditChallenge() {
                 </p>
               </div>
             </div>
-            
 
           </div>
 

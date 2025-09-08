@@ -143,7 +143,6 @@ export function ChallengeCreateForm() {
       toast.success("Challenge criado com sucesso!")
       router.push("/teacher")
     } catch (error) {
-      console.error("Erro ao criar challenge:", error)
       toast.error("Erro ao criar challenge")
     }
   }

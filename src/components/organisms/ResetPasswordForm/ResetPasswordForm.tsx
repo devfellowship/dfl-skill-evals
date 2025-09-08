@@ -32,7 +32,6 @@ export function ResetPasswordForm() {
         toast.success('Email de recuperação enviado com sucesso!')
       }
     } catch (error) {
-      console.error('Erro no reset de senha:', error)
       setError('Erro ao enviar email de recuperação. Tente novamente.')
       toast.error('Erro ao enviar email de recuperação. Tente novamente.')
     } finally {

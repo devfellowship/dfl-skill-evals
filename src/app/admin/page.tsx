@@ -6,7 +6,7 @@ import { AdminNavigation } from "@/components/atoms/AdminNavigation/AdminNavigat
 
 export default function AdminPage() {
   return (
-    <AdminRouteWrapper allowedRoles={['admin']}>
+    <AdminRouteWrapper allowedRoles={['admin', 'mentor']}>
       <AdminNavigation 
         items={[
           { label: "Dashboard Admin", href: "/admin" }

@@ -150,8 +150,7 @@ export function useDashboardAdmin() {
         await handleApprove(challengeToCompare)
         handleCloseComparison()
       } catch (error) {
-        console.error('Erro ao aprovar challenge:', error)
-      }
+        }
     }
   }
 
@@ -161,8 +160,7 @@ export function useDashboardAdmin() {
         await handleReject(challengeToCompare, "Rejeitado após análise de alterações")
         handleCloseComparison()
       } catch (error) {
-        console.error('Erro ao rejeitar challenge:', error)
-      }
+        }
     }
   }
 

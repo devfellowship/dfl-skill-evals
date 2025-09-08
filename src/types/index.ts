@@ -11,7 +11,7 @@ export type {
   TestCase as ChallengeTestCase
 } from './challenges'
 
-export type { TestCase as ExecutionTestCase, TestResult } from './editor'
+export type { ExecutionTestCase, TestResult } from './editor'
 
 export interface User {
   name: string

@@ -77,7 +77,6 @@ export async function discoverLanguageId(languageName: string): Promise<number |
     
     return language ? language.id : null;
   } catch (error) {
-    console.error('Erro ao descobrir ID da linguagem:', error);
     return null;
   }
 }
@@ -101,8 +100,7 @@ export async function updateLanguageIds(): Promise<void> {
       (JUDGE0_CONFIG.LANGUAGES as any).JAVASCRIPT = jsLanguage.id;
     }
   } catch (error) {
-    console.error('Erro ao atualizar IDs das linguagens:', error);
-  }
+    }
 }
 
 export async function testJudge0Connection(): Promise<boolean> {
@@ -121,10 +119,8 @@ export async function testJudge0Connection(): Promise<boolean> {
       }
     }
     
-    console.error('❌ Não foi possível conectar com Judge0 em nenhum endpoint')
     return false
   } catch (error) {
-    console.error('Erro ao conectar com Judge0:', error)
     return false
   }
 }
@@ -133,12 +129,9 @@ export async function listAvailableLanguages(): Promise<Judge0Language[]> {
   try {
     const response = await fetch(`${JUDGE0_CONFIG.API_URL}/languages`);
     const languages: Judge0Language[] = await response.json();
-    
 
-    
     return languages;
   } catch (error) {
-    console.error('Erro ao listar linguagens:', error);
     return [];
   }
 }
@@ -159,7 +152,6 @@ export async function executeCode(submission: Judge0Submission): Promise<Judge0R
     
     return await response.json();
   } catch (error) {
-    console.error('Erro ao executar código:', error);
     throw error;
   }
 }
@@ -174,7 +166,6 @@ export async function getSubmissionResult(submissionId: string): Promise<Judge0R
     
     return await response.json();
   } catch (error) {
-    console.error('Erro ao obter resultado da submissão:', error);
     throw error;
   }
 }

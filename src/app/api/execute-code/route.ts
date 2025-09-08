@@ -7,9 +7,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const body: ExecutionRequest = await request.json()
     const { code, testCases, languageId, timeoutMs = 5000, functionName } = body
-    
 
-    
     // Rate limiting (usando IP como identificador simples)
     const clientIp = request.headers.get('x-forwarded-for') || 'unknown'
     if (!checkRateLimit(clientIp)) {
@@ -52,8 +50,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         { status: 400 }
       )
     }
-    
-
 
     const startTime = Date.now()
     
@@ -73,8 +69,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json(response)
       
     } catch (error) {
-      console.error('Judge0 execution error:', error)
-      
       if (error instanceof Error && error.message.includes('Compilation')) {
         return NextResponse.json({
           success: false,
@@ -88,7 +82,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
     
   } catch (error) {
-    console.error('Code execution API error:', error)
     return NextResponse.json(
       { 
         success: false, 

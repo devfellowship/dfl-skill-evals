@@ -61,13 +61,11 @@ export async function GET(request: NextRequest) {
     const { data: users, error: usersError } = await query
 
     if (usersError) {
-      console.error('Erro ao buscar usuários:', usersError)
       return NextResponse.json({ error: 'Erro ao buscar usuários' }, { status: 500 })
     }
 
     return NextResponse.json({ users: users || [] })
   } catch (error) {
-    console.error('Erro na API de usuários:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
@@ -126,7 +124,6 @@ export async function PATCH(request: NextRequest) {
       .single()
 
     if (updateError) {
-      console.error('Erro ao atualizar role:', updateError)
       return NextResponse.json({ error: 'Erro ao atualizar role do usuário' }, { status: 500 })
     }
 
@@ -135,7 +132,6 @@ export async function PATCH(request: NextRequest) {
       user: updatedUser
     })
   } catch (error) {
-    console.error('Erro na API de atualização de role:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
@@ -163,7 +159,6 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json()
     const { userId, full_name, email, role, is_active, password } = body
-
 
     if (!userId) {
       return NextResponse.json({ error: 'userId é obrigatório' }, { status: 400 })
@@ -211,7 +206,6 @@ export async function PUT(request: NextRequest) {
         .eq('id', userId)
 
       if (updateError) {
-        console.error('Erro ao atualizar perfil:', updateError)
         return NextResponse.json({ error: 'Erro ao atualizar perfil do usuário' }, { status: 500 })
       }
     }
@@ -222,7 +216,6 @@ export async function PUT(request: NextRequest) {
       })
 
       if (passwordError) {
-        console.error('Erro ao atualizar senha:', passwordError)
         return NextResponse.json({ error: 'Erro ao atualizar senha do usuário' }, { status: 500 })
       }
       changes.push('Senha: [alterada]')
@@ -235,7 +228,6 @@ export async function PUT(request: NextRequest) {
       .single()
 
     if (fetchError) {
-      console.error('Erro ao buscar usuário atualizado:', fetchError)
       return NextResponse.json({ error: 'Erro ao buscar dados atualizados' }, { status: 500 })
     }
 
@@ -246,7 +238,6 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Erro na API de atualização de usuário:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }

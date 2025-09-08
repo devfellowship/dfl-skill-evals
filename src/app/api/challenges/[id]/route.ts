@@ -22,7 +22,6 @@ export async function GET(
       .single()
 
     if (error) {
-      console.error('Erro ao buscar challenge:', error)
       return NextResponse.json(
         { error: 'Erro ao buscar challenge' },
         { status: 500 }
@@ -38,7 +37,6 @@ export async function GET(
 
     return NextResponse.json({ data: challenge })
   } catch (error) {
-    console.error('Erro na API de challenge:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }
@@ -72,7 +70,6 @@ export async function PUT(
       .single()
 
     if (error) {
-      console.error('Erro ao atualizar challenge:', error)
       return NextResponse.json(
         { error: 'Erro ao atualizar challenge' },
         { status: 500 }
@@ -81,7 +78,6 @@ export async function PUT(
 
     return NextResponse.json({ data: challenge })
   } catch (error) {
-    console.error('Erro na API de atualização de challenge:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }
@@ -109,7 +105,6 @@ export async function DELETE(
       .eq('id', id)
 
     if (error) {
-      console.error('Erro ao deletar challenge:', error)
       return NextResponse.json(
         { error: 'Erro ao deletar challenge' },
         { status: 500 }
@@ -118,7 +113,6 @@ export async function DELETE(
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Erro na API de exclusão de challenge:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }

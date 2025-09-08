@@ -31,7 +31,6 @@ export function useAuth() {
           setUser(null)
         }
       } catch (err) {
-        console.error('Erro ao buscar sessão:', err)
         setError(err instanceof Error ? err.message : 'Erro desconhecido')
       } finally {
         setLoading(false)

@@ -29,7 +29,6 @@ export default function AdminChallengeView() {
 
     return () => {
       if (channelRef.current) {
-        console.log('📡 Removendo canal realtime da página individual')
         supabase.removeChannel(channelRef.current)
         channelRef.current = null
       }
@@ -83,7 +82,6 @@ export default function AdminChallengeView() {
         .single()
 
       if (error) {
-        console.error('Erro ao carregar challenge:', error)
         setError('Erro ao carregar challenge')
         return
       }
@@ -93,7 +91,6 @@ export default function AdminChallengeView() {
         setChallenge(adaptedChallenge)
       }
     } catch (err) {
-      console.error('Erro ao carregar challenge:', err)
       setError('Erro ao carregar challenge')
     } finally {
       setLoading(false)
@@ -106,7 +103,6 @@ export default function AdminChallengeView() {
       supabase.removeChannel(channelRef.current)
     }
 
-
     const channel = supabase.channel(`challenge-${challengeId}`, {
       config: {
         broadcast: { self: true }
@@ -114,31 +110,22 @@ export default function AdminChallengeView() {
     })
     
     channelRef.current = channel
-    console.log('📡 Configurando realtime para challenge individual:', challengeId)
-
     channel
       .on('broadcast', { event: 'challenge-updated' }, ({ payload }) => {
-        console.log('📡 Broadcast recebido na página individual - challenge-updated:', payload)
         if (payload.challenge && payload.challenge.id === challengeId) {
           const adaptedChallenge = adaptChallenge(payload.challenge)
           setChallenge(adaptedChallenge)
-          console.log('✅ Challenge atualizado na página individual')
-        }
+          }
       })
       .on('broadcast', { event: 'challenge-deleted' }, ({ payload }) => {
-        console.log('📡 Broadcast recebido na página individual - challenge-deleted:', payload)
         if (payload.challengeId === challengeId) {
-          console.log('⚠️ Challenge foi deletado, redirecionando...')
           router.push('/admin')
         }
       })
       .subscribe((status) => {
-        console.log('📡 Status do canal realtime da página individual:', status)
         if (status === 'CHANNEL_ERROR') {
-          console.warn('⚠️ Erro no canal da página individual')
-        } else if (status === 'SUBSCRIBED') {
-          console.log('✅ Canal realtime da página individual conectado com sucesso')
-        }
+          } else if (status === 'SUBSCRIBED') {
+          }
       })
   }
 

@@ -27,7 +27,7 @@ export const DEFAULT_CHALLENGE_IMAGES = {
   'hard': '/images/challenges/defaults/hard.svg',
   
   // Imagem padrão genérica
-  'default': '/images/challenges/defaults/default.svg'
+  'default': '/images/challenges/defaults/algorithm.svg'
 }
 
 export const getDefaultImageForChallenge = (category?: string[], difficulty?: string): string => {

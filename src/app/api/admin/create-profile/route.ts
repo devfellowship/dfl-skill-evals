@@ -60,7 +60,6 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (createError) {
-      console.error('Erro ao criar perfil:', createError)
       return NextResponse.json({ error: 'Erro ao criar perfil' }, { status: 500 })
     }
 
@@ -69,7 +68,6 @@ export async function POST(request: NextRequest) {
       profile: newProfile
     })
   } catch (error) {
-    console.error('Erro na API de criação de perfil:', error)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }
 }
