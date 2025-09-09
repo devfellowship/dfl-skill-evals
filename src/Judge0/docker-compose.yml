@@ -57,7 +57,7 @@ services:
       - seccomp:unconfined
 
   worker:
-    image: judge0/judge0:latest-extra
+    image: judge0/judge0:1.13.1
     container_name: judge0-worker
     restart: unless-stopped
     environment:
