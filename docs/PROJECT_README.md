@@ -46,7 +46,7 @@ NEXT_PUBLIC_SUPABASE_URL=sua_url_do_supabase
 NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima
 
 # Judge0 (obrigatório)
-JUDGE0_API_URL=http://localhost:2358
+JUDGE0_API_URL=http://146.190.150.14:2358
 JUDGE0_API_KEY=sua_chave_api
 ```
 
@@ -91,7 +91,7 @@ docker-compose down -v
 docker-compose ps
 ```
 
-O Judge0 estará disponível em `http://localhost:2358`
+O Judge0 estará disponível em `http://146.190.150.14:2358`
 
 ### Configuração em VM (Recomendado para Windows)
 ### Isso só vai precisa ser feito caso o Judge0 dê o erro da pasta cgroup.
@@ -129,7 +129,7 @@ O WSL2 oferece uma experiência Linux nativa no Windows e é uma excelente alter
 
 5. **Configure o .env.local** para usar localhost (o WSL2 compartilha a rede com o Windows):
    ```env
-   JUDGE0_API_URL=http://localhost:2358
+   JUDGE0_API_URL=http://146.190.150.14:2358
    ```
 
 **💡 Vantagens do WSL2**: Melhor performance que VM, integração nativa com Windows, suporte completo ao Docker.
@@ -154,9 +154,9 @@ O WSL2 oferece uma experiência Linux nativa no Windows e é uma excelente alter
 
 ## 🌐 **URLs Importantes**
 
-- **API Judge0**: `http://localhost:2358`
-- **Health Check**: `http://localhost:2358/about`
-- **Linguagens**: `http://localhost:2358/languages`
+- **API Judge0**: `http://146.190.150.14:2358`
+- **Health Check**: `http://146.190.150.14:2358/about`
+- **Linguagens**: `http://146.190.150.14:2358/languages`
 
 
 ## 🏗️ Estrutura do Projeto

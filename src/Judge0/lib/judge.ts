@@ -6,7 +6,7 @@ type RunCodeParams = {
   };
 
 export async function runCode({ source_code, language_id, stdin = "" }: RunCodeParams) {
-    const url = process.env.JUDGE0_API_URL || "http://localhost:2358";
+    const url = process.env.JUDGE0_API_URL || "http://146.190.150.14:2358";
     const body = {
       source_code,
       language_id,

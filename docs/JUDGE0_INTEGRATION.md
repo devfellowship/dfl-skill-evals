@@ -107,7 +107,7 @@ docker-compose down -v
 ## 🔍 **Teste de Conexão**
 
 ```bash
-curl http://localhost:2358/languages
+curl http://146.190.150.14:2358/languages
 ```
 
 Se retornar uma lista de linguagens, está funcionando! ✅
@@ -132,9 +132,9 @@ docker-compose logs worker
 
 ## 🌐 **URLs Importantes**
 
-- **API Judge0**: `http://localhost:2358`
-- **Health Check**: `http://localhost:2358/about`
-- **Linguagens**: `http://localhost:2358/languages`
+- **API Judge0**: `http://146.190.150.14:2358`
+- **Health Check**: `http://146.190.150.14:2358/about`
+- **Linguagens**: `http://146.190.150.14:2358/languages`
 
 ## 🔄 **Fluxo de Execução**
 
