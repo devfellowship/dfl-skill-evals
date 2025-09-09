@@ -14,7 +14,7 @@ const nextConfig = {
     return [
       {
         source: '/api/judge0/:path*',
-        destination: process.env.JUDGE0_API_URL || 'http://localhost:2358/:path*',
+        destination: 'http://143.110.200.45:2358/:path*',
       },
     ]
   },

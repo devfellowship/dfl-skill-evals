@@ -24,7 +24,7 @@ export function PreChallengeActions({ challengeId, systemChecks }: PreChallengeA
         className="flex-1"
         disabled={!isSystemReady}
       >
-        <Link href={`/challenge-page/${challengeId}`}>Begin Assessment</Link>
+        <Link href={`/challenge/${challengeId}`}>Begin Assessment</Link>
       </Button>
     </div>
   )

@@ -10,8 +10,8 @@ export function ConditionalFooter() {
     "/teacher",
     "/teacher/create",
     "/teacher/edit",
-    "/challenge-page",
-    "/pre-challenge-page"
+    "/challenge",
+    "/challenge/pre"
   ]
   const shouldHideFooter = hideFooterPages.some(page => 
     pathname === page || pathname.startsWith(page + "/")

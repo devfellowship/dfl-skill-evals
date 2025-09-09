@@ -84,7 +84,7 @@ export const AssessmentCard = React.forwardRef<
               className="w-full"
               variant="outline"
             >
-              <Link href={`/pre-challenge-page/${generateSlug(assessment.title)}`}>
+              <Link href={`/challenge/pre/${generateSlug(assessment.title)}`}>
                 Start Challenge
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>

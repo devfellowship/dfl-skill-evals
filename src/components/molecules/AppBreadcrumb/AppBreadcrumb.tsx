@@ -48,7 +48,7 @@ export function createChallengeBreadcrumb(challengeId: string): BreadcrumbItem[]
       label: BREADCRUMB_LABELS.HOME,
     },
     {
-              href: `/pre-challenge-page/${challengeId}`,
+              href: `/challenge/pre/${challengeId}`,
       label: BREADCRUMB_LABELS.PRE_CHALLENGE,
     },
     {

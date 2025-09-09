@@ -42,7 +42,7 @@ export const JUDGE0_CONFIG = {
     TIMEOUT_MS: 5000,
   } as const,
 
-  API_URL: process.env.JUDGE0_API_URL || 'http://localhost:3000/api/judge0',
+  API_URL: 'http://localhost:3000/api/judge0',
   API_KEY: process.env.JUDGE0_API_KEY,
 
   FALLBACK_URLS: [

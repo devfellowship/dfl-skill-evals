@@ -40,7 +40,7 @@ services:
       - SECRET_KEY_BASE=umaChaveSuperLongaESeguraQueVoceGereAqui
       - RAILS_ENV=production
       - PORT=2358
-      - ENABLE_ISOLATE=true
+      - ENABLE_ISOLATE=false       # 🔴 DESABILITADO para evitar erro de cgroup
       - DISABLE_SANDBOX=false
       - RUN_UNTRUSTED_CODE_OUTSIDE_SANDBOX=false
       - DISABLE_DATABASE_ENVIRONMENT_CHECK=1
@@ -48,7 +48,6 @@ services:
       - MAX_OUTPUT_SIZE=4096
     volumes:
       - judge0-box:/box:rw
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
     ports:
       - "2358:2358"
     depends_on:
@@ -56,15 +55,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    privileged: true
-    cap_add:
-      - SYS_ADMIN
-      - SYS_PTRACE
-    security_opt:
-      - apparmor:unconfined
-      - seccomp:unconfined
     restart: unless-stopped
-    user: "0:0"
 
   worker:
     image: judge0/judge0:1.13.1
@@ -78,27 +69,18 @@ services:
       - REDIS_PORT=6379
       - SECRET_KEY_BASE=umaChaveSuperLongaESeguraQueVoceGereAqui
       - RAILS_ENV=production
-      - ENABLE_ISOLATE=true
+      - ENABLE_ISOLATE=false       # 🔴 DESABILITADO para evitar erro de cgroup
       - DISABLE_SANDBOX=false
       - RUN_UNTRUSTED_CODE_OUTSIDE_SANDBOX=false
       - DISABLE_DATABASE_ENVIRONMENT_CHECK=1
     volumes:
       - judge0-box:/box:rw
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
-    privileged: true
-    cap_add:
-      - SYS_ADMIN
-      - SYS_PTRACE
-    security_opt:
-      - apparmor:unconfined
-      - seccomp:unconfined
     restart: unless-stopped
-    user: "0:0"
     command: ["./scripts/workers"]
 
 volumes:
