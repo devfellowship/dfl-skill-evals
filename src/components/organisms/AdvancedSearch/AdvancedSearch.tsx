@@ -20,13 +20,7 @@ interface AdvancedSearchProps {
   assessments: Assessment[]
 }
 
-const difficulties = [
-  { value: "1", label: "Beginner", color: "bg-green-500" },
-  { value: "2", label: "Easy", color: "bg-green-400" },
-  { value: "3", label: "Medium", color: "bg-yellow-500" },
-  { value: "4", label: "Hard", color: "bg-orange-500" },
-  { value: "5", label: "Expert", color: "bg-red-500" },
-]
+import { DIFFICULTY_OPTIONS as difficulties } from "@/consts/advanced-search"
 
 export function AdvancedSearch({ onSearch, currentQuery, currentFilters, assessments }: AdvancedSearchProps) {
   const [open, setOpen] = useState(false)

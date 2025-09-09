@@ -9,8 +9,8 @@ export const getRoleInfo = (role: UserRole): UserRoleInfo => {
     color: ROLE_COLORS[role] || 'bg-gray-500',
     isLoading: false,
     isAdmin: role === 'admin',
-    isTeacher: role === 'mentor' || role === 'professor',
-    canCreateChallenges: role === 'admin' || role === 'mentor' || role === 'professor'
+    isMentor: role === 'mentor',
+    canCreateChallenges: role === 'admin' || role === 'mentor'
   }
 }
 

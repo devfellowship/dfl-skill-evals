@@ -21,7 +21,7 @@ export const DEFAULT_ROLE_INFO = {
   color: 'bg-gray-500',
   isLoading: true,
   isAdmin: false,
-  isTeacher: false,
+  isMentor: false,
   canCreateChallenges: false
 } as const
 

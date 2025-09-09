@@ -13,6 +13,20 @@ import { useProfile } from "@/hooks/useProfile"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/atoms/Badge/Badge"
+import { MAIN_SORT_OPTIONS } from "@/consts/main-header"
+
+const getIcon = (iconName: string) => {
+  const icons = {
+    Hash: <Hash className="w-4 h-4" />,
+    Calendar: <Calendar className="w-4 h-4" />,
+    Zap: <Zap className="w-4 h-4" />,
+    Star: <Star className="w-4 h-4" />,
+    Users: <Users className="w-4 h-4" />,
+    ArrowUp: <ArrowUp className="w-4 h-4" />,
+    ArrowDown: <ArrowDown className="w-4 h-4" />
+  }
+  return icons[iconName as keyof typeof icons] || <Hash className="w-4 h-4" />
+}
 
 interface MainHeaderProps {
   searchQuery: string
@@ -22,63 +36,6 @@ interface MainHeaderProps {
   showNavigation?: boolean
 }
 
-const MAIN_SORT_OPTIONS = [
-  {
-    value: 'order_index' as MainSortType,
-    label: 'Ordem Padrão',
-    icon: <Hash className="w-4 h-4" />
-  },
-  {
-    value: 'created_desc' as MainSortType,
-    label: 'Mais Recentes',
-    icon: <Calendar className="w-4 h-4" />
-  },
-  {
-    value: 'created_asc' as MainSortType,
-    label: 'Mais Antigos',
-    icon: <Calendar className="w-4 h-4" />
-  },
-  {
-    value: 'difficulty_asc' as MainSortType,
-    label: 'Fácil → Difícil',
-    icon: <Zap className="w-4 h-4" />
-  },
-  {
-    value: 'difficulty_desc' as MainSortType,
-    label: 'Difícil → Fácil',
-    icon: <Zap className="w-4 h-4" />
-  },
-  {
-    value: 'title_asc' as MainSortType,
-    label: 'Título A-Z',
-    icon: <ArrowUp className="w-4 h-4" />
-  },
-  {
-    value: 'title_desc' as MainSortType,
-    label: 'Título Z-A',
-    icon: <ArrowDown className="w-4 h-4" />
-  },
-  {
-    value: 'rating_desc' as MainSortType,
-    label: 'Melhor Avaliados',
-    icon: <Star className="w-4 h-4" />
-  },
-  {
-    value: 'rating_asc' as MainSortType,
-    label: 'Pior Avaliados',
-    icon: <Star className="w-4 h-4" />
-  },
-  {
-    value: 'participants_desc' as MainSortType,
-    label: 'Mais Populares',
-    icon: <Users className="w-4 h-4" />
-  },
-  {
-    value: 'participants_asc' as MainSortType,
-    label: 'Menos Populares',
-    icon: <Users className="w-4 h-4" />
-  }
-]
 
 export function MainHeader({ 
   searchQuery, 
@@ -88,7 +45,7 @@ export function MainHeader({
   showNavigation = true 
 }: MainHeaderProps) {
   const { user, signOut } = useAuth()
-  const { isAdmin, isTeacher, canCreateChallenges, isLoading: roleLoading } = useUserRole()
+  const { isAdmin, isMentor, canCreateChallenges, isLoading: roleLoading } = useUserRole()
   const { profile } = useProfile()
   
   const currentOption = MAIN_SORT_OPTIONS.find(option => option.value === sortBy) || MAIN_SORT_OPTIONS[0]
@@ -157,7 +114,7 @@ export function MainHeader({
                     onClick={() => onSortChange(option.value)}
                     className="flex items-center gap-2 cursor-pointer"
                   >
-                    {option.icon}
+                    {getIcon(option.iconName)}
                     <span>{option.label}</span>
                     {sortBy === option.value && (
                       <Badge variant="secondary" className="ml-auto text-xs">
@@ -186,7 +143,7 @@ export function MainHeader({
                 </Button>
               )}
 
-              {isTeacher && (
+              {isMentor && (
                 <Button 
                   asChild 
                   variant="outline"
@@ -204,7 +161,7 @@ export function MainHeader({
                   variant="outline"
                   className="px-4 py-2 text-sm"
                 >
-                  <Link href="/teacher/create">
+                  <Link href="/admin/create">
                     Criar
                   </Link>
                 </Button>

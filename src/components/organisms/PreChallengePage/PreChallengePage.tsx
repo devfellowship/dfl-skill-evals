@@ -10,7 +10,7 @@ import { SystemCheckCard } from "@/components/organisms/SystemCheckCard/SystemCh
 import { PreChallengeActions } from "@/components/molecules/PreChallengeActions/PreChallengeActions"
 import { LoadingState } from "@/components/molecules/LoadingState/LoadingState"
 import { NotFoundState } from "@/components/molecules/NotFoundState/NotFoundState"
-import type { PreChallengePageProps } from "@/types/pre-challenge-page"
+import type { PreChallengePageProps } from "@/types/challenges/pre-challenge-page"
 
 export function PreChallengePage({ challengeId }: PreChallengePageProps) {
   const { challenges, loading } = useChallenges()

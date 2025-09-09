@@ -1,12 +1,12 @@
-export interface TeacherStats {
+export interface MentorStats {
   totalChallenges: number
   approvedChallenges: number
   pendingChallenges: number
   rejectedChallenges: number
 }
 
-export interface TeacherStatsCardsProps {
-  stats: TeacherStats
+export interface MentorStatsCardsProps {
+  stats: MentorStats
 }
 
 export interface AdminStats {

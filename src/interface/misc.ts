@@ -33,7 +33,7 @@ export interface SearchFilters {
   status?: string[]
 }
 
-export interface TeacherChallengeListProps {
+export interface MentorChallengeListProps {
   challenges: any[]
   onDelete: (id: string) => void
 }
@@ -50,7 +50,7 @@ export interface EditChallengeProps {
   challengeId: string
 }
 
-export interface TeacherChallengeViewProps {
+export interface MentorChallengeViewProps {
   challengeId: string
 }
 

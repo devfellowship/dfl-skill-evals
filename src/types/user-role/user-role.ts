@@ -6,7 +6,7 @@ export interface UserRoleInfo {
   color: string
   isLoading: boolean
   isAdmin: boolean
-  isTeacher: boolean
+  isMentor: boolean
   canCreateChallenges: boolean
 }
 

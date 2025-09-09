@@ -9,7 +9,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-export type UserRole = 'student' | 'mentor' | 'professor' | 'admin'
+export type UserRole = 'student' | 'mentor' | 'admin'
 export type ChallengeStatus = 'to_approve' | 'approved' | 'rejected' | 'archived'
 export type DifficultyLevel = 'beginner' | 'easy' | 'medium' | 'hard' | 'expert'
 export type ProgrammingLanguage = 'typescript' | 'javascript' | 'python' | 'java' | 'cpp' | 'csharp'

@@ -7,7 +7,9 @@ import { toast } from 'sonner'
 import { LoginHeader } from '@/components/molecules/LoginHeader/LoginHeader'
 import { LoginFormFields } from '@/components/molecules/LoginFormFields/LoginFormFields'
 import { useAuth } from '@/components/providers/AuthProvider'
+import { MockAuthInstructions } from '@/components/molecules/MockAuthInstructions/MockAuthInstructions'
 import { supabase } from '@/lib/supabase'
+import { isMockEmail } from '@/lib/mock-data'
 
 export function LoginForm() {
   const [email, setEmail] = useState('')
@@ -15,7 +17,7 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
-  const { signIn } = useAuth()
+  const { signIn, isMockMode } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -28,7 +30,9 @@ export function LoginForm() {
       if (authError) {
         if (authError.message.includes('Invalid login credentials') || 
             authError.message.includes('Email not confirmed') ||
-            authError.message.includes('Invalid email or password')) {
+            authError.message.includes('Invalid email or password') ||
+            authError.message.includes('Email não encontrado nos dados mock') ||
+            authError.message.includes('Senha incorreta')) {
           setError('Email ou senha incorretos')
           toast.error('Email ou senha incorretos')
         } else {
@@ -37,21 +41,17 @@ export function LoginForm() {
         }
       } else {
         toast.success('Login realizado com sucesso!')
-        
-        if (email === 'admin@devshapper.com') {
-          router.push('/admin')
-        } else if (email === 'teacher@devshapper.com') {
-          router.push('/teacher')
-        } else {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('email', email)
-            .single()
-          
-          if (profile?.role === 'admin') {
+
+        if (isMockMode) {
+          if (email === 'admin@devsharper.com') {
             router.push('/admin')
-          } else if (profile?.role === 'mentor') {
+          } else if (email === 'mentor@devsharper.com') {
+            router.push('/admin')
+          } else {
+            router.push('/')
+          }
+        } else {
+          if (email === 'admin@devshapper.com') {
             router.push('/admin')
           } else {
             router.push('/')
@@ -97,6 +97,7 @@ export function LoginForm() {
           </button>
         </p>
       </div>
+      {process.env.NODE_ENV === 'development' && <MockAuthInstructions />}
     </div>
   )
 }

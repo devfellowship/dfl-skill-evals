@@ -27,7 +27,7 @@ export interface Example {
   output: string
 }
 
-export interface TeacherChallenge {
+export interface MentorChallenge {
   id: string
   title: string
   description: string

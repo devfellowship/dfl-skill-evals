@@ -14,19 +14,7 @@ import Link from "next/link"
 import { toast } from "sonner"
 import { DIFFICULTY_OPTIONS } from "@/types/admin/admin-dashboard"
 import { BackgroundImageSelector } from "@/components/atoms/BackgroundImageSelector/BackgroundImageSelector"
-
-const CATEGORY_OPTIONS = [
-  "Algoritmos",
-  "Estruturas de Dados", 
-  "Matemática",
-  "Strings",
-  "Arrays",
-  "Grafos",
-  "Árvores",
-  "Dinâmica",
-  "Guloso",
-  "Backtracking"
-]
+import { CATEGORY_OPTIONS } from "@/consts/challenge-form"
 
 interface TestCase {
   input: string
