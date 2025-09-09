@@ -22,7 +22,7 @@ services:
       - judge0
 
   server:
-    image: judge0/judge0:latest-extra
+    image: judge0/judge0:1.13.1-extra
     container_name: judge0-server
     restart: unless-stopped
     ports:
