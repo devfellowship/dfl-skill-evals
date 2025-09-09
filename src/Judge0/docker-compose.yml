@@ -70,8 +70,8 @@ services:
       - SECRET_KEY_BASE=umaChaveSuperLongaESeguraQueVoceGereAqui
       - RAILS_ENV=production
       - ENABLE_ISOLATE=false       # 🔴 DESABILITADO para evitar erro de cgroup
-      - DISABLE_SANDBOX=false
-      - RUN_UNTRUSTED_CODE_OUTSIDE_SANDBOX=false
+      - DISABLE_SANDBOX=true
+      - RUN_UNTRUSTED_CODE_OUTSIDE_SANDBOX=true
       - DISABLE_DATABASE_ENVIRONMENT_CHECK=1
     volumes:
       - judge0-box:/box:rw
