@@ -82,7 +82,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         }
       })
     } catch (logError) {
-      :', logError)
+      console.error('Erro ao logar mudança de credenciais:', logError)
     }
 
     return NextResponse.json({ 

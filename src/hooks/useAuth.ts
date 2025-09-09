@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { User } from '@supabase/supabase-js'
 import type { UserRole, Tables } from '@/lib/supabase'
-import { useMockAuth } from './useMockAuth'
-import { isMockEmail } from '@/lib/mock-data'
 
 interface AuthUser extends User {
   profile?: Tables<'profiles'>
@@ -13,36 +11,8 @@ export function useAuth() {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [isMockMode, setIsMockMode] = useState(false)
-
-  const {
-    mockUser,
-    mockSession,
-    loading: mockLoading,
-    signInMock,
-    signOutMock,
-    hasRole: mockHasRole,
-    canCreateChallenges: mockCanCreateChallenges,
-    canApproveChallenges: mockCanApproveChallenges,
-    isAdmin: mockIsAdmin,
-  } = useMockAuth()
 
   useEffect(() => {
-    const savedSession = localStorage.getItem('mock-session')
-    if (savedSession) {
-      try {
-        const session = JSON.parse(savedSession)
-        if (session.expires_at > Date.now()) {
-          setIsMockMode(true)
-          setLoading(false)
-          return
-        } else {
-          localStorage.removeItem('mock-session')
-        }
-      } catch (error) {
-        localStorage.removeItem('mock-session')
-      }
-    }
     const getSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession()
@@ -54,32 +24,44 @@ export function useAuth() {
             .eq('id', session.user.id)
             .single()
           
-          setUser({ ...session.user, profile })
+          setUser({
+            ...session.user,
+            profile: profile || undefined
+          } as AuthUser)
         } else {
           setUser(null)
         }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Erro desconhecido')
+      } catch (error) {
+        console.error('Error getting session:', error)
+        setError('Erro ao carregar sessão')
       } finally {
         setLoading(false)
       }
     }
 
     getSession()
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (session?.user) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single()
-          
-          setUser({ ...session.user, profile })
+          try {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .single()
+            
+            setUser({
+              ...session.user,
+              profile: profile || undefined
+            } as AuthUser)
+          } catch (error) {
+            console.error('Error loading profile:', error)
+            setUser(session.user as AuthUser)
+          }
         } else {
           setUser(null)
         }
-        
         setLoading(false)
       }
     )
@@ -87,66 +69,66 @@ export function useAuth() {
     return () => subscription.unsubscribe()
   }, [])
 
+  const signIn = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+    return { error }
+  }
+
+  const signUp = async (email: string, password: string, fullName: string) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+        },
+      },
+    })
+    return { error }
+  }
+
   const signOut = async () => {
-    try {
-      setLoading(true)
-      
-      if (isMockMode) {
-        const { error } = await signOutMock()
-        if (error) throw error
-        setIsMockMode(false)
-        setUser(null)
-      } else {
-        const { error } = await supabase.auth.signOut()
-        if (error) throw error
-        setUser(null)
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao fazer logout')
-    } finally {
-      setLoading(false)
-    }
+    const { error } = await supabase.auth.signOut()
+    return { error }
+  }
+
+  const resetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email)
+    return { error }
   }
 
   const hasRole = (role: UserRole): boolean => {
-    if (isMockMode) {
-      return mockHasRole(role)
-    }
     return user?.profile?.role === role
   }
 
   const canCreateChallenges = (): boolean => {
-    if (isMockMode) {
-      return mockCanCreateChallenges()
-    }
     const role = user?.profile?.role
     return role === 'admin' || role === 'mentor'
   }
 
   const canApproveChallenges = (): boolean => {
-    if (isMockMode) {
-      return mockCanApproveChallenges()
-    }
-    const role = user?.profile?.role
-    return role === 'admin'
+    return user?.profile?.role === 'admin'
   }
 
   const isAdmin = (): boolean => {
-    if (isMockMode) {
-      return mockIsAdmin()
-    }
     return user?.profile?.role === 'admin'
   }
 
   return {
-    user: isMockMode ? mockUser : user,
-    loading: isMockMode ? mockLoading : loading,
+    user,
+    session: null,
+    loading,
     error,
+    signIn,
+    signUp,
     signOut,
+    resetPassword,
     hasRole,
     canCreateChallenges,
     canApproveChallenges,
     isAdmin,
-    isMockMode,
   }
 }

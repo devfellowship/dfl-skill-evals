@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuth } from '@/components/providers/AuthProvider'
+import { useAuth } from '@/hooks/useAuth'
 import { useUserRole } from '@/hooks/useUserRole'
 import { useProfile } from '@/hooks/useProfile'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -16,7 +16,7 @@ import { useState } from 'react'
 import { getUserDisplayName, getUserInitials, formatPhoneNumber } from '@/lib/utils/profile-utils'
 export function ProfilePage() {
   const { user, signOut } = useAuth()
-  const { role, label, color, isAdmin, isTeacher, canCreateChallenges, isLoading: roleLoading } = useUserRole()
+  const { role, label, color, isAdmin, isMentor, canCreateChallenges, isLoading: roleLoading } = useUserRole()
   const { profile } = useProfile()
   const router = useRouter()
   const [showEditForm, setShowEditForm] = useState(false)
@@ -128,11 +128,11 @@ export function ProfilePage() {
                       </Button>
                     )}
                     
-                    {isTeacher && (
+                    {isMentor && (
                       <Button asChild variant="outline" className="justify-start h-12 border-2 hover:border-primary/50 hover:bg-primary/5">
-                        <Link href="/teacher" className="flex items-center gap-3">
+                        <Link href="/admin" className="flex items-center gap-3">
                           <User className="w-5 h-5" />
-                          <span className="font-medium">Painel Teacher</span>
+                          <span className="font-medium">Painel Mentor</span>
                         </Link>
                       </Button>
                     )}

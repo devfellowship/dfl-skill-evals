@@ -6,7 +6,7 @@ services:
       POSTGRES_USER: judge0
       POSTGRES_PASSWORD: YourJudge0PostgresPassword
     ports:
-      - "5432:5432"
+      - "55432:5432"   
     volumes:
       - judge0-db:/var/lib/postgresql/data
     healthcheck:
@@ -31,7 +31,7 @@ services:
     image: judge0/judge0:1.13.1
     environment:
       - POSTGRES_HOST=db
-      - POSTGRES_PORT=5432
+      - POSTGRES_PORT=5432  
       - POSTGRES_DB=judge0
       - POSTGRES_USER=judge0
       - POSTGRES_PASSWORD=YourJudge0PostgresPassword
@@ -40,7 +40,7 @@ services:
       - SECRET_KEY_BASE=umaChaveSuperLongaESeguraQueVoceGereAqui
       - RAILS_ENV=production
       - PORT=2358
-      - ENABLE_ISOLATE=true         # Isolamento real ativado
+      - ENABLE_ISOLATE=true       
       - DISABLE_SANDBOX=false
       - RUN_UNTRUSTED_CODE_OUTSIDE_SANDBOX=false
       - DISABLE_DATABASE_ENVIRONMENT_CHECK=1
@@ -70,7 +70,7 @@ services:
     image: judge0/judge0:1.13.1
     environment:
       - POSTGRES_HOST=db
-      - POSTGRES_PORT=5432
+      - POSTGRES_PORT=5432   
       - POSTGRES_DB=judge0
       - POSTGRES_USER=judge0
       - POSTGRES_PASSWORD=YourJudge0PostgresPassword
@@ -78,7 +78,7 @@ services:
       - REDIS_PORT=6379
       - SECRET_KEY_BASE=umaChaveSuperLongaESeguraQueVoceGereAqui
       - RAILS_ENV=production
-      - ENABLE_ISOLATE=true         # Isolamento real ativado
+      - ENABLE_ISOLATE=true         
       - DISABLE_SANDBOX=false
       - RUN_UNTRUSTED_CODE_OUTSIDE_SANDBOX=false
       - DISABLE_DATABASE_ENVIRONMENT_CHECK=1

@@ -2,7 +2,7 @@
 
 import { ReactNode, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/components/providers/AuthProvider'
+import { useAuth } from '@/hooks/useAuth'
 import { useUserRole } from '@/hooks/useUserRole'
 import { Loader2 } from 'lucide-react'
 

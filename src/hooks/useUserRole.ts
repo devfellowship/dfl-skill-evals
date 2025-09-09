@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useAuth } from '@/components/providers/AuthProvider'
+import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
 import { UserRoleInfo } from '@/types/user-role/user-role'
 import { getRoleInfo, isAdminEmail, getDefaultRoleInfo, getLoadingRoleInfo, getUnauthenticatedRoleInfo } from '@/lib/utils/user-role-utils'

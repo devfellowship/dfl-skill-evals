@@ -6,10 +6,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { toast } from 'sonner'
 import { LoginHeader } from '@/components/molecules/LoginHeader/LoginHeader'
 import { LoginFormFields } from '@/components/molecules/LoginFormFields/LoginFormFields'
-import { useAuth } from '@/components/providers/AuthProvider'
-import { MockAuthInstructions } from '@/components/molecules/MockAuthInstructions/MockAuthInstructions'
+import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
-import { isMockEmail } from '@/lib/mock-data'
 
 export function LoginForm() {
   const [email, setEmail] = useState('')
@@ -17,7 +15,7 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
-  const { signIn, isMockMode } = useAuth()
+  const { signIn } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -42,20 +40,23 @@ export function LoginForm() {
       } else {
         toast.success('Login realizado com sucesso!')
 
-        if (isMockMode) {
-          if (email === 'admin@devsharper.com') {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single()
+          
+          if (profile?.role === 'admin') {
             router.push('/admin')
-          } else if (email === 'mentor@devsharper.com') {
+          } else if (profile?.role === 'mentor') {
             router.push('/admin')
           } else {
             router.push('/')
           }
         } else {
-          if (email === 'admin@devshapper.com') {
-            router.push('/admin')
-          } else {
-            router.push('/')
-          }
+          router.push('/')
         }
       }
     } catch (error) {
@@ -97,7 +98,6 @@ export function LoginForm() {
           </button>
         </p>
       </div>
-      {process.env.NODE_ENV === 'development' && <MockAuthInstructions />}
     </div>
   )
 }

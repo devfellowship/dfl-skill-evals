@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
-import { useAuth } from '@/components/providers/AuthProvider'
+import { useAuth } from '@/hooks/useAuth'
 import { useUserRole } from '@/hooks/useUserRole'
 import { ProfileFormData, PasswordFormData, EmailFormData } from '@/types/profile/profile'
 import { canChangeName, getDaysUntilNameChange, validateEmail, getUserDisplayName, getUserInitials, formatPhoneNumber } from '@/lib/utils/profile-utils'
