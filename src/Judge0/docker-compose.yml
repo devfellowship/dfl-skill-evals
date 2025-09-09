@@ -63,17 +63,26 @@ services:
     environment:
       ENABLE_ISOLATE: "true"
       RUN_UNTRUSTED_CODE_OUTSIDE_SANDBOX: "false"
+
       POSTGRES_USER: judge0
       POSTGRES_PASSWORD: YourJudge0PostgresPassword
       POSTGRES_DB: devsharperDB
       POSTGRES_HOST: db
       POSTGRES_PORT: 5432
+
       REDIS_HOST: redis
       REDIS_PORT: 6379
+
       SECRET_KEY_BASE: umaChaveSuperLongaESeguraQueVoceGereAqui
+
+      # Config do worker
+      QUEUE: "1.13.1"
+      COUNT: "2"
+      INTERVAL: "0.1"
     volumes:
       - ./box:/box:rw
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - /var/local/lib/isolate:/var/local/lib/isolate
     depends_on:
       - db
       - redis
@@ -87,6 +96,14 @@ services:
     security_opt:
       - apparmor:unconfined
       - seccomp:unconfined
+    command: >
+      bash -lc '
+        echo "[worker] starting resque-scheduler...";
+        bundle exec rake resque:scheduler &
+        sleep 1;
+        echo "[worker] starting resque workers (COUNT=${COUNT:-2}, QUEUE=${QUEUE:-1.13.1})";
+        COUNT=${COUNT:-2} INTERVAL=${INTERVAL:-0.1} QUEUE=${QUEUE:-1.13.1} bundle exec rake resque:work
+      '
 
 volumes:
   judge0-db:
