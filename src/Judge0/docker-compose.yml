@@ -2,15 +2,15 @@ services:
   db:
     image: postgres:13
     environment:
-      POSTGRES_DB: judge0
+      POSTGRES_DB: devsharperDB
       POSTGRES_USER: judge0
       POSTGRES_PASSWORD: YourJudge0PostgresPassword
     ports:
-      - "55432:5432"   
+      - "55432:5432"
     volumes:
       - judge0-db:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U judge0 -d judge0"]
+      test: ["CMD-SHELL", "pg_isready -U judge0 -d devsharperDB"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -31,8 +31,8 @@ services:
     image: judge0/judge0:1.13.1
     environment:
       - POSTGRES_HOST=db
-      - POSTGRES_PORT=5432  
-      - POSTGRES_DB=judge0
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=devsharperDB
       - POSTGRES_USER=judge0
       - POSTGRES_PASSWORD=YourJudge0PostgresPassword
       - REDIS_HOST=redis
@@ -40,7 +40,7 @@ services:
       - SECRET_KEY_BASE=umaChaveSuperLongaESeguraQueVoceGereAqui
       - RAILS_ENV=production
       - PORT=2358
-      - ENABLE_ISOLATE=true       
+      - ENABLE_ISOLATE=true
       - DISABLE_SANDBOX=false
       - RUN_UNTRUSTED_CODE_OUTSIDE_SANDBOX=false
       - DISABLE_DATABASE_ENVIRONMENT_CHECK=1
@@ -70,15 +70,15 @@ services:
     image: judge0/judge0:1.13.1
     environment:
       - POSTGRES_HOST=db
-      - POSTGRES_PORT=5432   
-      - POSTGRES_DB=judge0
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=devsharperDB
       - POSTGRES_USER=judge0
       - POSTGRES_PASSWORD=YourJudge0PostgresPassword
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - SECRET_KEY_BASE=umaChaveSuperLongaESeguraQueVoceGereAqui
       - RAILS_ENV=production
-      - ENABLE_ISOLATE=true         
+      - ENABLE_ISOLATE=true
       - DISABLE_SANDBOX=false
       - RUN_UNTRUSTED_CODE_OUTSIDE_SANDBOX=false
       - DISABLE_DATABASE_ENVIRONMENT_CHECK=1
