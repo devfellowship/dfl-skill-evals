@@ -14,21 +14,6 @@ export interface MainSortButtonProps {
 
 const MAIN_SORT_OPTIONS = [
   {
-    value: 'order_index' as MainSortType,
-    label: 'Ordem Padrão',
-    icon: <Hash className="w-4 h-4" />
-  },
-  {
-    value: 'created_desc' as MainSortType,
-    label: 'Mais Recentes',
-    icon: <Calendar className="w-4 h-4" />
-  },
-  {
-    value: 'created_asc' as MainSortType,
-    label: 'Mais Antigos',
-    icon: <Calendar className="w-4 h-4" />
-  },
-  {
     value: 'difficulty_asc' as MainSortType,
     label: 'Fácil → Difícil',
     icon: <Zap className="w-4 h-4" />

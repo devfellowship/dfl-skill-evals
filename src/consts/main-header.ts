@@ -2,21 +2,6 @@ import type { MainSortType } from "@/lib/main-challenge-sorter"
 
 export const MAIN_SORT_OPTIONS = [
   {
-    value: 'order_index' as MainSortType,
-    label: 'Ordem Padrão',
-    iconName: 'Hash'
-  },
-  {
-    value: 'created_desc' as MainSortType,
-    label: 'Mais Recentes',
-    iconName: 'Calendar'
-  },
-  {
-    value: 'created_asc' as MainSortType,
-    label: 'Mais Antigos',
-    iconName: 'Calendar'
-  },
-  {
     value: 'difficulty_asc' as MainSortType,
     label: 'Fácil → Difícil',
     iconName: 'Zap'

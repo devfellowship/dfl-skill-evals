@@ -16,25 +16,40 @@ export function Footer() {
           
           <FooterSection title="Para Desenvolvedores">
             <li>
-              <FooterLink href="/challenges">Challenges</FooterLink>
+              <a 
+                href="https://learn.devfellowship.com/courses" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors duration-300 flex items-center space-x-2 group"
+              >
+                <span>Assista nossas aulas</span>
+                <ExternalLink className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </a>
             </li>
             <li>
-              <FooterLink href="/dashboard">Dashboard</FooterLink>
-            </li>
-            <li>
-              <FooterLink href="/progress">Progresso</FooterLink>
+              <a 
+                href="https://devfellowship.com/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors duration-300 flex items-center space-x-2 group"
+              >
+                <span>Entre para o time</span>
+                <ExternalLink className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </a>
             </li>
           </FooterSection>
 
           <FooterSection title="Para Empresas">
             <li>
-              <FooterLink href="/hiring">Modelos de contratação</FooterLink>
-            </li>
-            <li>
-              <FooterLink href="/talent-pool">Pool de talentos</FooterLink>
-            </li>
-            <li>
-              <FooterLink href="/partnership">Parcerias</FooterLink>
+              <a 
+                href="https://devfellowship.com/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors duration-300 flex items-center space-x-2 group"
+              >
+                <span>Contrate nossos serviços</span>
+                <ExternalLink className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </a>
             </li>
           </FooterSection>
 

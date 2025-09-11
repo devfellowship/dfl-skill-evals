@@ -32,7 +32,7 @@ export function useChallenges() {
         .select('*, image_url')
         .eq('status', 'approved')
         .eq('is_public', true)
-        .order('order_index', { ascending: true })
+        .order('difficulty', { ascending: true })
 
       if (fetchError) {
         setError(`Erro ao conectar com o banco: ${fetchError.message}`)

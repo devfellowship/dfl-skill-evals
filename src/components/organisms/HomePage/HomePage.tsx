@@ -18,7 +18,7 @@ export function HomePage() {
     minRating: 0,
     trending: false,
   })
-  const [sortBy, setSortBy] = useState<MainSortType>("order_index")
+  const [sortBy, setSortBy] = useState<MainSortType>("difficulty_asc")
 
   const handleSearch = (query: string, filters: SearchFilters) => {
     setSearchQuery(query)

@@ -53,7 +53,7 @@ export function useChallengesGlobal() {
       const { data: dbChallenges, error: fetchError } = await supabase
         .from('challenges')
         .select('*')
-        .order('order_index', { ascending: true })
+        .order('difficulty', { ascending: true })
         .order('created_at', { ascending: false })
 
       if (fetchError) {
