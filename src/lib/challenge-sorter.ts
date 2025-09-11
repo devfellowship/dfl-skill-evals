@@ -1,4 +1,4 @@
-import { AdminChallenge } from '@/types/admin'
+import { AdminChallenge } from '@/types/admin/admin-dashboard'
 
 export type SortType = 
   | 'created_desc' 

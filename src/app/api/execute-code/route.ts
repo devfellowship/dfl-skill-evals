@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { executeCodeWithJudge0, checkRateLimit, isLanguageSupported, getLanguageName } from '@/lib/execution/judge0-executor'
 import { validateCodeStructure, validateNoExtraCode, validateFunctionBody } from '@/lib/validation/code-validator'
-import type { ExecutionRequest, ExecutionResponse } from '@/types/execution'
+import type { ExecutionRequest, ExecutionResponse } from '@/types/editor/execution'
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {

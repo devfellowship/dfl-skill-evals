@@ -12,7 +12,7 @@ export interface Example {
 }
 
 export interface Problem {
-  id: number
+  id: string
   title: string
   difficulty: "Easy" | "Medium" | "Hard"
   description: string

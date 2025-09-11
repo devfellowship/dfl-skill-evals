@@ -9,7 +9,7 @@ import { CodeExecutionPanel } from "@/components/organisms/CodeExecutionPanel/Co
 import { TestResultsPanel } from "@/components/organisms/TestResultsPanel/TestResultsPanel"
 import { NotFoundState } from "@/components/molecules/NotFoundState/NotFoundState"
 import { LoadingState } from "@/components/molecules/LoadingState/LoadingState"
-import type { ChallengePageProps, ChallengeProblem } from "@/types/challenge-page"
+import type { ChallengePageProps, ChallengeProblem } from "@/types/challenges/challenge-page"
 
 export function ChallengePage({ challengeId }: ChallengePageProps) {
   const { challenge, loading: challengeLoading, error: challengeError } = useChallengeDetails(challengeId)
@@ -49,11 +49,26 @@ export function ChallengePage({ challengeId }: ChallengePageProps) {
     )
   }
 
+  const mapDifficulty = (difficulty: string): "Easy" | "Medium" | "Hard" => {
+    switch (difficulty) {
+      case 'beginner':
+      case 'easy':
+        return 'Easy'
+      case 'medium':
+        return 'Medium'
+      case 'hard':
+      case 'expert':
+        return 'Hard'
+      default:
+        return 'Easy'
+    }
+  }
+
   const adaptedProblem = {
     id: challenge.id,
     title: challenge.title,
     description: challenge.description,
-    difficulty: challenge.difficulty,
+    difficulty: mapDifficulty(challenge.difficulty),
     examples: challenge.examples || [],
     constraints: challenge.constraints || [],
     hints: challenge.hints || [],

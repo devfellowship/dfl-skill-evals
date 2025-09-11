@@ -2,7 +2,7 @@ import { ChallengeHeader } from "@/components/organisms/ChallengeHeader/Challeng
 import { ProblemPanel } from "@/components/organisms/ProblemPanel/ProblemPanel"
 import { CodeExecutionPanel } from "@/components/organisms/CodeExecutionPanel/CodeExecutionPanel"
 import { TestResultsPanel } from "@/components/organisms/TestResultsPanel/TestResultsPanel"
-import type { ChallengeLayoutProps, ChallengeProblem, ChallengeResults } from "@/types/challenge-page"
+import type { ChallengeLayoutProps} from "@/types/challenges/challenge-page"
 
 export function ChallengeLayout({
   title,

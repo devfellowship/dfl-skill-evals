@@ -8,7 +8,13 @@
     "lint": "next lint",
     "start": "next start",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "migrate": "node docs/migrations/apply-migrations.js",
+    "migrate:dev": "node docs/migrations/apply-migrations.js --env=development",
+    "migrate:prod": "node docs/migrations/apply-migrations.js --env=production",
+    "migrate:status": "node docs/migrations/check-migration-status.js",
+    "migrate:status:dev": "node docs/migrations/check-migration-status.js --env=development",
+    "migrate:status:prod": "node docs/migrations/check-migration-status.js --env=production"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
