@@ -2,8 +2,8 @@ import Link from "next/link"
 
 export function FooterBottom() {
   return (
-    <div className="border-t border-border/40 pt-8">
-      <div className="flex flex-col lg:flex-row justify-between items-center">
+    <div className="border-t border-border/40 mt-6 pt-8">
+      <div className="flex flex-col lg:flex-row justify-between items-center space-y-6 lg:space-y-0">
         <p className="text-muted-foreground text-base">
           © 2025 devfellowship. Todos os direitos reservados.
         </p>
