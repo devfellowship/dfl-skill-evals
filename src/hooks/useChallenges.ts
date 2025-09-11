@@ -7,7 +7,7 @@ import type { Challenge } from '@/types/challenges/challenge'
 
 let challengesCache: Challenge[] | null = null
 let cacheTimestamp: number = 0
-const CACHE_DURATION = 5 * 60 * 1000 // 5 minutos
+const CACHE_DURATION = 5 * 60 * 1000
 
 export function useChallenges() {
   const [challenges, setChallenges] = useState<Challenge[]>([])
@@ -53,13 +53,12 @@ export function useChallenges() {
         description: challenge.description,
         skills: challenge.skills || [],
         difficulty: challenge.difficulty,
-
         category: challenge.category || 'Algoritmos',
         problems: 1,
         participants: 500 + index * 50,
         rating: parseFloat((4.2 + (index * 0.1)).toFixed(1)),
         trending: index < 2,
-        image: challenge.image_url
+        image: '/images/challenges/defaults/Default.jpg' 
       }))
       
 
@@ -111,8 +110,6 @@ export function useChallenges() {
       if (createError) {
         throw createError
       }
-
-      // Atualizar a lista local
       setChallenges(prev => [data, ...prev])
       return { data, error: null }
     } catch (err) {
@@ -134,8 +131,6 @@ export function useChallenges() {
       if (updateError) {
         throw updateError
       }
-
-      // Adaptar dados atualizados para o formato da aplicação
       const adaptedData = {
         id: challenges.find(c => c.supabaseId === id)?.id || 1,
         supabaseId: data.id,
@@ -143,16 +138,13 @@ export function useChallenges() {
         description: data.description,
         skills: data.skills,
         difficulty: data.difficulty,
-        duration: data.duration,
         category: data.category,
         problems: 1,
         participants: Math.floor(Math.random() * 1000) + 100,
         rating: parseFloat((Math.random() * 2 + 3).toFixed(1)),
         trending: Math.random() > 0.8,
-        image: data.image_url
+        image: '/images/challenges/defaults/Default.jpg'
       }
-
-      // Atualizar a lista local
       setChallenges(prev => prev.map(challenge => 
         challenge.supabaseId === id ? adaptedData : challenge
       ))
@@ -174,8 +166,6 @@ export function useChallenges() {
       if (deleteError) {
         throw deleteError
       }
-
-      // Atualizar a lista local
       setChallenges(prev => prev.filter(challenge => challenge.supabaseId !== id))
       return { error: null }
     } catch (err) {
@@ -184,8 +174,6 @@ export function useChallenges() {
       return { error: errorMessage }
     }
   }
-
-  // Função para invalidar o cache
   const invalidateCache = useCallback(() => {
     challengesCache = null
     cacheTimestamp = 0
@@ -193,40 +181,30 @@ export function useChallenges() {
 
   useEffect(() => {
     fetchChallenges()
-    
-    // Configurar Supabase Realtime para escutar mudanças na tabela challenges
     const channel = supabase
       .channel('public:challenges')
       .on('postgres_changes',
           { event: 'UPDATE', schema: 'public', table: 'challenges' },
           payload => {
-            // Invalidar cache quando uma challenge é atualizada
             challengesCache = null
             cacheTimestamp = 0
-            
-            // Recarregar challenges
             fetchChallenges(true)
           }
       )
       .on('postgres_changes',
           { event: 'INSERT', schema: 'public', table: 'challenges' },
           payload => {
-            // Invalidar cache quando uma nova challenge é criada
             challengesCache = null
             cacheTimestamp = 0
-            
-            // Recarregar challenges
             fetchChallenges(true)
           }
       )
       .on('postgres_changes',
           { event: 'DELETE', schema: 'public', table: 'challenges' },
           payload => {
-            // Invalidar cache quando uma challenge é deletada
             challengesCache = null
             cacheTimestamp = 0
             
-            // Recarregar challenges
             fetchChallenges(true)
           }
       )
@@ -237,12 +215,17 @@ export function useChallenges() {
     }
   }, [])
 
-  // Função para forçar refresh manual
   const forceRefresh = useCallback(() => {
     challengesCache = null
     cacheTimestamp = 0
     fetchChallenges(true)
   }, [])
+  const clearCacheAndRefresh = useCallback(() => {
+    challengesCache = null
+    cacheTimestamp = 0
+    setChallenges([])
+    fetchChallenges(true)
+  }, [fetchChallenges])
 
 
 
@@ -257,5 +240,6 @@ export function useChallenges() {
     deleteChallenge,
     invalidateCache,
     forceRefresh,
+    clearCacheAndRefresh,
   }
 }

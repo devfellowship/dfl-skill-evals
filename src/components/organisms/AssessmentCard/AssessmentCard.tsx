@@ -27,10 +27,10 @@ export const AssessmentCard = React.forwardRef<
             category={[assessment.category]}
             difficulty={assessment.difficulty.toString()}
             title={assessment.title}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="w-full h-full object-cover"
           />
           {assessment.trending && (
-            <div className="absolute top-3 right-3">
+            <div className="absolute top-3 right-3 z-30">
               <Badge variant="secondary" className="bg-orange-100 text-orange-700 text-xs">
                 Trending
               </Badge>
