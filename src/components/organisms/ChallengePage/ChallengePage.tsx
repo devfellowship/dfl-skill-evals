@@ -69,11 +69,19 @@ export function ChallengePage({ challengeId }: ChallengePageProps) {
     title: challenge.title,
     description: challenge.description,
     difficulty: mapDifficulty(challenge.difficulty),
-    examples: challenge.examples || [],
+    examples: challenge.challenge_examples?.map(example => ({
+      input: example.input,
+      output: example.output,
+      explanation: example.explanation || ''
+    })) || [],
     constraints: challenge.constraints || [],
     hints: challenge.hints || [],
     functionName: challenge.function_name,
-    testCases: challenge.test_cases || []
+    testCases: challenge.challenge_test_cases?.map(testCase => ({
+      input: testCase.input,
+      expectedOutput: testCase.expected_output,
+      hidden: testCase.is_hidden
+    })) || []
   }
 
   const passedTests = finalResults?.details?.filter((test) => test.status === "passed").length || 0
