@@ -3,7 +3,8 @@ import { supabase } from '@/lib/supabase'
 import type { Tables } from '@/lib/supabase'
 
 interface ChallengeDetails extends Tables<'challenges'> {
-  // Campos adicionais processados
+  challenge_examples?: Array<Tables<'challenge_examples'>>
+  challenge_test_cases?: Array<Tables<'challenge_test_cases'>>
 }
 
 export function useChallengeDetails(challengeId: string) {
@@ -22,11 +23,27 @@ export function useChallengeDetails(challengeId: string) {
         // Buscar por título (convertendo slug)
         const searchTitle = challengeId.replace(/-/g, ' ')
         
-        // Buscar por título usando ilike para melhor compatibilidade
+        // Buscar por título usando ilike para melhor compatibilidade, incluindo exemplos e test cases
         const { data, error: fetchError } = await supabase
           .schema('skill_evals')
           .from('challenges')
-          .select('*')
+          .select(`
+            *,
+            challenge_examples (
+              id,
+              input,
+              output,
+              explanation,
+              order_index
+            ),
+            challenge_test_cases (
+              id,
+              input,
+              expected_output,
+              is_hidden,
+              order_index
+            )
+          `)
           .eq('status', 'approved')
           .eq('is_public', true)
           .ilike('title', `%${searchTitle}%`)
