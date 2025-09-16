@@ -74,19 +74,29 @@ export function useChallengeExecution({ problemId, functionName }: UseChallengeE
         const { data: challenge } = await supabase
           .schema('skill_evals')
           .from('challenges')
-          .select('test_cases') // TODO: change to challenge_test_cases
+          .select(`
+            id,
+            challenge_test_cases (
+              id,
+              input,
+              expected_output,
+              is_hidden,
+              order_index
+            )
+          `)
           .ilike('title', `%${searchTitle}%`)
           .single()
 
-        if (challenge?.test_cases && Array.isArray(challenge.test_cases)) {
-          traditionalTestCases = challenge.test_cases.map((tc: any) => ({
+        if (challenge?.challenge_test_cases && Array.isArray(challenge.challenge_test_cases)) {
+          traditionalTestCases = challenge.challenge_test_cases.map((tc: any) => ({
             input: tc.input,
-            expectedOutput: tc.expectedOutput,
-            description: tc.description || '',
-            hidden: tc.hidden || false
+            expectedOutput: tc.expected_output,
+            description: '',
+            hidden: tc.is_hidden || false
           }))
         }
       } catch (dbError) {
+        console.log('Erro ao buscar test cases:', dbError)
         // Fallback para test cases gerados
       }
 

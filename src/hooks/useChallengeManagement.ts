@@ -12,7 +12,6 @@ export interface CreateChallengeData {
   skills?: string[]
   function_name: string
   initial_code: string
-  test_cases: any[]
   examples?: any[]
   constraints?: string[]
   hints?: string[]
@@ -64,7 +63,6 @@ export function useChallengeManagement() {
         category: data.category || 'Algoritmos',
         function_name: data.function_name,
         initial_code: data.initial_code,
-        test_cases: data.test_cases || [],
         examples: data.examples || [],
         skills: data.skills || [],
         constraints: data.constraints || [],
@@ -146,12 +144,6 @@ export function useChallengeManagement() {
         mappedUpdates.initial_code = updates.initialCode
       }
       
-      if (updates.test_cases !== undefined) {
-        mappedUpdates.test_cases = updates.test_cases
-      }
-      if (updates.testCases !== undefined) {
-        mappedUpdates.test_cases = updates.testCases
-      }
       
       if (updates.imageUrl !== undefined) {
         mappedUpdates.image_url = updates.imageUrl

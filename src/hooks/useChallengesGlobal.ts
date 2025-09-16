@@ -42,7 +42,7 @@ export function useChallengesGlobal() {
       createdAt: raw.created_at ? new Date(raw.created_at).toLocaleDateString('pt-BR') : 'Data não disponível',
       updatedAt: raw.updated_at ? new Date(raw.updated_at).toLocaleDateString('pt-BR') : 'Data não disponível',
       initialCode: raw.initial_code ?? '',
-      testCases: raw.test_cases ?? [],
+      testCases: [],
       orderIndex: raw.order_index ?? null,
       imageUrl: raw.image_url ?? null
     }

@@ -37,7 +37,6 @@ export function useChallengeOperations() {
           category: challengeData.category,
           function_name: challengeData.function_name,
           initial_code: challengeData.initial_code || "",
-          test_cases: challengeData.test_cases || [],
           status: 'to_approve',
           is_public: false,
           slug: challengeData.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
@@ -95,7 +94,6 @@ export function useChallengeOperations() {
           category: updateData.category,
           function_name: updateData.function_name,
           initial_code: updateData.initial_code,
-          test_cases: updateData.test_cases,
           status: newStatus,
           image_url: updateData.imageUrl,
           slug: updateData.slug

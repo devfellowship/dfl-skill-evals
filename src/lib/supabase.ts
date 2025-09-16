@@ -127,7 +127,6 @@ export interface Database {
           skills: string[]
           function_name: string
           initial_code: string
-          test_cases: any
           examples: any
           constraints: string[]
           hints: string[]
@@ -157,7 +156,6 @@ export interface Database {
           skills?: string[]
           function_name?: string
           initial_code: string
-          test_cases?: any
           examples?: any
           constraints?: string[]
           hints?: string[]
@@ -187,7 +185,6 @@ export interface Database {
           skills?: string[]
           function_name?: string
           initial_code?: string
-          test_cases?: any
           examples?: any
           constraints?: string[]
           hints?: string[]
