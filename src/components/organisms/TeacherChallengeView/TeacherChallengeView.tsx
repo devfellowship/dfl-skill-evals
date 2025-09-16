@@ -44,6 +44,7 @@ export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps)
     try {
       setLoading(true)
       const { data, error } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .select('*')
         .eq('id', id)

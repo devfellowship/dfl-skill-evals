@@ -76,6 +76,7 @@ export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
     try {
       setLoading(true)
       const { data, error } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .select('*')
         .eq('id', id)

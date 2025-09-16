@@ -67,6 +67,7 @@ export function ChallengeComparisonModal({
       
       // Carregar challenge atual
       const { data: currentData, error: currentError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .select('*')
         .eq('id', challengeId)

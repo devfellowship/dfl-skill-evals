@@ -24,6 +24,7 @@ export function useChallengeDetails(challengeId: string) {
         
         // Buscar por título usando ilike para melhor compatibilidade
         const { data, error: fetchError } = await supabase
+          .schema('skill_evals')
           .from('challenges')
           .select('*')
           .eq('status', 'approved')

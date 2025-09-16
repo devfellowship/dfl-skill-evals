@@ -16,6 +16,7 @@ export async function GET(
     }
 
     const { data: challenge, error } = await supabase
+      .schema('skill_evals')
       .from('challenges')
       .select('*')
       .eq('id', id)
@@ -60,6 +61,7 @@ export async function PUT(
     }
 
     const { data: challenge, error } = await supabase
+      .schema('skill_evals')
       .from('challenges')
       .update({
         ...body,
@@ -100,6 +102,7 @@ export async function DELETE(
     }
 
     const { error } = await supabase
+      .schema('skill_evals')
       .from('challenges')
       .delete()
       .eq('id', id)

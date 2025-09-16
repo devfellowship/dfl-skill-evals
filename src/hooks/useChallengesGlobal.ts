@@ -51,6 +51,7 @@ export function useChallengesGlobal() {
   const loadAllChallenges = useCallback(async () => {
     try {
       const { data: dbChallenges, error: fetchError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .select('*')
         .order('difficulty', { ascending: true })

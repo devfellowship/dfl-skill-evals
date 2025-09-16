@@ -72,6 +72,7 @@ export function useChallengeExecution({ problemId, functionName }: UseChallengeE
       try {
         const searchTitle = problemId.replace('-', ' ')
         const { data: challenge } = await supabase
+          .schema('skill_evals')
           .from('challenges')
           .select('test_cases')
           .ilike('title', `%${searchTitle}%`)

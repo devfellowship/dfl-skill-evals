@@ -45,6 +45,7 @@ export function useChallengeManagement() {
       }
 
       const { data: existingChallenges, error: slugError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .select('slug')
       
@@ -76,6 +77,7 @@ export function useChallengeManagement() {
       }
 
       const { data: challenge, error: createError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .insert([challengeData])
         .select()
@@ -203,6 +205,7 @@ export function useChallengeManagement() {
       }
 
       const { data: challenge, error: updateError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .update(mappedUpdates)
         .eq('id', id)
@@ -244,6 +247,7 @@ export function useChallengeManagement() {
       setError(null)
 
       const { data: challenge, error: submitError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .update({ status: 'to_approve' })
         .eq('id', challengeId)
@@ -269,8 +273,9 @@ export function useChallengeManagement() {
 
       // Simplificando para apenas os campos que existem na tabela
       const { data: challenge, error: approveError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
-        .update({ 
+        .update({
           status: 'approved',
           is_public: true
         })
@@ -303,8 +308,9 @@ export function useChallengeManagement() {
 
       // Simplificando para apenas os campos que existem na tabela
       const { data: challenge, error: rejectError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
-        .update({ 
+        .update({
           status: 'rejected'
           // Removendo rejection_reason se não existir na tabela
         })
@@ -337,8 +343,9 @@ export function useChallengeManagement() {
 
       // Simplificando para apenas os campos que existem na tabela
       const { data: challenge, error: archiveError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
-        .update({ 
+        .update({
           status: 'archived',
           is_public: false
         })
@@ -371,8 +378,9 @@ export function useChallengeManagement() {
       setError(null)
 
       const { data: challenge, error: sendBackError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
-        .update({ 
+        .update({
           status: 'to_approve',
           is_public: false
         })
@@ -405,6 +413,7 @@ export function useChallengeManagement() {
 
       // Primeiro, buscar o challenge para verificar o status
       const { data: challenge, error: fetchError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .select('status, title')
         .eq('id', challengeId)
@@ -430,6 +439,7 @@ export function useChallengeManagement() {
       }
 
       const { error: deleteError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .delete()
         .eq('id', challengeId)
@@ -454,6 +464,7 @@ export function useChallengeManagement() {
       setError(null)
 
       const { data: challenges, error: fetchError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .select('*')
         .order('created_at', { ascending: false })
@@ -483,6 +494,7 @@ export function useChallengeManagement() {
       // Como estamos usando login mock, vamos buscar todas as challenges
       // Em produção, aqui seria filtrado por created_by = user.id
       let query = supabase
+        .schema('skill_evals')
         .from('challenges')
         .select('*')
         .order('created_at', { ascending: false })
@@ -513,6 +525,7 @@ export function useChallengeManagement() {
 
       // Primeiro, vamos buscar apenas os campos básicos para debug
       const { data: challenges, error: fetchError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .select('*')
         .eq('status', 'to_approve')
@@ -541,6 +554,7 @@ export function useChallengeManagement() {
       setError(null)
 
       const { data: challenges, error: fetchError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .select('*')
         .eq('status', 'archived')
@@ -569,6 +583,7 @@ export function useChallengeManagement() {
       setError(null)
 
       const { data: challenge, error: fetchError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .select('*')
         .eq('slug', slug)
@@ -594,6 +609,7 @@ export function useChallengeManagement() {
 
       // Buscar todas as challenges que não têm slug
       const { data: challengesWithoutSlug, error: fetchError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .select('id, title')
         .is('slug', null)
@@ -606,6 +622,7 @@ export function useChallengeManagement() {
 
       // Buscar todos os slugs existentes
       const { data: existingChallenges } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .select('slug')
         .not('slug', 'is', null)
@@ -618,6 +635,7 @@ export function useChallengeManagement() {
         const uniqueSlug = generateUniqueSlug(challenge.title, existingSlugs)
         
         const { error: updateError } = await supabase
+          .schema('skill_evals')
           .from('challenges')
           .update({ slug: uniqueSlug })
           .eq('id', challenge.id)

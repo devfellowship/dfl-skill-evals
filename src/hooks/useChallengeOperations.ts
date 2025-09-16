@@ -28,6 +28,7 @@ export function useChallengeOperations() {
     setIsSubmitting(true)
     try {
       const { data: challenge, error: createError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .insert({
           title: challengeData.title,
@@ -69,6 +70,7 @@ export function useChallengeOperations() {
     setIsSubmitting(true)
     try {
       const { data: currentChallenge, error: fetchError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .select('status')
         .eq('id', id)
@@ -84,6 +86,7 @@ export function useChallengeOperations() {
       }
 
       const { data: challenge, error: updateError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .update({
           title: updateData.title,
@@ -130,6 +133,7 @@ export function useChallengeOperations() {
     setIsDeleting(id)
     try {
       const { error: deleteError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .delete()
         .eq('id', id)
@@ -159,6 +163,7 @@ export function useChallengeOperations() {
     setIsApproving(id)
     try {
       const { data: challenge, error: approveError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .update({ 
           status: 'approved',
@@ -193,6 +198,7 @@ export function useChallengeOperations() {
     setIsSubmitting(true)
     try {
       const { data: challenge, error: rejectError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .update({ 
           status: 'rejected',
@@ -228,6 +234,7 @@ export function useChallengeOperations() {
     setIsArchiving(id)
     try {
       const { data: challenge, error: archiveError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .update({ 
           status: 'archived',
@@ -266,6 +273,7 @@ export function useChallengeOperations() {
     setIsSubmitting(true)
     try {
       const { data: challenge, error: sendBackError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .update({ 
           status: 'to_approve',

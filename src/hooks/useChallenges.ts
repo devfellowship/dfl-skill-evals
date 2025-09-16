@@ -28,6 +28,7 @@ export function useChallenges() {
       }
       
       const { data, error: fetchError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .select('*, image_url')
         .eq('status', 'approved')
@@ -81,6 +82,7 @@ export function useChallenges() {
       setError(null)
 
       const { data, error: fetchError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .select('*')
         .eq('id', id)
@@ -102,6 +104,7 @@ export function useChallenges() {
   const createChallenge = async (challengeData: Omit<Tables<'challenges'>, 'id' | 'created_at' | 'updated_at'>) => {
     try {
       const { data, error: createError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .insert([challengeData])
         .select()
@@ -122,6 +125,7 @@ export function useChallenges() {
   const updateChallenge = async (id: string, updates: Partial<Tables<'challenges'>>) => {
     try {
       const { data, error: updateError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .update(updates)
         .eq('id', id)
@@ -159,6 +163,7 @@ export function useChallenges() {
   const deleteChallenge = async (id: string) => {
     try {
       const { error: deleteError } = await supabase
+        .schema('skill_evals')
         .from('challenges')
         .delete()
         .eq('id', id)
@@ -182,9 +187,9 @@ export function useChallenges() {
   useEffect(() => {
     fetchChallenges()
     const channel = supabase
-      .channel('public:challenges')
+      .channel('skill_evals:challenges')
       .on('postgres_changes',
-          { event: 'UPDATE', schema: 'public', table: 'challenges' },
+          { event: 'UPDATE', schema: 'skill_evals', table: 'challenges' },
           payload => {
             challengesCache = null
             cacheTimestamp = 0
@@ -192,7 +197,7 @@ export function useChallenges() {
           }
       )
       .on('postgres_changes',
-          { event: 'INSERT', schema: 'public', table: 'challenges' },
+          { event: 'INSERT', schema: 'skill_evals', table: 'challenges' },
           payload => {
             challengesCache = null
             cacheTimestamp = 0
@@ -200,11 +205,11 @@ export function useChallenges() {
           }
       )
       .on('postgres_changes',
-          { event: 'DELETE', schema: 'public', table: 'challenges' },
+          { event: 'DELETE', schema: 'skill_evals', table: 'challenges' },
           payload => {
             challengesCache = null
             cacheTimestamp = 0
-            
+
             fetchChallenges(true)
           }
       )
