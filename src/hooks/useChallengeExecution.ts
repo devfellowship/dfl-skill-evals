@@ -74,7 +74,7 @@ export function useChallengeExecution({ problemId, functionName }: UseChallengeE
         const { data: challenge } = await supabase
           .schema('skill_evals')
           .from('challenges')
-          .select('test_cases')
+          .select('test_cases') // TODO: change to challenge_test_cases
           .ilike('title', `%${searchTitle}%`)
           .single()
 
