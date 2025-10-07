@@ -30,7 +30,6 @@ export interface ProfileEditFormProps {
 
 export interface ProfileFormData {
   full_name: string
-  phone: string
 }
 
 export interface PasswordFormData {

@@ -27,6 +27,23 @@ export function useChallenges() {
         return
       }
       
+      console.log('🔍 useChallenges: Buscando challenges aprovadas e públicas...')
+      
+      // Debug: Buscar todas as challenges primeiro para comparar
+      const { data: allChallenges } = await supabase
+        .schema('skill_evals')
+        .from('challenges')
+        .select('id, title, status, is_public')
+        .order('created_at', { ascending: false })
+        .limit(10)
+      
+      console.log('🔍 useChallenges: Todas as challenges (últimas 10):')
+      if (allChallenges) {
+        allChallenges.forEach((challenge, index) => {
+          console.log(`  ${index + 1}. ${challenge.title} - Status: ${challenge.status} - is_public: ${challenge.is_public}`)
+        })
+      }
+      
       const { data, error: fetchError } = await supabase
         .schema('skill_evals')
         .from('challenges')
@@ -34,6 +51,18 @@ export function useChallenges() {
         .eq('status', 'approved')
         .eq('is_public', true)
         .order('difficulty', { ascending: true })
+
+      console.log('🔍 useChallenges: Resultado da query:', { data: data?.length || 0, error: fetchError })
+      
+      // Debug: Mostrar detalhes das challenges encontradas
+      if (data && data.length > 0) {
+        console.log('🔍 useChallenges: Challenges encontradas:')
+        data.forEach((challenge, index) => {
+          console.log(`  ${index + 1}. ${challenge.title} - Status: ${challenge.status} - is_public: ${challenge.is_public}`)
+        })
+      } else {
+        console.log('❌ useChallenges: Nenhuma challenge aprovada e pública encontrada')
+      }
 
       if (fetchError) {
         setError(`Erro ao conectar com o banco: ${fetchError.message}`)
@@ -191,6 +220,9 @@ export function useChallenges() {
       .on('postgres_changes',
           { event: 'UPDATE', schema: 'skill_evals', table: 'challenges' },
           payload => {
+            console.log('🔄 useChallenges: Challenge atualizada via realtime:', payload)
+            console.log('🔄 useChallenges: Status da challenge:', payload.new?.status)
+            console.log('🔄 useChallenges: is_public da challenge:', payload.new?.is_public)
             challengesCache = null
             cacheTimestamp = 0
             fetchChallenges(true)

@@ -2,8 +2,7 @@ export const PROFILE_CONSTANTS = {
   NAME_CHANGE_COOLDOWN_DAYS: 7,
   MIN_PASSWORD_LENGTH: 6,
   EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  ALLOWED_PROFILE_FIELDS: ['full_name', 'phone', 'updated_at', 'last_name_change'] as const,
-  ADMIN_EMAILS: ['samuelstefanodocarmo@gmail.com', 'admin@devshapper.com']
+  ALLOWED_PROFILE_FIELDS: ['full_name', 'phone', 'updated_at', 'last_name_change'] as const
 } as const
 
 export const PROFILE_MESSAGES = {

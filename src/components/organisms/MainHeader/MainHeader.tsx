@@ -77,6 +77,10 @@ export function MainHeader({
     return name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
   }
 
+  // Forçar re-renderização quando o perfil mudar
+  const displayName = getUserDisplayName()
+  const userInitials = getUserInitials()
+
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center gap-4 px-6">
@@ -149,7 +153,7 @@ export function MainHeader({
                   variant="outline"
                   className="px-4 py-2 text-sm"
                 >
-                  <Link href="/admin">
+                  <Link href="/teacher">
                     Mentor
                   </Link>
                 </Button>
@@ -161,7 +165,7 @@ export function MainHeader({
                   variant="outline"
                   className="px-4 py-2 text-sm"
                 >
-                  <Link href="/admin/create">
+                  <Link href="/create">
                     Criar
                   </Link>
                 </Button>
@@ -174,14 +178,14 @@ export function MainHeader({
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="flex items-center gap-3 px-3 py-2">
                   <Avatar className="w-8 h-8">
-                    <AvatarImage src={user.user_metadata?.avatar_url} alt={getUserDisplayName()} />
+                    <AvatarImage src={profile?.avatar_url || user.user_metadata?.avatar_url} alt={displayName} />
                     <AvatarFallback className="bg-blue-600 text-white text-sm font-medium">
-                      {getUserInitials()}
+                      {userInitials}
                     </AvatarFallback>
                   </Avatar>
                   <div className="hidden sm:block text-left">
                     <div className="text-sm font-medium">
-                      {getUserDisplayName()}
+                      {displayName}
                     </div>
                   </div>
                 </Button>

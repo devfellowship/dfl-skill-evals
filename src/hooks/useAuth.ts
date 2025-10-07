@@ -16,23 +16,9 @@ export function useAuth() {
     const getSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession()
-        
-        if (session?.user) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single()
-          
-          setUser({
-            ...session.user,
-            profile: profile || undefined
-          } as AuthUser)
-        } else {
-          setUser(null)
-        }
-      } catch (error) {
-        console.error('Error getting session:', error)
+        if (session?.user) setUser(session.user as AuthUser)
+        else setUser(null)
+      } catch {
         setError('Erro ao carregar sessão')
       } finally {
         setLoading(false)
@@ -41,39 +27,17 @@ export function useAuth() {
 
     getSession()
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (session?.user) {
-          try {
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', session.user.id)
-              .single()
-            
-            setUser({
-              ...session.user,
-              profile: profile || undefined
-            } as AuthUser)
-          } catch (error) {
-            console.error('Error loading profile:', error)
-            setUser(session.user as AuthUser)
-          }
-        } else {
-          setUser(null)
-        }
-        setLoading(false)
-      }
-    )
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) setUser(session.user as AuthUser)
+      else setUser(null)
+      setLoading(false)
+    })
 
     return () => subscription.unsubscribe()
   }, [])
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
     return { error }
   }
 
@@ -81,11 +45,7 @@ export function useAuth() {
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: {
-          full_name: fullName,
-        },
-      },
+      options: { data: { full_name: fullName } },
     })
     return { error }
   }
@@ -100,21 +60,24 @@ export function useAuth() {
     return { error }
   }
 
-  const hasRole = (role: UserRole): boolean => {
-    return user?.profile?.role === role
+  const getUserRole = (): UserRole => {
+    if (!user?.email) return 'community_member'
+    if (user.email.includes('@admin.') || user.email.includes('@fellowship.')) return 'admin'
+    return 'community_member'
   }
 
+  const hasRole = (role: UserRole): boolean => getUserRole() === role
   const canCreateChallenges = (): boolean => {
-    const role = user?.profile?.role
-    return role === 'admin' || role === 'mentor'
+    const role = getUserRole()
+    return role === 'admin' || role === 'superadmin'
   }
-
   const canApproveChallenges = (): boolean => {
-    return user?.profile?.role === 'admin'
+    const role = getUserRole()
+    return role === 'admin' || role === 'superadmin'
   }
-
   const isAdmin = (): boolean => {
-    return user?.profile?.role === 'admin'
+    const role = getUserRole()
+    return role === 'admin' || role === 'superadmin'
   }
 
   return {
@@ -126,6 +89,7 @@ export function useAuth() {
     signUp,
     signOut,
     resetPassword,
+    getUserRole,
     hasRole,
     canCreateChallenges,
     canApproveChallenges,

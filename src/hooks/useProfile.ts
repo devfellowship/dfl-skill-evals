@@ -1,47 +1,54 @@
+'use client'
+
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
-import { useUserRole } from '@/hooks/useUserRole'
-import { ProfileFormData, PasswordFormData, EmailFormData } from '@/types/profile/profile'
-import { canChangeName, getDaysUntilNameChange, validateEmail, getUserDisplayName, getUserInitials, formatPhoneNumber } from '@/lib/utils/profile-utils'
+import { ProfileFormData } from '@/types/profile/profile'
+import { canChangeName, getDaysUntilNameChange, validateEmail, getUserDisplayName, getUserInitials } from '@/lib/utils/profile-utils'
+import { UserRole } from '@/lib/supabase'
 
 export interface Profile {
   id: string
   email: string
   full_name: string
-  phone: string | null
-  role: string
+  role: UserRole
   is_active: boolean
   created_at: string
   updated_at: string
   last_name_change?: string
+  avatar_url?: string
 }
 
 export const useProfile = () => {
   const { user } = useAuth()
-  const { roleInfo } = useUserRole()
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const fetchProfile = useCallback(async () => {
     if (!user?.id) return
-
     try {
       setLoading(true)
       setError(null)
-
       const { data, error: fetchError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single()
-
-      if (fetchError) {
-        throw fetchError
+      if (fetchError) throw fetchError
+      if (!data) throw new Error('Perfil não encontrado')
+      const mapped: Profile = {
+        id: data.id,
+        email: data.email || user.email || '',
+        full_name: data.full_name || data.name || '',
+        role: (data.role as UserRole) || 'community_member',
+        is_active: data.is_active !== false,
+        created_at: data.created_at || new Date().toISOString(),
+        updated_at: data.updated_at || new Date().toISOString(),
+        last_name_change: data.last_name_change || undefined,
+        avatar_url: data.avatar_url || undefined
       }
-
-      setProfile(data)
+      setProfile(mapped)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao buscar perfil')
     } finally {
@@ -50,94 +57,60 @@ export const useProfile = () => {
   }, [user?.id])
 
   useEffect(() => {
-    fetchProfile()
-  }, [fetchProfile])
+    if (user?.id) fetchProfile()
+  }, [user?.id, fetchProfile])
 
   const updateProfile = useCallback(async (data: ProfileFormData) => {
     if (!user?.id) return
-
     try {
       setError(null)
-
-      const payload: any = {
-        full_name: data.full_name,
-        phone: data.phone || null,
-        updated_at: new Date().toISOString()
-      }
-
-      const { data: updatedProfile, error: updateError } = await supabase
+      const payload = { full_name: data.full_name, updated_at: new Date().toISOString() }
+      const { data: updated, error: updateError } = await supabase
         .from('profiles')
         .update(payload)
         .eq('id', user.id)
         .select()
         .single()
-
-      if (updateError) {
-        throw updateError
+      if (updateError) throw updateError
+      if (!updated) throw new Error('Nenhum perfil retornado')
+      const mapped: Profile = {
+        id: updated.id,
+        email: updated.email || user.email || '',
+        full_name: updated.full_name || updated.name || '',
+        role: (updated.role as UserRole) || 'community_member',
+        is_active: updated.is_active !== false,
+        created_at: updated.created_at || new Date().toISOString(),
+        updated_at: updated.updated_at || new Date().toISOString(),
+        last_name_change: updated.last_name_change || undefined,
+        avatar_url: updated.avatar_url || undefined
       }
-
-      setProfile(updatedProfile)
+      setProfile(mapped)
       await fetchProfile()
-      
-      return updatedProfile
+      return mapped
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao atualizar perfil')
       throw err
     }
   }, [user?.id, fetchProfile])
 
-  const changePassword = useCallback(async (data: PasswordFormData) => {
+  const changePassword = useCallback(async (_current: string, next: string) => {
     if (!user) return
-
-    try {
-      setError(null)
-
-      const { error: updateError } = await supabase.auth.updateUser({
-        password: data.newPassword
-      })
-
-      if (updateError) {
-        throw updateError
-      }
-
-      return true
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao alterar senha')
-      throw err
-    }
+    const { error } = await supabase.auth.updateUser({ password: next })
+    if (error) throw error
+    return true
   }, [user])
 
-  const changeEmail = useCallback(async (data: EmailFormData) => {
+  const changeEmail = useCallback(async (newEmail: string) => {
     if (!user) return
-
-    try {
-      setError(null)
-
-      if (!validateEmail(data.newEmail)) {
-        throw new Error('Email inválido')
-      }
-
-      if (data.newEmail === user.email) {
-        throw new Error('O novo email deve ser diferente do atual')
-      }
-
-      const { error: updateError } = await supabase.auth.updateUser({
-        email: data.newEmail
-      })
-
-      if (updateError) {
-        throw updateError
-      }
-
-      return true
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao alterar email')
-      throw err
-    }
+    if (!validateEmail(newEmail)) throw new Error('Email inválido')
+    if (newEmail === user.email) throw new Error('O novo email deve ser diferente do atual')
+    const { error } = await supabase.auth.updateUser({ email: newEmail })
+    if (error) throw error
+    return true
   }, [user])
 
-  const canChangeNameNow = canChangeName(profile?.last_name_change, roleInfo?.role)
-  const daysUntilNameChange = getDaysUntilNameChange(profile?.last_name_change)
+  const canChangeNameNow = canChangeName(profile)
+  const daysUntilNameChange = getDaysUntilNameChange(profile)
 
   return {
     profile,
@@ -148,8 +121,7 @@ export const useProfile = () => {
     changeEmail,
     canChangeName: canChangeNameNow,
     daysUntilNameChange,
-    getUserDisplayName: () => getUserDisplayName(profile, user),
-    getUserInitials: () => getUserInitials(profile, user),
-    formatPhoneNumber: (phone: string | null) => formatPhoneNumber(phone)
+    getUserDisplayName: () => getUserDisplayName(user, profile),
+    getUserInitials: () => getUserInitials(getUserDisplayName(user, profile))
   }
 }

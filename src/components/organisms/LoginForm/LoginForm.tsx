@@ -42,15 +42,11 @@ export function LoginForm() {
 
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', user.id)
-            .single()
+          // Por enquanto, assumir que todos são community_member
+          // O role real será carregado pelo useUserRole
+          const isAdmin = false
           
-          if (profile?.role === 'admin') {
-            router.push('/admin')
-          } else if (profile?.role === 'mentor') {
+          if (isAdmin) {
             router.push('/admin')
           } else {
             router.push('/')

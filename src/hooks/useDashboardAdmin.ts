@@ -48,7 +48,6 @@ export function useDashboardAdmin() {
         initial_code: formData.initialCode || "// Seu código aqui",
         test_cases: formData.testCases || [],
         status: formData.status,
-        imageUrl: formData.imageUrl,
         slug: formData.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
       }
       
@@ -57,8 +56,7 @@ export function useDashboardAdmin() {
         description: formData.description,
         difficulty: formData.difficulty,
         category: formData.category,
-        status: formData.status,
-        imageUrl: formData.imageUrl
+        status: formData.status
       })
       
       const result = await handleUpdate(editingChallenge.id, updateData)
@@ -84,6 +82,7 @@ export function useDashboardAdmin() {
   }
 
   const handleEdit = (challenge: Challenge) => {
+    console.log('🔧 useDashboardAdmin: handleEdit chamado com challenge:', challenge)
     setEditingChallenge(challenge)
     setIsCreating(true)
   }

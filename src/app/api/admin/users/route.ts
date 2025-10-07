@@ -14,7 +14,8 @@ export async function GET(request: NextRequest) {
     }
 
     const { data: profile, error: profileError } = await supabase
-      .from('profiles')
+      .schema('portfolio')
+      .from('users')
       .select('role')
       .eq('id', user.id)
       .single()
@@ -30,14 +31,14 @@ export async function GET(request: NextRequest) {
     const to = searchParams.get('to')
 
     let query = supabase
-      .from('profiles')
+      .schema('portfolio')
+      .from('users')
       .select(`
         id,
         email,
         full_name,
         role,
         is_active,
-        phone,
         created_at,
         updated_at
       `)
@@ -46,13 +47,10 @@ export async function GET(request: NextRequest) {
     if (id) {
       query = query.eq('id', id)
     } else if (q) {
-      query = query.or(
-        [
-          `full_name.ilike.%${q}%`,
-          `email.ilike.%${q}%`,
-          `phone.ilike.%${q}%`,
-        ].join(',')
-      )
+      query = query.or([
+        `full_name.ilike.%${q}%`,
+        `email.ilike.%${q}%`
+      ].join(','))
     }
 
     if (from) query = query.gte('created_at', from)
@@ -98,13 +96,14 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'userId e role são obrigatórios' }, { status: 400 })
     }
 
-    const validRoles: UserRole[] = ['student', 'mentor', 'admin']
+    const validRoles: UserRole[] = ['superadmin', 'admin', 'community_member']
     if (!validRoles.includes(role)) {
       return NextResponse.json({ error: 'Role inválida' }, { status: 400 })
     }
 
     const { data: existingUser, error: userError } = await supabase
-      .from('profiles')
+      .schema('portfolio')
+      .from('users')
       .select('id, email, role')
       .eq('id', userId)
       .single()
@@ -114,7 +113,8 @@ export async function PATCH(request: NextRequest) {
     }
 
     const { data: updatedUser, error: updateError } = await supabase
-      .from('profiles')
+      .schema('portfolio')
+      .from('users')
       .update({ 
         role,
         updated_at: new Date().toISOString()

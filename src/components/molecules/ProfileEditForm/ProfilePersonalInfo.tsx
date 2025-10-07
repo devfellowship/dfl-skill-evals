@@ -6,7 +6,7 @@ import { Input } from '@/components/atoms/Input/Input'
 import { Label } from '@/components/atoms/Label/Label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/atoms/Badge/Badge'
-import { User, Phone, Calendar, AlertCircle } from 'lucide-react'
+import { User, Calendar, AlertCircle } from 'lucide-react'
 import { ProfileFormData } from '@/types/profile/profile'
 import { PROFILE_MESSAGES } from '@/consts/profile/profile-constants'
 
@@ -69,19 +69,6 @@ export function ProfilePersonalInfo({
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="text-sm font-medium text-muted-foreground">Telefone</Label>
-                <p className="text-foreground font-medium">{profile.phone || 'Não informado'}</p>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onEdit}
-              >
-                Editar
-              </Button>
-            </div>
 
             {!canChangeName && (
               <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
@@ -112,15 +99,6 @@ export function ProfilePersonalInfo({
               )}
             </div>
 
-            <div>
-              <Label htmlFor="phone">Telefone</Label>
-              <Input
-                id="phone"
-                value={formData.phone}
-                onChange={(e) => onFormDataChange({ ...formData, phone: e.target.value })}
-                placeholder="(11) 99999-9999"
-              />
-            </div>
 
             <div className="flex gap-2">
               <Button

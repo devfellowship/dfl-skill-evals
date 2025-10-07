@@ -38,7 +38,7 @@ export function NavigationButtons({
           variant="outline"
           className="px-4 py-2 text-sm"
         >
-          <Link href="/admin">
+          <Link href="/teacher">
             Mentor
           </Link>
         </Button>

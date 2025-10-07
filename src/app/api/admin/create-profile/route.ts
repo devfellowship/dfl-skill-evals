@@ -14,7 +14,8 @@ export async function POST(request: NextRequest) {
     }
 
     const { data: profile, error: profileError } = await supabase
-      .from('profiles')
+      .schema('portfolio')
+      .from('users')
       .select('role')
       .eq('id', user.id)
       .single()
@@ -24,19 +25,20 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { userId, email, fullName, role = 'student' } = body
+    const { userId, email, fullName, role = 'community_member' } = body
 
     if (!userId || !email || !fullName) {
       return NextResponse.json({ error: 'userId, email e fullName são obrigatórios' }, { status: 400 })
     }
 
-    const validRoles: UserRole[] = ['student', 'mentor', 'admin']
+    const validRoles: UserRole[] = ['superadmin', 'admin', 'community_member']
     if (!validRoles.includes(role)) {
       return NextResponse.json({ error: 'Role inválida' }, { status: 400 })
     }
 
     const { data: existingProfile, error: existingError } = await supabase
-      .from('profiles')
+      .schema('portfolio')
+      .from('users')
       .select('id')
       .eq('id', userId)
       .single()
@@ -46,7 +48,8 @@ export async function POST(request: NextRequest) {
     }
 
     const { data: newProfile, error: createError } = await supabase
-      .from('profiles')
+      .schema('portfolio')
+      .from('users')
       .insert({
         id: userId,
         email,

@@ -12,6 +12,8 @@ export function useChallengesGlobal() {
   const pollingRef = useRef<NodeJS.Timeout | null>(null)
 
   const adaptChallenge = useCallback((raw: any): Challenge => {
+    console.log('🔍 adaptChallenge: Dados brutos:', raw)
+    
     const mapStatus = raw.status === 'approved'
       ? 'published'
       : raw.status === 'to_approve' || raw.status === 'rejected'
@@ -29,6 +31,8 @@ export function useChallengesGlobal() {
         default: return 'easy'
       }
     }
+    
+    console.log('📝 adaptChallenge: Status mapeado:', mapStatus, 'Difficulty mapeado:', mapDifficulty(raw.difficulty))
 
     return {
       id: raw.id,
@@ -44,7 +48,8 @@ export function useChallengesGlobal() {
       initialCode: raw.initial_code ?? '',
       testCases: [],
       orderIndex: raw.order_index ?? null,
-      imageUrl: raw.image_url ?? null
+      created_by: raw.created_by, // Incluir o campo created_by
+      mentor: raw.mentor // Incluir o campo mentor
     }
   }, [])
 

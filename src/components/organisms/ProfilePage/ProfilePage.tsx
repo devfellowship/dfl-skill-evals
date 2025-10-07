@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useUserRole } from '@/hooks/useUserRole'
 import { useProfile } from '@/hooks/useProfile'
@@ -8,12 +9,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/atoms/Button/Button'
 import { Badge } from '@/components/atoms/Badge/Badge'
 import { ProfileEditForm } from '@/components/molecules/ProfileEditForm/ProfileEditForm'
-import { User, Mail, Calendar, Shield, LogOut, Settings, Plus, Edit3, Phone } from 'lucide-react'
+import { AdminNavigation } from '@/components/atoms/AdminNavigation/AdminNavigation'
+import { User, Mail, Calendar, Shield, LogOut, Settings, Plus, Edit3 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import Link from 'next/link'
-import { useState } from 'react'
-import { getUserDisplayName, getUserInitials, formatPhoneNumber } from '@/lib/utils/profile-utils'
+import { getUserDisplayName, getUserInitials } from '@/lib/utils/profile-utils'
+
 export function ProfilePage() {
   const { user, signOut } = useAuth()
   const { role, label, color, isAdmin, isMentor, canCreateChallenges, isLoading: roleLoading } = useUserRole()
@@ -26,16 +28,28 @@ export function ProfilePage() {
       await signOut()
       toast.success('Logout realizado com sucesso!')
       router.push('/')
-    } catch (error) {
+    } catch {
       toast.error('Erro ao fazer logout')
     }
   }
 
-  const displayName = getUserDisplayName(user, profile as any)
-  const userInitials = getUserInitials(displayName)
+  const [displayName, setDisplayName] = useState('')
+  const [userInitials, setUserInitials] = useState('')
+
+  useEffect(() => {
+    const name = getUserDisplayName(user, profile as any)
+    const initials = getUserInitials(name)
+    setDisplayName(name)
+    setUserInitials(initials)
+  }, [user, profile])
 
   return (
     <div className="min-h-screen bg-background">
+      <AdminNavigation 
+        items={[]}
+        showUserInfo={false}
+        quickActions={[]}
+      />
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="space-y-8">
           <div className="text-center space-y-4">
@@ -53,7 +67,7 @@ export function ProfilePage() {
               <div className="flex flex-col items-center gap-6 text-center">
                 <div className="relative">
                   <Avatar className="w-24 h-24 border-4 border-background shadow-lg">
-                    <AvatarImage src={user?.user_metadata?.avatar_url} alt={displayName} />
+                    <AvatarImage src={profile?.avatar_url || user?.user_metadata?.avatar_url} alt={displayName} />
                     <AvatarFallback className="bg-gradient-to-r from-primary to-purple-600 text-white text-2xl font-bold">
                       {userInitials}
                     </AvatarFallback>
@@ -74,7 +88,7 @@ export function ProfilePage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex justify-center">
                 <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-xl border border-border">
                   <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
                     <Mail className="w-5 h-5 text-primary" />
@@ -82,18 +96,6 @@ export function ProfilePage() {
                   <div>
                     <p className="text-sm text-primary font-medium">Email</p>
                     <p className="font-semibold text-foreground">{user?.email || 'N/A'}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-xl border border-border">
-                  <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center">
-                    <Phone className="w-5 h-5 text-blue-500" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-blue-500 font-medium">Telefone</p>
-                    <p className="font-semibold text-foreground">
-                      {formatPhoneNumber(profile?.phone)}
-                    </p>
                   </div>
                 </div>
               </div>
@@ -130,7 +132,7 @@ export function ProfilePage() {
                     
                     {isMentor && (
                       <Button asChild variant="outline" className="justify-start h-12 border-2 hover:border-primary/50 hover:bg-primary/5">
-                        <Link href="/admin" className="flex items-center gap-3">
+                        <Link href="/teacher" className="flex items-center gap-3">
                           <User className="w-5 h-5" />
                           <span className="font-medium">Painel Mentor</span>
                         </Link>
@@ -157,14 +159,6 @@ export function ProfilePage() {
                 >
                   <LogOut className="w-5 h-5" />
                   Sair da Conta
-                </Button>
-                
-                <Button 
-                  onClick={() => router.push('/')}
-                  className="flex items-center gap-3 h-12 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-700 font-medium shadow-lg"
-                >
-                  <User className="w-5 h-5" />
-                  Voltar ao Início
                 </Button>
               </div>
             </CardContent>

@@ -1,7 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useChallengeManagement } from "@/hooks/useChallengeManagement"
+import { useState, useEffect, useMemo } from "react"
+import { useChallengesGlobal } from "@/hooks/useChallengesGlobal"
+import { useChallengeOperations } from "@/hooks/useChallengeOperations"
+import { useAuth } from "@/hooks/useAuth"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Code, CheckCircle, Clock, Archive } from "lucide-react"
@@ -12,93 +14,83 @@ import { TeacherChallengeList } from "@/components/molecules/TeacherChallengeLis
 import { SearchButton } from "@/components/atoms/SearchButton/SearchButton"
 
 export function TeacherDashboard() {
+  const { user } = useAuth()
   const { 
-    getUserChallenges, 
-    submitForApproval,
-    deleteChallenge,
-    sendBackForReview,
-    loading: challengeLoading 
-  } = useChallengeManagement()
+    published, 
+    pending, 
+    archived, 
+    isInitialLoading, 
+    loadAllChallenges
+  } = useChallengesGlobal()
 
-  const [myChallenges, setMyChallenges] = useState<any[]>([])
-  const [teacherStats, setTeacherStats] = useState({
-    totalChallenges: 0,
-    approvedChallenges: 0,
-    toApproveChallenges: 0,
-    totalSubmissions: 0,
-    averageScore: 0
-  })
-  const [activeTab, setActiveTab] = useState("published")
+  const {
+    isDeleting,
+    isArchiving,
+    handleDelete,
+    handleArchive,
+    handleSendBackForReview
+  } = useChallengeOperations()
+
+  const myPublished = useMemo(
+    () => (user?.id ? published.filter(c => c.created_by === user.id) : []),
+    [published, user?.id]
+  )
+
+  const myPending = useMemo(
+    () => (user?.id ? pending.filter(c => c.created_by === user.id) : []),
+    [pending, user?.id]
+  )
+
+  const myArchived = useMemo(
+    () => (user?.id ? archived.filter(c => c.created_by === user.id) : []),
+    [archived, user?.id]
+  )
+
   const [searchQuery, setSearchQuery] = useState("")
-  const publishedChallenges = myChallenges.filter(c => c.status === 'approved')
-  const pendingChallenges = myChallenges.filter(c => (c.status === 'to_approve' || c.status === 'draft') && c.status !== 'archived')
-  const archivedChallenges = myChallenges.filter(c => c.status === 'archived')
+
+  const teacherStats = useMemo(() => {
+    const allMine = [...myPublished, ...myPending, ...myArchived]
+    return {
+      totalChallenges: allMine.length,
+      approvedChallenges: myPublished.length,
+      toApproveChallenges: myPending.length,
+      totalSubmissions: allMine.reduce((sum, c) => sum + (c.submissions_count || 0), 0),
+      averageScore:
+        allMine.length > 0
+          ? allMine.reduce((sum, c) => sum + (c.average_score || 0), 0) / allMine.length
+          : 0
+    }
+  }, [myPublished, myPending, myArchived])
 
   useEffect(() => {
-    loadChallenges()
-  }, [])
-
-  const loadChallenges = async () => {
-    try {
-      const challenges = await getUserChallenges()
-      
-      setMyChallenges(challenges)
-      
-      const stats = {
-        totalChallenges: challenges.length,
-        approvedChallenges: challenges.filter(c => c.status === 'approved').length,
-        toApproveChallenges: challenges.filter(c => c.status === 'to_approve').length,
-        totalSubmissions: challenges.reduce((sum, c) => sum + (c.submissions_count || 0), 0),
-        averageScore: challenges.length > 0 ? challenges.reduce((sum, c) => sum + (c.average_score || 0), 0) / challenges.length : 0
-      }
-      
-      setTeacherStats(stats)
-    } catch (error) {
-      }
-  }
-
-  const updateStatsAfterDeletion = (deletedChallenge: any) => {
-    setTeacherStats(prev => ({
-      ...prev,
-      totalChallenges: prev.totalChallenges - 1,
-      approvedChallenges: prev.approvedChallenges - (deletedChallenge.status === 'approved' ? 1 : 0),
-      toApproveChallenges: prev.toApproveChallenges - (deletedChallenge.status === 'to_approve' ? 1 : 0)
-    }))
-  }
+    loadAllChallenges()
+  }, [loadAllChallenges])
 
   const handleDeleteChallenge = async (id: string) => {
-    if (confirm('Tem certeza que deseja excluir este challenge?')) {
+    if (confirm("Tem certeza que deseja excluir este challenge?")) {
       try {
-        const challengeToDelete = myChallenges.find(c => c.id === id)
-        
-        const success = await deleteChallenge(id)
-        if (success) {
-          setMyChallenges(prev => prev.filter(c => c.id !== id))
-          if (challengeToDelete) {
-            updateStatsAfterDeletion(challengeToDelete)
-          }
-          
-          alert('Challenge excluído com sucesso!')
+        const result = await handleDelete(id)
+        if (result) {
+          alert("Challenge excluído com sucesso!")
         } else {
-          alert('Não foi possível excluir o challenge. Verifique se ele está em um status válido para exclusão.')
+          alert("Não foi possível excluir o challenge. Verifique se ele está em um status válido para exclusão.")
         }
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Erro ao excluir challenge. Tente novamente.'
+        const errorMessage = error instanceof Error ? error.message : "Erro ao excluir challenge. Tente novamente."
         alert(errorMessage)
       }
     }
   }
 
-  const handleSendBackForReview = async (id: string) => {
-    if (confirm('Tem certeza que deseja enviar este challenge de volta para análise? Isso permitirá que ele seja excluído posteriormente.')) {
+  const onSendBackForReviewClick = async (id: string) => {
+    if (confirm("Tem certeza que deseja enviar este challenge de volta para análise? Isso permitirá que ele seja excluído posteriormente.")) {
       try {
-        const success = await sendBackForReview(id)
-        if (success) {
-          loadChallenges()
-          alert('Challenge enviado de volta para análise com sucesso!')
+        const result = await handleSendBackForReview(id)
+        if (result) {
+          alert("Challenge enviado de volta para análise com sucesso!")
         }
-      } catch (error) {
-        alert('Erro ao enviar challenge de volta. Tente novamente.')
+      } catch {
+        alert("Erro ao enviar challenge de volta. Tente novamente.")
       }
     }
   }
@@ -110,9 +102,7 @@ export function TeacherDashboard() {
   return (
     <div className="min-h-screen bg-background">
       <AdminNavigation
-        items={[
-          { label: "Dashboard Teacher", href: "/teacher" }
-        ]}
+        items={[{ label: "Dashboard Teacher", href: "/teacher" }]}
         quickActions={[]}
         showBackButton={false}
       />
@@ -148,37 +138,35 @@ export function TeacherDashboard() {
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="published" className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4" />
-              Publicados ({publishedChallenges.length})
+              Publicados ({myPublished.length})
             </TabsTrigger>
             <TabsTrigger value="pending" className="flex items-center gap-2">
               <Clock className="w-4 h-4" />
-              Pendentes ({pendingChallenges.length})
+              Pendentes ({myPending.length})
             </TabsTrigger>
             <TabsTrigger value="archived" className="flex items-center gap-2">
               <Archive className="w-4 h-4" />
-              Arquivados ({archivedChallenges.length})
+              Arquivados ({myArchived.length})
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="published" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Challenges Publicados ({publishedChallenges.length})</CardTitle>
-                <CardDescription>
-                  Challenges aprovados e disponíveis para os alunos
-                </CardDescription>
+                <CardTitle>Challenges Publicados ({myPublished.length})</CardTitle>
+                <CardDescription>Challenges aprovados e disponíveis para os alunos</CardDescription>
               </CardHeader>
               <CardContent>
-                {challengeLoading ? (
+                {isInitialLoading ? (
                   <div className="text-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
                     <p className="text-gray-600">Carregando challenges publicados...</p>
                   </div>
                 ) : (
                   <TeacherChallengeList 
-                    challenges={publishedChallenges} 
+                    challenges={myPublished} 
                     onDelete={handleDeleteChallenge}
-                    onSendBackForReview={handleSendBackForReview}
+                    onSendBackForReview={onSendBackForReviewClick}
                     searchQuery={searchQuery}
                   />
                 )}
@@ -189,22 +177,20 @@ export function TeacherDashboard() {
           <TabsContent value="pending" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Challenges Pendentes ({pendingChallenges.length})</CardTitle>
-                <CardDescription>
-                  Challenges aguardando aprovação ou em rascunho
-                </CardDescription>
+                <CardTitle>Challenges Pendentes ({myPending.length})</CardTitle>
+                <CardDescription>Challenges aguardando aprovação ou em rascunho</CardDescription>
               </CardHeader>
               <CardContent>
-                {challengeLoading ? (
+                {isInitialLoading ? (
                   <div className="text-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
                     <p className="text-gray-600">Carregando challenges pendentes...</p>
                   </div>
                 ) : (
                   <TeacherChallengeList 
-                    challenges={pendingChallenges} 
+                    challenges={myPending} 
                     onDelete={handleDeleteChallenge}
-                    onSendBackForReview={handleSendBackForReview}
+                    onSendBackForReview={onSendBackForReviewClick}
                     searchQuery={searchQuery}
                   />
                 )}
@@ -215,20 +201,18 @@ export function TeacherDashboard() {
           <TabsContent value="archived" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Challenges Arquivados ({archivedChallenges.length})</CardTitle>
-                <CardDescription>
-                  Challenges arquivados que podem ser excluídos permanentemente
-                </CardDescription>
+                <CardTitle>Challenges Arquivados ({myArchived.length})</CardTitle>
+                <CardDescription>Challenges arquivados que podem ser excluídos permanentemente</CardDescription>
               </CardHeader>
               <CardContent>
-                {challengeLoading ? (
+                {isInitialLoading ? (
                   <div className="text-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
                     <p className="text-gray-600">Carregando challenges arquivados...</p>
                   </div>
                 ) : (
                   <TeacherChallengeList 
-                    challenges={archivedChallenges} 
+                    challenges={myArchived} 
                     onDelete={handleDeleteChallenge}
                     searchQuery={searchQuery}
                   />
@@ -241,3 +225,8 @@ export function TeacherDashboard() {
     </div>
   )
 }
+
+
+
+
+

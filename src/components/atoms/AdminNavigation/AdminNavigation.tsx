@@ -2,6 +2,7 @@
 
 import { ReactNode, useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/atoms/Button/Button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Home, ChevronRight, ArrowLeft, User, Settings, BarChart3, Users, BookOpen, Plus, LogOut, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
@@ -9,7 +10,7 @@ import { useUserRole } from '@/hooks/useUserRole'
 import { useProfile } from '@/hooks/useProfile'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { getUserDisplayName } from '@/lib/utils/profile-utils'
+import { getUserDisplayName, getUserInitials } from '@/lib/utils/profile-utils'
 
 export interface NavigationItem {
   label: string
@@ -53,11 +54,24 @@ export function AdminNavigation({
   const router = useRouter()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const [displayName, setDisplayName] = useState('')
+  const [userInitials, setUserInitials] = useState('')
 
   const getDisplayName = () => {
     if (userName) return userName
     return getUserDisplayName(user, profile as any)
   }
+
+  useEffect(() => {
+    const name = getDisplayName()
+    const initials = getUserInitials(name)
+    setDisplayName(name)
+    setUserInitials(initials)
+    
+    console.log('🔍 AdminNavigation: Profile data:', profile)
+    console.log('🔍 AdminNavigation: User metadata:', user?.user_metadata)
+    console.log('🔍 AdminNavigation: Avatar URL:', profile?.avatar_url || user?.user_metadata?.avatar_url)
+  }, [user, profile, userName])
 
   const getUserRoleDisplay = () => {
     if (userRole) return userRole
@@ -164,12 +178,18 @@ export function AdminNavigation({
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className="flex items-center gap-3 px-4 py-2.5 rounded-xl border border-border/40 hover:border-border/60 transition-all duration-200 hover:scale-105 group cursor-pointer"
                 >
-                  <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:border-primary/30 transition-all duration-200">
-                    <User className="h-4 w-4 text-primary" />
-                  </div>
+                  <Avatar className="w-9 h-9 border-2 border-primary/20 group-hover:border-primary/30 transition-all duration-200">
+                    <AvatarImage 
+                      src={profile?.avatar_url || user?.user_metadata?.avatar_url} 
+                      alt={displayName} 
+                    />
+                    <AvatarFallback className="bg-gradient-to-r from-primary to-purple-600 text-white text-sm font-bold">
+                      {userInitials}
+                    </AvatarFallback>
+                  </Avatar>
                   <div className="hidden sm:block text-sm">
                     <div className="font-semibold text-foreground group-hover:text-primary transition-colors duration-200">
-                      {getDisplayName()}
+                      {displayName}
                     </div>
                     <div className="text-xs text-muted-foreground/80 group-hover:text-muted-foreground transition-colors duration-200">
                       {getUserRoleDisplay()}

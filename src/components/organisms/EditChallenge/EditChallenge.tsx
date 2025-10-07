@@ -54,6 +54,7 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
     examples: [],
     constraints: [],
     hints: [],
+    mentor: '',
   })
 
   const [testCases, setTestCases] = useState<TestCase[]>([
@@ -90,10 +91,21 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
       if (result.data) {
         const challengeData = result.data
         setChallenge(challengeData)
+        // Mapear dificuldade de número para string
+        const getDifficultyString = (difficulty: number) => {
+          switch (difficulty) {
+            case 1: return 'easy'
+            case 2: return 'medium'
+            case 3: return 'hard'
+            case 4: return 'expert'
+            default: return 'easy'
+          }
+        }
+
         setFormData({
           title: challengeData.title || '',
           description: challengeData.description || '',
-          difficulty: challengeData.difficulty || 'easy',
+          difficulty: typeof challengeData.difficulty === 'number' ? getDifficultyString(challengeData.difficulty) : (challengeData.difficulty || 'easy'),
           category: challengeData.category || '',
           skills: challengeData.skills || [],
           function_name: challengeData.function_name || 'solution',
@@ -102,6 +114,7 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
           examples: challengeData.examples || [],
           constraints: challengeData.constraints || [],
           hints: challengeData.hints || [],
+          mentor: challengeData.mentor || '', // Incluir o campo mentor
         })
 
         if (challengeData.test_cases) {
@@ -159,7 +172,16 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
       ...formData,
       test_cases: testCases.filter(tc => tc.input && tc.expectedOutput),
       examples: examples.filter(ex => ex.input && ex.output),
+      mentor: formData.mentor || challenge?.mentor || 'default_mentor', // Incluir o campo mentor do formData ou challenge original
     }
+
+    // Debug: Log dos dados que serão enviados
+    console.log('🔍 EditChallenge: Dados que serão enviados:', challengeData)
+    console.log('🔍 EditChallenge: Challenge original:', challenge)
+    console.log('🔍 EditChallenge: Mentor value:', formData.mentor || challenge?.mentor || 'default_mentor')
+    console.log('🔍 EditChallenge: FormData mentor:', formData.mentor)
+    console.log('🔍 EditChallenge: Challenge mentor:', challenge?.mentor)
+    console.log('🔍 EditChallenge: Challenge ID:', challengeId)
 
     try {
       const result = await updateChallenge(challengeId, challengeData)
@@ -262,7 +284,7 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
   }
 
   return (
-    <AdminRouteWrapper allowedRoles={['admin', 'mentor']}>
+    <AdminRouteWrapper allowedRoles={['superadmin', 'admin', 'mentor']}>
       <div className="min-h-screen bg-background">
         <AdminNavigation 
           items={[
@@ -340,8 +362,7 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
                         <SelectItem value="easy">Fácil</SelectItem>
                         <SelectItem value="medium">Médio</SelectItem>
                         <SelectItem value="hard">Difícil</SelectItem>
-                        <SelectItem value="beginner">Iniciante</SelectItem>
-                        <SelectItem value="expert">Especialista</SelectItem>
+                        <SelectItem value="expert">Expert</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

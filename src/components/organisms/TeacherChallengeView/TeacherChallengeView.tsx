@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, Edit, CheckCircle, XCircle, Clock, Code, TestTube, BookOpen, FileText } from "lucide-react"
 import { supabase } from "@/lib/supabase"
+import { AdminRouteWrapper } from "@/components/atoms/AdminRouteWrapper/AdminRouteWrapper"
 
 interface TeacherChallenge {
   id: string
@@ -61,7 +62,7 @@ export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps)
           slug: data.slug,
           title: data.title,
           description: data.description,
-          difficulty: data.difficulty === 1 ? 'Fácil' : data.difficulty === 2 ? 'Médio' : data.difficulty === 3 ? 'Difícil' : 'Expert',
+          difficulty: data.difficulty === 1 ? 'Fácil' : data.difficulty === 2 ? 'Médio' : data.difficulty === 3 ? 'Difícil' : data.difficulty === 4 ? 'Expert' : 'Fácil',
           category: Array.isArray(data.category) ? data.category : (data.category ? [data.category] : ['Algoritmos']),
           functionName: data.function_name,
           status: data.status === 'approved' ? 'Aprovado' : data.status === 'to_approve' ? 'Em Análise' : data.status === 'rejected' ? 'Rejeitado' : 'Rascunho',
@@ -119,7 +120,8 @@ export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps)
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <AdminRouteWrapper allowedRoles={['superadmin', 'admin', 'mentor']}>
+      <div className="min-h-screen bg-background p-6">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -288,5 +290,6 @@ export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps)
         </Tabs>
       </div>
     </div>
+    </AdminRouteWrapper>
   )
 }

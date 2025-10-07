@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { DifficultyIndicator } from "@/components/molecules/DifficultyIndicator/DifficultyIndicator"
-import { BackgroundImageSelector } from "@/components/atoms/BackgroundImageSelector/BackgroundImageSelector"
+import { useUserRole } from "@/hooks/useUserRole"
 import { AdminChallenge as Challenge, ChallengeFormData, DIFFICULTY_OPTIONS, CATEGORY_OPTIONS, STATUS_OPTIONS } from "@/types/admin/admin-dashboard"
 
 interface ChallengeFormProps {
@@ -24,6 +24,7 @@ export function ChallengeForm({
   onCancel,
   isSubmitting
 }: ChallengeFormProps) {
+  const { isAdmin } = useUserRole()
   const getDifficultyNumber = (difficulty: string): number => {
     const difficultyMap: Record<string, number> = {
       'easy': 1,
@@ -41,25 +42,31 @@ export function ChallengeForm({
     functionName: "",
     status: "draft",
     initialCode: "",
-    testCases: [],
-    imageUrl: ""
+    testCases: []
   })
 
 
   useEffect(() => {
+    console.log('🔄 ChallengeForm: useEffect executado, editingChallenge:', editingChallenge, 'isAdmin:', isAdmin)
     if (editingChallenge) {
+      console.log('🔍 ChallengeForm: Editando challenge:', editingChallenge)
+      
+      // Para não-admins, sempre define status como 'draft' (aguardando aprovação)
+      const statusForUser = isAdmin ? (editingChallenge.status || "draft") : "draft"
+      
       const editFormData = {
         title: editingChallenge.title || "",
         description: editingChallenge.description || "",
         difficulty: editingChallenge.difficulty || "easy",
         category: Array.isArray(editingChallenge.category) ? editingChallenge.category : (editingChallenge.category ? [editingChallenge.category] : []),
         functionName: editingChallenge.functionName || "",
-        status: editingChallenge.status || "draft",
+        status: statusForUser,
         initialCode: editingChallenge.initialCode || "",
-        testCases: editingChallenge.testCases || [],
-        imageUrl: editingChallenge.imageUrl || ""
+        testCases: editingChallenge.testCases || []
       }
+      console.log('📝 ChallengeForm: Dados do formulário:', editFormData)
       setFormData(editFormData)
+      console.log('✅ ChallengeForm: FormData atualizado')
     } else {
       setFormData({
         title: "",
@@ -72,9 +79,10 @@ export function ChallengeForm({
         testCases: []
       })
     }
-  }, [editingChallenge])
+  }, [editingChallenge, isAdmin])
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | string[]) => {
+    console.log(`🔄 handleInputChange: ${field} = ${JSON.stringify(value)}`)
     setFormData((prev: ChallengeFormData) => ({ ...prev, [field]: value }))
   }
 
@@ -143,7 +151,7 @@ export function ChallengeForm({
                   onValueChange={(value) => handleInputChange("difficulty", value)}
                 >
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Selecione a dificuldade" />
                   </SelectTrigger>
                   <SelectContent>
                     {DIFFICULTY_OPTIONS.map((option: any) => (
@@ -185,12 +193,6 @@ export function ChallengeForm({
             </div>
           </div>
 
-          <div className="space-y-2">
-            <BackgroundImageSelector
-              currentImage={formData.imageUrl}
-              onImageSelect={(imageUrl) => handleInputChange("imageUrl", imageUrl || "")}
-            />
-          </div>
 
           <div className="space-y-2">
             <Label htmlFor="description">Descrição *</Label>
@@ -204,24 +206,37 @@ export function ChallengeForm({
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
-            <Select
-              value={formData.status}
-              onValueChange={(value) => handleInputChange("status", value)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {STATUS_OPTIONS.map((option: any) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {isAdmin && (
+            <div className="space-y-2">
+              <Label htmlFor="status">Status</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value) => handleInputChange("status", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {STATUS_OPTIONS.map((option: any) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          
+          {!isAdmin && (
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <div className="p-3 bg-muted rounded-md">
+                <span className="text-sm text-muted-foreground">
+                  Aguardando Aprovação (apenas administradores podem alterar o status)
+                </span>
+              </div>
+            </div>
+          )}
 
         </form>
         

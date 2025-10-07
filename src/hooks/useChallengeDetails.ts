@@ -20,10 +20,8 @@ export function useChallengeDetails(challengeId: string) {
         setLoading(true)
         setError(null)
 
-        // Buscar por título (convertendo slug)
         const searchTitle = challengeId.replace(/-/g, ' ')
         
-        // Buscar por título usando ilike para melhor compatibilidade, incluindo exemplos e test cases
         const { data, error: fetchError } = await supabase
           .schema('skill_evals')
           .from('challenges')

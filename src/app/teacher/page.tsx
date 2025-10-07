@@ -5,7 +5,7 @@ import { AdminRouteWrapper } from "@/components/atoms/AdminRouteWrapper/AdminRou
 
 export default function TeacherPage() {
   return (
-    <AdminRouteWrapper allowedRoles={['mentor']}>
+    <AdminRouteWrapper allowedRoles={['superadmin', 'admin', 'mentor']}>
       <TeacherDashboard />
     </AdminRouteWrapper>
   )

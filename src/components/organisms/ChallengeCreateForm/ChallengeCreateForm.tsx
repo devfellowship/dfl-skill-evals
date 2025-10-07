@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useChallengeManagement, CreateChallengeData } from "@/hooks/useChallengeManagement"
+import { useUserRole } from "@/hooks/useUserRole"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/atoms/Button/Button"
 import { Input } from "@/components/atoms/Input/Input"
@@ -13,7 +14,6 @@ import { Save, ArrowLeft, Plus, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 import { DIFFICULTY_OPTIONS } from "@/types/admin/admin-dashboard"
-import { BackgroundImageSelector } from "@/components/atoms/BackgroundImageSelector/BackgroundImageSelector"
 import { CATEGORY_OPTIONS } from "@/consts/challenge-form"
 
 interface TestCase {
@@ -30,17 +30,22 @@ interface Example {
 export function ChallengeCreateForm() {
   const router = useRouter()
   const { createChallenge, loading } = useChallengeManagement()
+  const { isAdmin } = useUserRole()
   
   const [formData, setFormData] = useState<CreateChallengeData>({
     title: "",
     description: "",
     difficulty: "easy",
     category: [],
-    functionName: "",
-    initialCode: "",
+    function_name: "",
+    initial_code: `function solution() {
+    // Seu código aqui
+    return null;
+}`,
     testCases: [],
     examples: [],
-    imageUrl: ""
+    status: isAdmin ? "draft" : "to_approve"
+    // mentor removido - será derivado automaticamente do usuário logado
   })
 
   const [testCase, setTestCase] = useState<TestCase>({
@@ -64,9 +69,9 @@ export function ChallengeCreateForm() {
   const handleCategoryChange = (category: string, checked: boolean) => {
     setFormData(prev => ({
       ...prev,
-      category: checked
-        ? [...prev.category, category]
-        : prev.category.filter(c => c !== category)
+      category: checked 
+        ? [...(Array.isArray(prev.category) ? prev.category : []), category]
+        : (Array.isArray(prev.category) ? prev.category : []).filter((c: string) => c !== category)
     }))
   }
 
@@ -78,7 +83,7 @@ export function ChallengeCreateForm() {
       }
       setFormData(prev => ({
         ...prev,
-        testCases: [...prev.testCases, newTestCase]
+        testCases: [...(prev.testCases || []), newTestCase]
       }))
       setTestCase({ input: "", expectedOutput: "" })
     }
@@ -87,7 +92,7 @@ export function ChallengeCreateForm() {
   const removeTestCase = (index: number) => {
     setFormData(prev => ({
       ...prev,
-      testCases: prev.testCases.filter((_, i) => i !== index)
+      testCases: (prev.testCases || []).filter((_: any, i: number) => i !== index)
     }))
   }
 
@@ -116,27 +121,56 @@ export function ChallengeCreateForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!formData.title.trim() || !formData.description.trim() || !formData.functionName.trim()) {
+    console.log('🔍 ChallengeCreateForm: handleSubmit chamado')
+    console.log('🔍 ChallengeCreateForm: formData atual:', formData)
+    
+    if (!formData.title.trim() || !formData.description.trim() || !formData.function_name.trim() || !formData.initial_code.trim()) {
+      console.log('❌ ChallengeCreateForm: Campos obrigatórios não preenchidos')
+      console.log('❌ ChallengeCreateForm: title:', formData.title)
+      console.log('❌ ChallengeCreateForm: description:', formData.description)
+      console.log('❌ ChallengeCreateForm: function_name:', formData.function_name)
+      console.log('❌ ChallengeCreateForm: initial_code:', formData.initial_code)
       toast.error("Por favor, preencha todos os campos obrigatórios")
       return
     }
 
-    if (formData.testCases.length === 0) {
-      toast.error("Adicione pelo menos um caso de teste")
-      return
-    }
+    // Remover validação de casos de teste por enquanto para testar
+    // if ((formData.testCases || []).length === 0) {
+    //   console.log('❌ ChallengeCreateForm: Nenhum caso de teste adicionado')
+    //   console.log('❌ ChallengeCreateForm: testCases:', formData.testCases)
+    //   toast.error("Adicione pelo menos um caso de teste")
+    //   return
+    // }
+
+    // Debug: Log dos dados que serão enviados
+    console.log('🔍 ChallengeCreateForm: Dados que serão enviados:', formData)
+    console.log('🔍 ChallengeCreateForm: Iniciando criação do challenge...')
+    console.log('🔍 ChallengeCreateForm: loading state:', loading)
 
     try {
-      await createChallenge(formData)
-      toast.success("Challenge criado com sucesso!")
-      router.push("/teacher")
+      console.log('🔍 ChallengeCreateForm: Chamando createChallenge...')
+      const result = await createChallenge(formData)
+      console.log('🔍 ChallengeCreateForm: Resultado da criação:', result)
+      if (result) {
+        console.log('✅ ChallengeCreateForm: Challenge criado com sucesso!')
+        toast.success("Challenge criado com sucesso!")
+        router.push("/teacher")
+      } else {
+        console.log('❌ ChallengeCreateForm: createChallenge retornou null')
+        toast.error("Erro ao criar challenge")
+      }
     } catch (error) {
+      console.error('❌ ChallengeCreateForm: Erro ao criar challenge:', error)
       toast.error("Erro ao criar challenge")
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6" onKeyDown={(e) => {
+      if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
+        console.log('🔍 ChallengeCreateForm: Enter pressionado no input')
+      }
+    }}>
       <Card>
         <CardHeader>
           <CardTitle>Informações Básicas</CardTitle>
@@ -186,11 +220,11 @@ export function ChallengeCreateForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="functionName">Nome da Função *</Label>
+              <Label htmlFor="function_name">Nome da Função *</Label>
               <Input
-                id="functionName"
-                value={formData.functionName}
-                onChange={(e) => handleInputChange("functionName", e.target.value)}
+                id="function_name"
+                value={formData.function_name}
+                onChange={(e) => handleInputChange("function_name", e.target.value)}
                 placeholder="Ex: twoSum"
                 required
               />
@@ -205,7 +239,7 @@ export function ChallengeCreateForm() {
                   <input
                     type="checkbox"
                     id={`category-${category}`}
-                    checked={formData.category.includes(category)}
+                    checked={(formData.category || []).includes(category)}
                     onChange={(e) => handleCategoryChange(category, e.target.checked)}
                     className="rounded border-gray-300"
                   />
@@ -215,26 +249,15 @@ export function ChallengeCreateForm() {
                 </div>
               ))}
             </div>
-            {formData.category.length > 0 && (
+            {(formData.category || []).length > 0 && (
               <div className="text-sm text-muted-foreground">
-                Selecionadas: {formData.category.join(", ")}
+                Selecionadas: {Array.isArray(formData.category) ? formData.category.join(", ") : formData.category || ""}
               </div>
             )}
           </div>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Imagem de Fundo do Challenge</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <BackgroundImageSelector
-            currentImage={formData.imageUrl}
-            onImageSelect={(url) => handleInputChange("imageUrl", url)}
-          />
-        </CardContent>
-      </Card>
 
       <Card>
         <CardHeader>
@@ -242,11 +265,11 @@ export function ChallengeCreateForm() {
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            <Label htmlFor="initialCode">Código Inicial</Label>
+            <Label htmlFor="initial_code">Código Inicial</Label>
             <Textarea
-              id="initialCode"
-              value={formData.initialCode}
-              onChange={(e) => handleInputChange("initialCode", e.target.value)}
+              id="initial_code"
+              value={formData.initial_code}
+              onChange={(e) => handleInputChange("initial_code", e.target.value)}
               placeholder="function twoSum(nums, target) {&#10;    // Seu código aqui&#10;}"
               rows={8}
               className="font-mono"
@@ -313,9 +336,9 @@ export function ChallengeCreateForm() {
                       <div className="text-xs text-muted-foreground">
                         Output: {example.output}
                       </div>
-                      {example.explanation && (
+                      {(example as any).explanation && (
                         <div className="text-xs text-muted-foreground">
-                          Explicação: {example.explanation}
+                          Explicação: {(example as any).explanation}
                         </div>
                       )}
                     </div>
@@ -369,11 +392,11 @@ export function ChallengeCreateForm() {
             Adicionar Caso de Teste
           </Button>
 
-          {formData.testCases.length > 0 && (
+          {(formData.testCases || []).length > 0 && (
             <div className="space-y-2">
-              <Label>Casos de Teste Adicionados ({formData.testCases.length})</Label>
+              <Label>Casos de Teste Adicionados ({(formData.testCases || []).length})</Label>
               <div className="space-y-2">
-                {formData.testCases.map((testCase, index) => (
+                {(formData.testCases || []).map((testCase: any, index: number) => (
                   <div key={index} className="flex items-center gap-2 p-2 border rounded">
                     <div className="flex-1">
                       <div className="text-sm font-medium">Caso {index + 1}</div>
@@ -409,7 +432,7 @@ export function ChallengeCreateForm() {
           <Button variant="outline" asChild>
             <Link href="/">Inicio</Link>
           </Button>
-          <Button type="submit" disabled={loading}>
+          <Button type="submit" disabled={loading} onClick={() => console.log('🔍 ChallengeCreateForm: Botão clicado')}>
             <Save className="w-4 h-4 mr-2" />
             {loading ? "Salvando..." : "Salvar Challenge"}
           </Button>

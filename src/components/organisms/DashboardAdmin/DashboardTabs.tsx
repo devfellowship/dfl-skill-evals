@@ -1,10 +1,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Code, TestTube, CheckCircle, Archive, Users } from "lucide-react"
+import { Code, TestTube, CheckCircle, Archive } from "lucide-react"
 import { ChallengeForm } from "./ChallengeForm"
 import { ChallengeList } from "./ChallengeList"
 import { PendingApprovalsList } from "./PendingApprovalsList"
 import { ArchivedChallengesList } from "./ArchivedChallengesList"
-import { UserManagement } from "@/components/organisms/UserManagement/UserManagement"
 import { AdminChallenge as Challenge, ChallengeFormData } from "@/types/admin/admin-dashboard"
 
 interface DashboardTabsProps {
@@ -60,7 +59,7 @@ export function DashboardTabs({
 }: DashboardTabsProps) {
   return (
     <Tabs defaultValue="challenges" value={activeTab} onValueChange={onTabChange} className="space-y-4">
-      <TabsList className="grid w-full grid-cols-4">
+      <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="challenges" className="flex items-center gap-2">
           <Code className="w-4 h-4" />
           Challenges
@@ -68,10 +67,6 @@ export function DashboardTabs({
         <TabsTrigger value="approvals" className="flex items-center gap-2">
           <CheckCircle className="w-4 h-4" />
           Aprovações
-        </TabsTrigger>
-        <TabsTrigger value="users" className="flex items-center gap-2">
-          <Users className="w-4 h-4" />
-          Usuários
         </TabsTrigger>
         <TabsTrigger value="archived" className="flex items-center gap-2">
           <Archive className="w-4 h-4" />
@@ -125,9 +120,6 @@ export function DashboardTabs({
         />
       </TabsContent>
 
-      <TabsContent value="users" className="space-y-6">
-        <UserManagement />
-      </TabsContent>
 
       <TabsContent value="archived" className="space-y-6">
         <ArchivedChallengesList

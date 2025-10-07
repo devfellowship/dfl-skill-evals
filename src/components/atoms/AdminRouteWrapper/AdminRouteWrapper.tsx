@@ -33,7 +33,7 @@ export function AdminRouteWrapper({ children, allowedRoles }: AdminRouteWrapperP
       }
 
       if (!allowedRoles.includes(role)) {
-        router.push('/dashboard')
+        router.push('/')
         return
       }
 

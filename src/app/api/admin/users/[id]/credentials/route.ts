@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { serverClientWithToken, serverAdminClient, getToken } from '@/lib/supabase/server-clients'
 
-export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const token = getToken(request)
     const supabase = serverClientWithToken(token)
@@ -11,9 +14,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (authError || !user) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
-
     const { data: profile, error: profileError } = await supabase
-      .from('profiles')
+      .schema('portfolio')
+      .from('users')
       .select('role')
       .eq('id', user.id)
       .single()
@@ -22,7 +25,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: 'Acesso negado. Apenas administradores podem atualizar credenciais.' }, { status: 403 })
     }
 
-    const { id: userId } = await params
+    const { id: userId } = params
     const { email, password } = await request.json() as Partial<{ 
       email: string
       password: string 
@@ -31,9 +34,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (!email && !password) {
       return NextResponse.json({ error: 'Email ou senha deve ser fornecido' }, { status: 400 })
     }
-
     const { data: before, error: beforeError } = await supabase
-      .from('profiles')
+      .schema('portfolio')
+      .from('users')
       .select('email')
       .eq('id', userId)
       .single()
@@ -47,9 +50,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         error: 'Configuração do servidor incompleta. Service role key não encontrada.' 
       }, { status: 500 })
     }
-
     const admin = serverAdminClient()
-
     const updateData: any = {}
     if (email) updateData.email = email
     if (password) updateData.password = password
@@ -61,18 +62,17 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         error: `Erro ao atualizar credenciais: ${updateError.message}` 
       }, { status: 500 })
     }
-
     if (email && email !== before.email) {
       await supabase
-        .from('profiles')
+        .schema('portfolio')
+        .from('users')
         .update({ email, updated_at: new Date().toISOString() })
         .eq('id', userId)
     }
-
     try {
       await supabase.from('app_logs').insert({
-        user_id: userId,
-        actor_id: user.id,
+        actor_id: user.id,   
+        target_id: userId,   
         action: 'update_credentials',
         details: {
           email_changed: Boolean(email),

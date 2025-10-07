@@ -80,11 +80,12 @@ export function useChallengeOperations() {
       }
 
       let newStatus = updateData.status
-      if (currentChallenge.status === 'approved' && updateData.status === 'approved') {
-        newStatus = 'to_approve'
+      // Se o challenge já está aprovado, mantém o status aprovado após edição
+      if (currentChallenge.status === 'approved') {
+        newStatus = 'approved'
       }
 
-      const { data: challenge, error: updateError } = await supabase
+      const { error: updateError } = await supabase
         .schema('skill_evals')
         .from('challenges')
         .update({
@@ -95,26 +96,17 @@ export function useChallengeOperations() {
           function_name: updateData.function_name,
           initial_code: updateData.initial_code,
           status: newStatus,
-          image_url: updateData.imageUrl,
           slug: updateData.slug
         })
         .eq('id', id)
-        .select()
-        .single()
 
       if (updateError) {
         throw new Error(updateError.message || 'Erro ao atualizar challenge')
       }
 
       toast.success("Challenge atualizado com sucesso!")
-      
-      try {
-        broadcastChallengeUpdated(challenge)
-      } catch (broadcastError) {
-        loadAllChallenges()
-      }
-      
-      return challenge
+      loadAllChallenges()
+      return true
     } catch (err) {
       toast.error("Erro ao atualizar challenge")
       return null
@@ -158,9 +150,10 @@ export function useChallengeOperations() {
   }
 
   const handleApprove = async (id: string) => {
+    console.log('🔍 useChallengeOperations: Aprovando challenge:', id)
     setIsApproving(id)
     try {
-      const { data: challenge, error: approveError } = await supabase
+      const { error: approveError } = await supabase
         .schema('skill_evals')
         .from('challenges')
         .update({ 
@@ -168,23 +161,25 @@ export function useChallengeOperations() {
           is_public: true
         })
         .eq('id', id)
-        .select()
-        .single()
 
       if (approveError) {
+        console.error('❌ useChallengeOperations: Erro ao aprovar:', approveError)
         throw new Error(approveError.message || 'Erro ao aprovar challenge')
       }
 
+      console.log('✅ useChallengeOperations: Challenge aprovada com sucesso!')
       toast.success("Challenge aprovado com sucesso!")
       
       try {
-        broadcastChallengeUpdated(challenge)
-      } catch (broadcastError) {
+        console.log('🔄 useChallengeOperations: Recarregando challenges...')
         loadAllChallenges()
+      } catch (broadcastError) {
+        console.error('❌ useChallengeOperations: Erro ao recarregar challenges:', broadcastError)
       }
       
-      return challenge
+      return true
     } catch (err) {
+      console.error('❌ useChallengeOperations: Erro ao aprovar challenge:', err)
       toast.error("Erro ao aprovar challenge")
       return null
     } finally {
@@ -195,7 +190,7 @@ export function useChallengeOperations() {
   const handleReject = async (id: string, reason: string) => {
     setIsSubmitting(true)
     try {
-      const { data: challenge, error: rejectError } = await supabase
+      const { error: rejectError } = await supabase
         .schema('skill_evals')
         .from('challenges')
         .update({ 
@@ -204,8 +199,6 @@ export function useChallengeOperations() {
           is_public: false
         })
         .eq('id', id)
-        .select()
-        .single()
 
       if (rejectError) {
         throw new Error(rejectError.message || 'Erro ao rejeitar challenge')
@@ -214,12 +207,12 @@ export function useChallengeOperations() {
       toast.success("Challenge rejeitado e retornado ao mentor")
       
       try {
-        broadcastChallengeUpdated(challenge)
-      } catch (broadcastError) {
         loadAllChallenges()
+      } catch (broadcastError) {
+        console.error('Erro ao recarregar challenges:', broadcastError)
       }
       
-      return challenge
+      return true
     } catch (err) {
       toast.error("Erro ao rejeitar challenge")
       return null
@@ -231,7 +224,7 @@ export function useChallengeOperations() {
   const handleArchive = async (id: string) => {
     setIsArchiving(id)
     try {
-      const { data: challenge, error: archiveError } = await supabase
+      const { error: archiveError } = await supabase
         .schema('skill_evals')
         .from('challenges')
         .update({ 
@@ -239,8 +232,6 @@ export function useChallengeOperations() {
           is_public: false
         })
         .eq('id', id)
-        .select()
-        .single()
 
       if (archiveError) {
         throw new Error(archiveError.message || 'Erro ao arquivar challenge')
@@ -249,12 +240,12 @@ export function useChallengeOperations() {
       toast.success("Challenge arquivado com sucesso!")
       
       try {
-        broadcastChallengeUpdated(challenge)
-      } catch (broadcastError) {
         loadAllChallenges()
+      } catch (broadcastError) {
+        console.error('Erro ao recarregar challenges:', broadcastError)
       }
       
-      return challenge
+      return true
     } catch (err) {
       toast.error("Erro ao arquivar challenge")
       return null
@@ -270,7 +261,7 @@ export function useChallengeOperations() {
 
     setIsSubmitting(true)
     try {
-      const { data: challenge, error: sendBackError } = await supabase
+      const { error: sendBackError } = await supabase
         .schema('skill_evals')
         .from('challenges')
         .update({ 
@@ -278,8 +269,6 @@ export function useChallengeOperations() {
           is_public: false
         })
         .eq('id', id)
-        .select()
-        .single()
 
       if (sendBackError) {
         throw new Error(sendBackError.message || 'Erro ao enviar challenge de volta')
@@ -288,12 +277,12 @@ export function useChallengeOperations() {
       toast.success("Challenge enviado de volta para análise!")
       
       try {
-        broadcastChallengeUpdated(challenge)
-      } catch (broadcastError) {
         loadAllChallenges()
+      } catch (broadcastError) {
+        console.error('Erro ao recarregar challenges:', broadcastError)
       }
       
-      return challenge
+      return true
     } catch (err) {
       toast.error("Erro ao enviar challenge de volta")
       return null

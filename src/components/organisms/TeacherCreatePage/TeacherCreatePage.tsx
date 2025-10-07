@@ -6,7 +6,7 @@ import { ChallengeCreateForm } from "@/components/organisms/ChallengeCreateForm/
 
 export function TeacherCreatePage() {
   return (
-    <AdminRouteWrapper allowedRoles={['admin', 'mentor']}>
+    <AdminRouteWrapper allowedRoles={['superadmin', 'admin', 'mentor']}>
       <div className="min-h-screen bg-background">
         <AdminNavigation
           items={[

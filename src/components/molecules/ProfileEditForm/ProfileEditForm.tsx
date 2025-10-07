@@ -22,8 +22,7 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
   const [emailSaving, setEmailSaving] = useState(false)
 
   const [formData, setFormData] = useState<ProfileFormData>({
-    full_name: '',
-    phone: ''
+    full_name: ''
   })
 
   const [passwordData, setPasswordData] = useState<PasswordFormData>({
@@ -39,29 +38,36 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
   useEffect(() => {
     if (profile) {
       setFormData({
-        full_name: profile.full_name || '',
-        phone: profile.phone || ''
+        full_name: profile.full_name || ''
       })
     }
   }, [profile])
 
   const handleSave = async () => {
-    if (!profile) return
+    if (!profile) {
+      console.error('❌ ProfileEditForm: Nenhum perfil encontrado')
+      return
+    }
 
+    console.log('🔄 ProfileEditForm: Iniciando salvamento...')
+    console.log('📝 ProfileEditForm: Dados do formulário:', formData)
+    console.log('📝 ProfileEditForm: Perfil atual:', profile)
+    
     setSaving(true)
     try {
-      const { error } = await updateProfile(formData)
-      
-      if (error) {
-        toast.error(error.message || PROFILE_MESSAGES.UNEXPECTED_ERROR)
-        return
-      }
-
+      console.log('🔄 ProfileEditForm: Chamando updateProfile...')
+      const result = await updateProfile(formData)
+      console.log('✅ ProfileEditForm: Resultado do updateProfile:', result)
+      console.log('✅ ProfileEditForm: Perfil atualizado com sucesso!')
       toast.success(PROFILE_MESSAGES.PROFILE_UPDATED)
       setIsEditing(false)
       onClose?.()
     } catch (error) {
-      toast.error(PROFILE_MESSAGES.UNEXPECTED_ERROR)
+      console.error('❌ ProfileEditForm: Erro ao atualizar perfil:', error)
+      console.error('❌ ProfileEditForm: Tipo do erro:', typeof error)
+      console.error('❌ ProfileEditForm: Stack do erro:', error instanceof Error ? error.stack : 'N/A')
+      console.error('❌ ProfileEditForm: Message do erro:', error instanceof Error ? error.message : 'N/A')
+      toast.error(error instanceof Error ? error.message : PROFILE_MESSAGES.UNEXPECTED_ERROR)
     } finally {
       setSaving(false)
     }
@@ -80,13 +86,7 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
 
     setPasswordSaving(true)
     try {
-      const { error } = await changePassword(passwordData.currentPassword, passwordData.newPassword)
-      
-      if (error) {
-        toast.error(error.message || PROFILE_MESSAGES.UNEXPECTED_ERROR)
-        return
-      }
-
+      await changePassword(passwordData)
       toast.success(PROFILE_MESSAGES.PASSWORD_CHANGED)
       setIsChangingPassword(false)
       setPasswordData({
@@ -95,7 +95,8 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
         confirmPassword: ''
       })
     } catch (error) {
-      toast.error(PROFILE_MESSAGES.UNEXPECTED_ERROR)
+      console.error('Erro ao alterar senha:', error)
+      toast.error(error instanceof Error ? error.message : PROFILE_MESSAGES.UNEXPECTED_ERROR)
     } finally {
       setPasswordSaving(false)
     }
@@ -119,20 +120,15 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
 
     setEmailSaving(true)
     try {
-      const { error } = await changeEmail(emailData.newEmail)
-      
-      if (error) {
-        toast.error(error.message || PROFILE_MESSAGES.UNEXPECTED_ERROR)
-        return
-      }
-
+      await changeEmail(emailData)
       toast.success(PROFILE_MESSAGES.EMAIL_CHANGED)
       setIsChangingEmail(false)
       setEmailData({
         newEmail: ''
       })
     } catch (error) {
-      toast.error(PROFILE_MESSAGES.UNEXPECTED_ERROR)
+      console.error('Erro ao alterar email:', error)
+      toast.error(error instanceof Error ? error.message : PROFILE_MESSAGES.UNEXPECTED_ERROR)
     } finally {
       setEmailSaving(false)
     }
@@ -178,8 +174,7 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
         onCancel={() => {
           setIsEditing(false)
           setFormData({
-            full_name: profile.full_name || '',
-            phone: profile.phone || ''
+            full_name: profile.full_name || ''
           })
         }}
         onFormDataChange={setFormData}

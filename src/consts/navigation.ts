@@ -58,7 +58,7 @@ export const progressMenuItems: MenuItem[] = [
 export const settingsMenuItems: MenuItem[] = [
   {
     title: "Criar Challenge",
-    url: "/create-challenge",
+    url: "/create",
     icon: PlusCircle,
   },
   {
