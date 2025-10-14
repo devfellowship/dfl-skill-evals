@@ -129,21 +129,12 @@ export function useChallengeOperations() {
     )
   }, [validateUser, executeWithBroadcastAndToast])
 
-  const deleteChallenge = useCallback(async (id: string, reason?: string) => {
+  const deleteChallenge = useCallback(async (id: string, reason: string) => {
     const { user: validatedUser, isAdmin } = validateUser()
 
-    // Se não tiver motivo, pedir para o usuário
-    if (!reason) {
-      const userReason = prompt('Digite o motivo da exclusão:')
-      if (!userReason || userReason.trim() === '') {
-        alert('Motivo é obrigatório para exclusão')
-        return null
-      }
-      reason = userReason.trim()
-    }
-
-    if (!confirm(`Tem certeza que deseja excluir este challenge?\n\nMotivo: ${reason}`)) {
-      return null
+    // Validar motivo
+    if (!reason || reason.trim().length < 10) {
+      throw new Error('Motivo deve ter pelo menos 10 caracteres')
     }
 
     setIsDeleting(id)
