@@ -2,14 +2,16 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useUserRole } from '@/hooks/useUserRole'
 
 export default function CreatePage() {
   const router = useRouter()
+  const { isAdmin } = useUserRole()
 
   useEffect(() => {
-    // Redireciona para a página de criação de challenges do teacher
-    router.replace('/teacher/create')
-  }, [router])
+    // Redireciona para a página de criação baseada na role do usuário
+    router.replace(isAdmin ? '/admin' : '/teacher/create')
+  }, [router, isAdmin])
 
   return (
     <div className="min-h-screen flex items-center justify-center">

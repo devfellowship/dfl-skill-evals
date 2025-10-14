@@ -8,6 +8,7 @@ export function useDashboardAdmin() {
     published, 
     pending, 
     archived, 
+    deleted,
     isInitialLoading, 
     lastUpdate,
     broadcastWorking,
@@ -20,9 +21,12 @@ export function useDashboardAdmin() {
     isDeleting,
     isApproving,
     isArchiving,
+    isRestoring,
     createChallenge,
     updateChallenge,
     deleteChallenge,
+    restoreChallenge,
+    permanentDeleteChallenge,
     approveChallenge,
     rejectChallenge,
     archiveChallenge,
@@ -164,10 +168,27 @@ export function useDashboardAdmin() {
     setSearchQuery(query)
   }
 
+  const handleRestoreWithOptimistic = async (id: string) => {
+    removeChallengeFromList(id)
+    const result = await restoreChallenge(id)
+    if (!result) {
+      loadAllChallenges()
+    }
+  }
+
+  const handlePermanentDeleteWithOptimistic = async (id: string) => {
+    removeChallengeFromList(id)
+    const result = await permanentDeleteChallenge(id)
+    if (!result) {
+      loadAllChallenges()
+    }
+  }
+
   return {
     published,
     pending,
     archived,
+    deleted,
     isInitialLoading,
     lastUpdate: lastUpdate as Date,
     broadcastWorking,
@@ -180,6 +201,7 @@ export function useDashboardAdmin() {
     isDeleting,
     isApproving,
     isArchiving,
+    isRestoring,
     handleSubmit,
     handleEdit,
     handleCancel,
@@ -188,6 +210,8 @@ export function useDashboardAdmin() {
     handleRejectWithOptimistic,
     handleArchiveWithOptimistic,
     handleSendBackWithOptimistic,
+    handleRestoreWithOptimistic,
+    handlePermanentDeleteWithOptimistic,
     handleOpenComparison,
     handleCloseComparison,
     handleApproveFromComparison,

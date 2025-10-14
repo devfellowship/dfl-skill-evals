@@ -107,21 +107,21 @@ export function ChallengeList({
                 {challenge.title}
               </h3>
               <Badge className={getDifficultyColor(challenge.difficulty)}>
-                {DIFFICULTY_OPTIONS.find(opt => opt.value === challenge.difficulty)?.label}
+                {DIFFICULTY_OPTIONS.find(opt => opt.value === challenge.difficulty)?.label || challenge.difficulty}
               </Badge>
               <Badge className={getStatusColor(challenge.status)}>
-                {getStatusLabel(challenge.status)}
+                {STATUS_OPTIONS.find(opt => opt.value === challenge.status)?.label || challenge.status}
               </Badge>
               {challenge.trending && (
                 <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-200">
-                  🔥 Trending
+                  🔥 Novidade
                 </Badge>
               )}
             </div>
             <p className="text-muted-foreground text-sm mb-2 group-hover:text-foreground transition-colors duration-200">
               {challenge.description}
             </p>
-            <div className="flex items-center gap-4 text-xs text-muted-foreground/70 group-hover:text-muted-foreground transition-colors duration-200">
+            <div className="flex items-center gap-4 text-xs text-muted-foreground/70">
               <span>📁 {Array.isArray(challenge.category) ? challenge.category.join(', ') : challenge.category}</span>
               <span>⚡ {challenge.functionName}</span>
               <span>👤 Criado por: {challenge.mentor || 'Usuário'}</span>
@@ -181,10 +181,7 @@ export function ChallengeList({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => {
-                console.log('🔍 Botão de exclusão clicado para challenge:', challenge.id, challenge.title)
-                onDelete(challenge.id)
-              }}
+              onClick={() => onDelete(challenge.id)}
               disabled={isDeleting === challenge.id}
               className="text-red-600 hover:text-red-700 opacity-70 group-hover:opacity-100 transition-opacity duration-200"
             >

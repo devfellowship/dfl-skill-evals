@@ -93,7 +93,7 @@ export function PendingApprovalsList({
             <p className="text-muted-foreground text-sm mb-2 group-hover:text-foreground transition-colors duration-200">
               {challenge.description}
             </p>
-            <div className="flex items-center gap-4 text-xs text-muted-foreground/70 group-hover:text-muted-foreground transition-colors duration-200">
+            <div className="flex items-center gap-4 text-xs text-muted-foreground/70">
               <span>👤 Criado por: {challenge.mentor || 'Usuário'}</span>
               <span>📅 Criado: {challenge.createdAt}</span>
               <span>⚡ {challenge.functionName}</span>

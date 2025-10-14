@@ -22,7 +22,6 @@ export const DeleteChallengeModal: React.FC<DeleteChallengeModalProps> = ({
   const [reason, setReason] = useState('')
   const [error, setError] = useState('')
 
-  console.log('🔍 DeleteChallengeModal renderizado com:', { isOpen, challengeTitle })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -48,11 +47,8 @@ export const DeleteChallengeModal: React.FC<DeleteChallengeModalProps> = ({
   }
 
   if (!isOpen) {
-    console.log('🔍 Modal não está aberto, não renderizando')
     return null
   }
-
-  console.log('🔍 Modal está aberto, renderizando...')
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -107,11 +103,17 @@ export const DeleteChallengeModal: React.FC<DeleteChallengeModalProps> = ({
               >
                 Cancelar
               </Button>
+              
               <Button
                 type="submit"
                 variant="destructive"
                 disabled={isDeleting || reason.length < 10}
                 className="flex-1"
+                onClick={(e) => {
+                  if (!isDeleting && reason.length >= 10) {
+                    handleSubmit(e)
+                  }
+                }}
               >
                 {isDeleting ? 'Excluindo...' : 'Excluir Challenge'}
               </Button>

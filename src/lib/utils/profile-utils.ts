@@ -32,12 +32,17 @@ export const getDaysUntilNameChange = (profile: ProfileData | null): number => {
 export const getUserDisplayName = (user: any, profile: ProfileData | null): string => {
   if (!user) return 'Usuário'
 
+  // Prioridade 1: Nome da tabela users_with_roles (se disponível)
   if (profile?.full_name) {
     return profile.full_name
   }
+  
+  // Prioridade 2: Nome do user_metadata
   if (user.user_metadata?.full_name) {
     return user.user_metadata.full_name
   }
+  
+  // Prioridade 3: Email como fallback
   if (user.email) {
     return user.email.split('@')[0]
   }

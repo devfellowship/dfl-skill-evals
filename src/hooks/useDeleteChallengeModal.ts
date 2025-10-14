@@ -16,10 +16,8 @@ export const useDeleteChallengeModal = (): UseDeleteChallengeModalReturn => {
   const { deleteChallenge, isDeleting } = useChallengeOperations()
 
   const openDeleteModal = useCallback((id: string, title: string) => {
-    console.log('🔍 openDeleteModal chamado com:', { id, title })
     setChallengeToDelete({ id, title })
     setIsModalOpen(true)
-    console.log('🔍 Modal deve estar aberto agora')
   }, [])
 
   const closeDeleteModal = useCallback(() => {
@@ -28,13 +26,14 @@ export const useDeleteChallengeModal = (): UseDeleteChallengeModalReturn => {
   }, [])
 
   const confirmDelete = useCallback(async (reason: string) => {
-    if (!challengeToDelete) return
+    if (!challengeToDelete) {
+      return
+    }
 
     try {
       await deleteChallenge(challengeToDelete.id, reason)
       closeDeleteModal()
     } catch (error) {
-      console.error('Erro ao excluir challenge:', error)
       // O erro será tratado pelo toast do executeWithBroadcastAndToast
     }
   }, [challengeToDelete, deleteChallenge, closeDeleteModal])

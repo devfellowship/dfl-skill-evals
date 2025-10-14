@@ -67,8 +67,7 @@ export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
       updatedAt: raw.updated_at ? new Date(raw.updated_at).toLocaleDateString('pt-BR') : 'Data não disponível',
       initialCode: raw.initial_code ?? '',
       testCases: raw.test_cases ?? [],
-      orderIndex: raw.order_index ?? null,
-      imageUrl: raw.image_url ?? null
+      orderIndex: raw.order_index ?? null
     }
   }
 
@@ -131,10 +130,10 @@ export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'published': return 'bg-green-100 text-green-800'
-      case 'draft': return 'bg-gray-100 text-gray-800'
-      case 'archived': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'published': return 'bg-blue-100 text-blue-800 hover:bg-blue-200 hover:text-blue-600 transition-colors'
+      case 'draft': return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200 hover:text-yellow-900 transition-colors'
+      case 'archived': return 'bg-gray-100 text-gray-800 hover:bg-gray-200 hover:text-gray-900 transition-colors'
+      default: return 'bg-gray-100 text-gray-800 hover:bg-gray-200 hover:text-gray-900 transition-colors'
     }
   }
 

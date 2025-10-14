@@ -30,14 +30,14 @@ export function TrendingToggle({
     setIsUpdating(true)
     try {
       await toggleTrending(challengeId, isTrending, 1)
-      toast.success(isTrending ? 'Removido do trending' : 'Adicionado ao trending')
+      toast.success(isTrending ? 'Removido das novidades' : 'Adicionado às novidades')
       
       // Invalida o cache para garantir que as mudanças sejam refletidas
       invalidateChallengesCache()
       onUpdate?.()
     } catch (error) {
-      console.error('Erro ao atualizar trending:', error)
-      toast.error('Erro ao atualizar trending')
+      console.error('Erro ao atualizar novidade:', error)
+      toast.error('Erro ao atualizar novidade')
     } finally {
       setIsUpdating(false)
     }
@@ -70,12 +70,12 @@ export function TrendingToggle({
         {isTrending ? (
           <>
             <Star className="w-4 h-4 fill-current" />
-            Trending
+            Novidade
           </>
         ) : (
           <>
             <StarOff className="w-4 h-4" />
-            Marcar Trending
+            Marcar Novidade
           </>
         )}
       </Button>

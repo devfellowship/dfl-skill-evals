@@ -19,6 +19,8 @@ export function useChallengesGlobal() {
       ? 'draft'
       : raw.status === 'archived'
       ? 'archived'
+      : raw.status === 'deleted'
+      ? 'deleted'
       : 'draft'
 
     const mapDifficulty = (difficulty: number): 'easy' | 'medium' | 'hard' | 'expert' => {
@@ -43,7 +45,10 @@ export function useChallengesGlobal() {
       created_by: raw.created_by,
       mentor: raw.mentor,
       trending: raw.trending || false,
-      trending_priority: raw.trending_priority || null
+      trending_priority: raw.trending_priority || null,
+      deleted_at: raw.deleted_at,
+      deleted_by: raw.deleted_by,
+      deletion_reason: raw.deletion_reason
     }
   }, [])
 
@@ -157,6 +162,11 @@ export function useChallengesGlobal() {
     challenges.filter(c => c.status === 'archived'), 
     [challenges]
   )
+
+  const deleted = useMemo(() => 
+    challenges.filter(c => c.status === 'deleted'), 
+    [challenges]
+  )
   const updateChallengeInList = useCallback((challengeId: string, updates: Partial<Challenge>) => {
     setChallenges(prev => prev.map(challenge => 
       challenge.id === challengeId 
@@ -215,6 +225,7 @@ export function useChallengesGlobal() {
     published,
     pending,
     archived,
+    deleted,
     updateChallengeInList,
     addChallengeToList,
     removeChallengeFromList,

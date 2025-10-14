@@ -4,6 +4,7 @@ import { Button } from '@/components/atoms/Button/Button'
 import { Badge } from '@/components/atoms/Badge/Badge'
 import { useSoftDeleteAudit, DeletedChallenge } from '@/hooks/useSoftDeleteAudit'
 import { useUserRole } from '@/hooks/useUserRole'
+import { convertToBrazilianTime } from '@/lib/utils/timezone'
 
 interface DeletedChallengesPanelProps {
   className?: string
@@ -171,7 +172,7 @@ export const DeletedChallengesPanel: React.FC<DeletedChallengesPanelProps> = ({
                         <strong>Deletado por:</strong> {challenge.profiles?.full_name || 'Usuário desconhecido'}
                       </p>
                       <p>
-                        <strong>Data:</strong> {new Date(challenge.deleted_at).toLocaleString('pt-BR')}
+                        <strong>Data:</strong> {convertToBrazilianTime(challenge.deleted_at)}
                       </p>
                     </div>
                   </div>

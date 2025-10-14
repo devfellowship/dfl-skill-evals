@@ -6,7 +6,7 @@ export interface AdminChallenge {
   difficulty: "easy" | "medium" | "hard" | "expert"
   category: string[]
   functionName: string
-  status: "draft" | "published" | "archived"
+  status: "draft" | "published" | "archived" | "deleted"
   createdAt: string
   updatedAt: string
   initialCode?: string
@@ -16,6 +16,13 @@ export interface AdminChallenge {
   created_by?: string
   trending?: boolean
   trending_priority?: number | null
+  deleted_at?: string | null
+  deleted_by?: string | null
+  deletion_reason?: string | null
+  rating?: number
+  participants?: number
+  skills?: string[]
+  image?: string
 }
 
 export interface ChallengeFormData {
@@ -24,7 +31,7 @@ export interface ChallengeFormData {
   difficulty: "easy" | "medium" | "hard" | "expert"
   category: string[]
   functionName: string
-  status: "draft" | "published" | "archived"
+  status: "draft" | "published" | "archived" | "deleted"
   initialCode: string
   testCases: any[]
 }
@@ -42,7 +49,8 @@ export const CATEGORY_OPTIONS = [
 ] as const
 
 export const STATUS_OPTIONS = [
-  { value: "draft", label: "Em análise", color: "bg-yellow-100 text-yellow-800" },
-  { value: "published", label: "Publicado", color: "bg-green-100 text-green-800" },
-  { value: "archived", label: "Arquivado", color: "bg-gray-100 text-gray-800" }
+  { value: "draft", label: "Em análise", color: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200 hover:text-yellow-900 transition-colors" },
+  { value: "published", label: "Publicado", color: "bg-blue-100 text-blue-800 hover:bg-blue-200 hover:text-blue-600 transition-colors" },
+  { value: "archived", label: "Arquivado", color: "bg-gray-100 text-gray-800 hover:bg-gray-200 hover:text-gray-900 transition-colors" },
+  { value: "deleted", label: "Excluído", color: "bg-red-100 text-red-800 hover:bg-red-200 hover:text-red-900 transition-colors" }
 ] as const

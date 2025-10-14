@@ -45,7 +45,6 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
 
   const handleSave = async () => {
     if (!profile) {
-      console.error('❌ ProfileEditForm: Nenhum perfil encontrado')
       return
     }
 
@@ -56,10 +55,6 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
       setIsEditing(false)
       onClose?.()
     } catch (error) {
-      console.error('❌ ProfileEditForm: Erro ao atualizar perfil:', error)
-      console.error('❌ ProfileEditForm: Tipo do erro:', typeof error)
-      console.error('❌ ProfileEditForm: Stack do erro:', error instanceof Error ? error.stack : 'N/A')
-      console.error('❌ ProfileEditForm: Message do erro:', error instanceof Error ? error.message : 'N/A')
       toast.error(error instanceof Error ? error.message : PROFILE_MESSAGES.UNEXPECTED_ERROR)
     } finally {
       setSaving(false)
@@ -88,7 +83,6 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
         confirmPassword: ''
       })
     } catch (error) {
-      console.error('Erro ao alterar senha:', error)
       toast.error(error instanceof Error ? error.message : PROFILE_MESSAGES.UNEXPECTED_ERROR)
     } finally {
       setPasswordSaving(false)
@@ -120,7 +114,6 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
         newEmail: ''
       })
     } catch (error) {
-      console.error('Erro ao alterar email:', error)
       toast.error(error instanceof Error ? error.message : PROFILE_MESSAGES.UNEXPECTED_ERROR)
     } finally {
       setEmailSaving(false)

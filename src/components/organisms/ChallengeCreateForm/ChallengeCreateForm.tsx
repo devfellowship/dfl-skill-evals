@@ -140,7 +140,7 @@ export function ChallengeCreateForm() {
       const result = await createChallenge(formData)
       if (result) {
         toast.success("Challenge criado com sucesso!")
-        router.push("/teacher")
+        router.push(isAdmin ? "/admin" : "/teacher")
       } else {
         toast.error("Erro ao criar challenge")
       }

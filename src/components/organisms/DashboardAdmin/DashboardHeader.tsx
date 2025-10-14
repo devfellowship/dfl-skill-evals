@@ -1,20 +1,15 @@
-import { SearchButton } from "@/components/atoms/SearchButton/SearchButton"
 import { DashboardHeaderButtons } from "@/components/atoms/DashboardHeaderButtons/DashboardHeaderButtons"
 import { ConnectionStatus } from "@/components/atoms/ConnectionStatus/ConnectionStatus"
 
 interface DashboardHeaderProps {
   broadcastWorking: boolean
   lastUpdate: Date
-  searchQuery: string
-  onSearch: (query: string) => void
   isSubmitting?: boolean
 }
 
 export function DashboardHeader({
   broadcastWorking,
   lastUpdate,
-  searchQuery,
-  onSearch,
   isSubmitting
 }: DashboardHeaderProps) {
   return (
@@ -25,11 +20,6 @@ export function DashboardHeader({
         <ConnectionStatus isConnected={broadcastWorking} lastUpdate={lastUpdate} />
       </div>
       <div className="flex items-center gap-3">
-        <SearchButton 
-          onSearch={onSearch}
-          placeholder="Pesquisar challenges por título..."
-          currentQuery={searchQuery}
-        />
         <DashboardHeaderButtons
           createButtonHref="/create"
           createButtonText="Novo Desafio"

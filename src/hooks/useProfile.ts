@@ -30,23 +30,38 @@ export const useProfile = () => {
     try {
       setLoading(true)
       setError(null)
-      const { data, error: fetchError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single()
-      if (fetchError) throw fetchError
-      if (!data) throw new Error('Perfil não encontrado')
+      
+      // Buscar dados do perfil e do users_with_roles em paralelo
+      const [profileResult, userRolesResult] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle(),
+        supabase
+          .from('users_with_roles')
+          .select('name, roles')
+          .eq('id', user.id)
+          .maybeSingle()
+      ])
+
+      const profileData = profileResult.data
+      const userRolesData = userRolesResult.data
+
+      if (profileResult.error && !profileData) {
+        throw profileResult.error
+      }
+
       const mapped: Profile = {
-        id: data.id,
-        email: data.email || user.email || '',
-        full_name: data.full_name || data.name || '',
-        role: (data.role as UserRole) || 'community_member',
-        is_active: data.is_active !== false,
-        created_at: data.created_at || new Date().toISOString(),
-        updated_at: data.updated_at || new Date().toISOString(),
-        last_name_change: data.last_name_change || undefined,
-        avatar_url: data.avatar_url || undefined
+        id: user.id,
+        email: profileData?.email || user.email || '',
+        full_name: profileData?.full_name || userRolesData?.name || user.user_metadata?.full_name || '',
+        role: (profileData?.role as UserRole) || 'community_member',
+        is_active: profileData?.is_active !== false,
+        created_at: profileData?.created_at || new Date().toISOString(),
+        updated_at: profileData?.updated_at || new Date().toISOString(),
+        last_name_change: profileData?.last_name_change || undefined,
+        avatar_url: profileData?.avatar_url || undefined
       }
       setProfile(mapped)
     } catch (err) {

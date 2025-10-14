@@ -1,9 +1,9 @@
 import React from "react"
 import { AssessmentCard } from "@/components/organisms/AssessmentCard/AssessmentCard"
-import type { Challenge } from "@/types/challenges/challenge"
+import type { AdminChallenge } from "@/types/admin/admin-dashboard"
 
 interface AssessmentGridProps {
-  assessments: Challenge[]
+  assessments: AdminChallenge[]
   isLoading?: boolean
 }
 

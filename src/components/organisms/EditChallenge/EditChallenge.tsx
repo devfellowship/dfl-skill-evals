@@ -536,8 +536,6 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Casos de Teste */}
             <Card>
               <CardHeader>
                 <CardTitle>Casos de Teste</CardTitle>
@@ -648,7 +646,6 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
             </Card>
           </form>
           
-          {/* Botões movidos para o final */}
           <div className="flex gap-3 pt-6 border-t mt-6">
             <Button 
               onClick={handleSubmit} 

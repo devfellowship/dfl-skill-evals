@@ -6,12 +6,12 @@ import { DashboardTabs } from "./DashboardTabs"
 import { DashboardModals } from "./DashboardModals"
 import { DeleteChallengeWrapper, useDeleteChallenge } from "@/components/organisms/DeleteChallengeWrapper/DeleteChallengeWrapper"
 
-// Componente interno que usa o hook de exclusão
 const DashboardAdminContent = () => {
   const {
     published,
     pending,
     archived,
+    deleted,
     isInitialLoading,
     lastUpdate,
     broadcastWorking,
@@ -24,6 +24,7 @@ const DashboardAdminContent = () => {
     isDeleting,
     isApproving,
     isArchiving,
+    isRestoring,
     handleSubmit,
     handleEdit,
     handleCancel,
@@ -32,6 +33,8 @@ const DashboardAdminContent = () => {
     handleRejectWithOptimistic,
     handleArchiveWithOptimistic,
     handleSendBackWithOptimistic,
+    handleRestoreWithOptimistic,
+    handlePermanentDeleteWithOptimistic,
     handleOpenComparison,
     handleCloseComparison,
     handleApproveFromComparison,
@@ -43,22 +46,14 @@ const DashboardAdminContent = () => {
 
   const { openDeleteModal } = useDeleteChallenge()
 
-  // Wrapper para o handleDelete que abre o modal
   const handleDeleteClick = (id: string, title: string) => {
     openDeleteModal(id, title)
   }
 
-  // Wrapper que converte a assinatura para o DashboardTabs
   const handleDeleteForTabs = async (id: string) => {
-    console.log('🔍 handleDeleteForTabs chamado com ID:', id)
-    // Buscar o título da challenge para mostrar no modal
     const challenge = [...published, ...pending, ...archived].find(c => c.id === id)
-    console.log('🔍 Challenge encontrada:', challenge)
     if (challenge) {
-      console.log('🔍 Abrindo modal para:', challenge.title)
       openDeleteModal(id, challenge.title)
-    } else {
-      console.error('❌ Challenge não encontrada com ID:', id)
     }
   }
 
@@ -67,8 +62,6 @@ const DashboardAdminContent = () => {
       <DashboardHeader
         broadcastWorking={broadcastWorking}
         lastUpdate={lastUpdate as Date}
-        searchQuery={searchQuery}
-        onSearch={handleTitleSearch}
       />
 
       <DashboardTabs
@@ -77,6 +70,7 @@ const DashboardAdminContent = () => {
         published={published}
         pending={pending}
         archived={archived}
+        deleted={deleted}
         isInitialLoading={isInitialLoading}
         onEdit={handleEdit}
         onDelete={handleDeleteForTabs}
@@ -84,12 +78,16 @@ const DashboardAdminContent = () => {
         onReject={handleRejectWithOptimistic}
         onArchive={handleArchiveWithOptimistic}
         onSendBackForReview={handleSendBackWithOptimistic}
+        onRestore={handleRestoreWithOptimistic}
+        onPermanentDelete={handlePermanentDeleteWithOptimistic}
         onCompare={handleOpenComparison}
         onCreateNew={() => window.location.href = '/create'}
+        onTitleSearch={handleTitleSearch}
         searchQuery={searchQuery}
         isDeleting={isDeleting as string | null}
         isApproving={isApproving as string | null}
         isArchiving={isArchiving as string | null}
+        isRestoring={isRestoring as string | null}
       />
 
       <DashboardModals
@@ -103,7 +101,6 @@ const DashboardAdminContent = () => {
   )
 }
 
-// Componente principal com wrapper
 export function DashboardAdmin() {
   return (
     <DeleteChallengeWrapper>

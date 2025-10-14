@@ -28,12 +28,12 @@ interface TeacherChallengeListProps {
 export function TeacherChallengeList({ challenges, onDelete, onSendBackForReview, searchQuery = "" }: TeacherChallengeListProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'published': return 'bg-green-100 text-green-800'
-      case 'draft': return 'bg-gray-100 text-gray-800'
-      case 'to_approve': return 'bg-yellow-100 text-yellow-800'
-      case 'rejected': return 'bg-red-100 text-red-800'
-      case 'archived': return 'bg-gray-100 text-gray-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'published': return 'bg-blue-100 text-blue-800 hover:bg-blue-200 hover:text-blue-600 transition-colors'
+      case 'draft': return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200 hover:text-yellow-900 transition-colors'
+      case 'to_approve': return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200 hover:text-yellow-900 transition-colors'
+      case 'rejected': return 'bg-red-100 text-red-800 hover:bg-red-200 hover:text-red-900 transition-colors'
+      case 'archived': return 'bg-gray-100 text-gray-800 hover:bg-gray-200 hover:text-gray-900 transition-colors'
+      default: return 'bg-gray-100 text-gray-800 hover:bg-gray-200 hover:text-gray-900 transition-colors'
     }
   }
 
@@ -82,7 +82,7 @@ export function TeacherChallengeList({ challenges, onDelete, onSendBackForReview
               </Badge>
             </div>
             <p className="text-muted-foreground text-sm mb-2 group-hover:text-foreground transition-colors duration-200">
-              {challenge.description}
+              {Array.isArray(challenge.category) ? challenge.category.join(', ') : challenge.category}
             </p>
             <div className="flex items-center gap-4 text-xs text-muted-foreground/70 group-hover:text-muted-foreground transition-colors duration-200">
               <span>👤 Criado por: {challenge.mentor || 'Usuário'}</span>

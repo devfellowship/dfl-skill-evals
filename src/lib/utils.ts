@@ -8,17 +8,17 @@ export function cn(...inputs: ClassValue[]) {
 export function getDifficultyLabel(level: number): string {
   switch (level) {
     case 1:
-      return "Beginner"
+      return "Iniciante"
     case 2:
-      return "Easy"
+      return "Fácil"
     case 3:
-      return "Medium"
+      return "Médio"
     case 4:
-      return "Hard"
+      return "Difícil"
     case 5:
       return "Expert"
     default:
-      return "Unknown"
+      return "Desconhecido"
   }
 }
 

@@ -60,7 +60,6 @@ export function TrendingManager({ challenges, onUpdate }: TrendingManagerProps) 
 
   return (
     <div className="space-y-6">
-      {/* Seção Trending */}
       {trendingChallenges.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2">

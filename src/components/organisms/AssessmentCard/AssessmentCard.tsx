@@ -7,11 +7,11 @@ import { Card, CardContent } from "@/components/ui/card"
 import { DifficultyIndicator } from "@/components/molecules/DifficultyIndicator/DifficultyIndicator"
 import { ChallengeImage } from "@/components/atoms/ChallengeImage/ChallengeImage"
 import { ChallengeMenu } from "@/components/molecules/ChallengeMenu/ChallengeMenu"
-import type { Challenge } from "@/types/challenges/challenge"
+import type { AdminChallenge } from "@/types/admin/admin-dashboard"
 import { formatParticipants, generateSlug } from "@/lib/utils"
 
 interface AssessmentCardProps {
-  assessment: Challenge
+  assessment: AdminChallenge
   className?: string
   isTrending?: boolean
 }
@@ -26,17 +26,19 @@ export const AssessmentCard = React.forwardRef<
         <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-primary/5 to-primary/10">
           <ChallengeImage
             imageUrl={assessment.image}
-            category={[assessment.category]}
+            category={assessment.category}
             difficulty={assessment.difficulty}
             title={assessment.title}
             className="w-full h-full object-cover"
           />
-          {/* Menu de 3 pontos no canto superior direito */}
           <ChallengeMenu
-            challengeId={assessment.supabaseId || assessment.id.toString()}
+            challengeId={assessment.id}
             isTrending={assessment.trending || false}
+            challenge={{
+              created_by: assessment.created_by,
+              title: assessment.title
+            }}
             onUpdate={() => {
-              // Força uma atualização da página para refletir as mudanças
               window.location.reload()
             }}
           />
@@ -44,7 +46,7 @@ export const AssessmentCard = React.forwardRef<
           {isTrending && (
             <div className="absolute top-3 right-12 z-30">
               <Badge variant="secondary" className="bg-gradient-to-r from-orange-500 to-yellow-500 text-white text-xs font-semibold shadow-lg">
-                🔥 Trending
+                🔥 Novidade
               </Badge>
             </div>
           )}
@@ -61,14 +63,14 @@ export const AssessmentCard = React.forwardRef<
           </div>
 
           <div className="flex flex-wrap gap-1">
-            {assessment.skills.slice(0, 3).map((skill: string) => (
+            {assessment.skills && assessment.skills.slice(0, 3).map((skill: string) => (
               <Badge key={skill} variant="outline" className="text-xs">
                 {skill}
               </Badge>
             ))}
-            {assessment.skills.length > 3 && (
+            {assessment.skills && assessment.skills.length > 3 && (
               <Badge variant="outline" className="text-xs">
-                +{assessment.skills.length - 3} more
+                +{assessment.skills.length - 3} mais
               </Badge>
             )}
           </div>
@@ -77,15 +79,14 @@ export const AssessmentCard = React.forwardRef<
             <DifficultyIndicator difficulty={assessment.difficulty} />
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <div className="flex items-center gap-3">
-
                 <span className="flex items-center gap-1">
                   <Users className="h-3 w-3" />
-                  {formatParticipants(assessment.participants)}
+                  {formatParticipants(assessment.participants || 0)}
                 </span>
               </div>
               <div className="flex items-center gap-1">
                 <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                <span>{assessment.rating.toFixed(1)}</span>
+                <span>{(assessment.rating || 0).toFixed(1)}</span>
               </div>
             </div>
           </div>

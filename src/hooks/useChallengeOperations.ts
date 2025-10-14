@@ -2,9 +2,12 @@ import { useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { mapDifficultyToNumber } from '@/lib/utils/difficulty-mapper'
 import { generateUniqueSlug } from '@/lib/utils/slug-generator'
+import { getBrazilianDateTime } from '@/lib/utils/timezone'
 import { useCrudOperations } from './useCrudOperations'
 import { useUserValidation } from './useUserValidation'
 import { useBroadcastOperations } from './useBroadcastOperations'
+import '@/lib/utils/profile-setup' // Carrega a função setupProfile no window
+import '@/lib/utils/debug-soft-delete' // Carrega as funções de debug no window
 
 export interface ChallengeOperationData {
   title: string
@@ -27,17 +30,29 @@ export function useChallengeOperations() {
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
   const [isApproving, setIsApproving] = useState<string | null>(null)
   const [isArchiving, setIsArchiving] = useState<string | null>(null)
+  const [isRestoring, setIsRestoring] = useState<string | null>(null)
 
   const createChallenge = useCallback(async (challengeData: ChallengeOperationData) => {
     const { user } = validateUser()
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('full_name')
-      .eq('id', user.id)
-      .maybeSingle()
+    const [profileResult, userRolesResult] = await Promise.all([
+      supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', user.id)
+        .maybeSingle(),
+      supabase
+        .from('users_with_roles')
+        .select('name')
+        .eq('id', user.id)
+        .maybeSingle()
+    ])
 
-    const mentorName = profile?.full_name || user.email?.split('@')[0] || 'Usuário'
+    const mentorName = profileResult.data?.full_name || 
+                      userRolesResult.data?.name || 
+                      user.user_metadata?.full_name || 
+                      user.email?.split('@')[0] || 
+                      'Usuário'
 
     const challengePayload = {
       title: challengeData.title,
@@ -45,6 +60,7 @@ export function useChallengeOperations() {
       description: challengeData.description,
       difficulty: mapDifficultyToNumber(challengeData.difficulty),
       category: Array.isArray(challengeData.category) ? challengeData.category[0] : challengeData.category,
+      skills: challengeData.skills || [],
       function_name: challengeData.function_name,
       initial_code: challengeData.initial_code || '',
       status: challengeData.status || 'to_approve',
@@ -79,7 +95,7 @@ export function useChallengeOperations() {
   const updateChallenge = useCallback(async (id: string, updateData: Partial<ChallengeOperationData>) => {
     const { user, isAdmin } = validateUser()
     const mappedUpdates: any = {
-      updated_at: new Date().toISOString()
+      updated_at: getBrazilianDateTime()
     }
     if (updateData.title) mappedUpdates.title = updateData.title
     if (updateData.description) mappedUpdates.description = updateData.description
@@ -132,32 +148,34 @@ export function useChallengeOperations() {
   const deleteChallenge = useCallback(async (id: string, reason: string) => {
     const { user: validatedUser, isAdmin } = validateUser()
 
-    // Validar motivo
     if (!reason || reason.trim().length < 10) {
       throw new Error('Motivo deve ter pelo menos 10 caracteres')
     }
-
     setIsDeleting(id)
     try {
       return executeWithBroadcastAndToast(
         async () => {
-          const { error } = await supabase
+          const { data: challenge, error } = await supabase
             .schema('skill_evals')
             .from('challenges')
             .update({
-              deleted_at: new Date().toISOString(),
+              deleted_at: getBrazilianDateTime(),
               deleted_by: validatedUser.id,
-              deletion_reason: reason
+              deletion_reason: reason,
+              status: 'deleted',
+              is_active: false,
+              is_public: false,
+              updated_at: getBrazilianDateTime()
             })
             .eq('id', id)
+            .select()
 
           if (error) {
             throw new Error(error.message || 'Erro ao excluir challenge')
           }
-
-          return { id, reason }
+          return challenge?.[0] || { id, reason }
         },
-        'delete',
+        'update',
         'Challenge excluído com sucesso!',
         'Erro ao excluir challenge'
       )
@@ -178,32 +196,37 @@ export function useChallengeOperations() {
       return null
     }
 
+    setIsRestoring(id)
     try {
       return executeWithBroadcastAndToast(
         async () => {
-          const { error } = await supabase
+          const { data: challenge, error } = await supabase
             .schema('skill_evals')
             .from('challenges')
             .update({
               deleted_at: null,
               deleted_by: null,
-              deletion_reason: null
+              deletion_reason: null,
+              status: 'approved',
+              is_active: true,
+              is_public: true,
+              updated_at: getBrazilianDateTime()
             })
             .eq('id', id)
+            .select()
 
           if (error) {
             throw new Error(error.message || 'Erro ao restaurar challenge')
           }
 
-          return { id }
+          return challenge?.[0] || { id }
         },
         'update',
         'Challenge restaurado com sucesso!',
         'Erro ao restaurar challenge'
       )
-    } catch (error) {
-      console.error('Erro ao restaurar challenge:', error)
-      throw error
+    } finally {
+      setIsRestoring(null)
     }
   }, [validateUser, executeWithBroadcastAndToast])
 
@@ -239,7 +262,6 @@ export function useChallengeOperations() {
         'Erro ao deletar permanentemente'
       )
     } catch (error) {
-      console.error('Erro ao deletar permanentemente:', error)
       throw error
     }
   }, [validateUser, executeWithBroadcastAndToast])
@@ -255,7 +277,7 @@ export function useChallengeOperations() {
             .update({ 
               status: 'approved',
               is_public: true,
-              updated_at: new Date().toISOString()
+              updated_at: getBrazilianDateTime()
             })
             .eq('id', id)
             .select()
@@ -285,7 +307,7 @@ export function useChallengeOperations() {
           .update({ 
             status: 'rejected',
             is_public: false,
-            updated_at: new Date().toISOString()
+            updated_at: getBrazilianDateTime()
           })
           .eq('id', id)
           .select()
@@ -314,7 +336,7 @@ export function useChallengeOperations() {
             .update({ 
               status: 'archived',
               is_public: false,
-              updated_at: new Date().toISOString()
+              updated_at: getBrazilianDateTime()
             })
             .eq('id', id)
             .select()
@@ -348,7 +370,7 @@ export function useChallengeOperations() {
           .update({ 
             status: 'to_approve',
             is_public: false,
-            updated_at: new Date().toISOString()
+            updated_at: getBrazilianDateTime()
           })
           .eq('id', id)
           .select()
@@ -370,6 +392,7 @@ export function useChallengeOperations() {
     isDeleting,
     isApproving,
     isArchiving,
+    isRestoring,
     
     createChallenge,
     updateChallenge,
