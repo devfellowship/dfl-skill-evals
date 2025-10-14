@@ -14,13 +14,12 @@ export async function POST(request: NextRequest) {
     }
 
     const { data: profile, error: profileError } = await supabase
-      .schema('portfolio')
-      .from('users')
-      .select('role')
+      .from('users_with_roles')
+      .select('roles')
       .eq('id', user.id)
       .single()
 
-    if (profileError || profile?.role !== 'admin') {
+    if (profileError || !profile?.roles?.includes('admin')) {
       return NextResponse.json({ error: 'Acesso negado. Apenas administradores podem criar perfis.' }, { status: 403 })
     }
 
@@ -31,14 +30,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'userId, email e fullName são obrigatórios' }, { status: 400 })
     }
 
-    const validRoles: UserRole[] = ['superadmin', 'admin', 'community_member']
+    const validRoles: UserRole[] = ['admin', 'mentor', 'community_member']
     if (!validRoles.includes(role)) {
       return NextResponse.json({ error: 'Role inválida' }, { status: 400 })
     }
 
     const { data: existingProfile, error: existingError } = await supabase
-      .schema('portfolio')
-      .from('users')
+      .from('users_with_roles')
       .select('id')
       .eq('id', userId)
       .single()
@@ -48,13 +46,12 @@ export async function POST(request: NextRequest) {
     }
 
     const { data: newProfile, error: createError } = await supabase
-      .schema('portfolio')
-      .from('users')
+      .from('users_with_roles')
       .insert({
         id: userId,
         email,
-        full_name: fullName,
-        role,
+        name: fullName,
+        roles: [role],
         is_active: true,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()

@@ -38,7 +38,6 @@ export function ChallengeMenu({ challengeId, isTrending, onUpdate, challenge }: 
         onUpdate?.()
       }, 500)
     } catch (error) {
-      console.error('Erro ao atualizar trending:', error)
       toast.error('Erro ao atualizar trending')
     } finally {
       setIsUpdating(false)

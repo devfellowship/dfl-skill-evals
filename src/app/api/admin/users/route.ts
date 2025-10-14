@@ -14,13 +14,12 @@ export async function GET(request: NextRequest) {
     }
 
     const { data: profile, error: profileError } = await supabase
-      .schema('portfolio')
-      .from('users')
-      .select('role')
+      .from('users_with_roles')
+      .select('roles')
       .eq('id', user.id)
       .single()
 
-    if (profileError || profile?.role !== 'admin') {
+    if (profileError || !profile?.roles?.includes('admin')) {
       return NextResponse.json({ error: 'Acesso negado. Apenas administradores podem acessar esta funcionalidade.' }, { status: 403 })
     }
 
@@ -31,13 +30,12 @@ export async function GET(request: NextRequest) {
     const to = searchParams.get('to')
 
     let query = supabase
-      .schema('portfolio')
-      .from('users')
+      .from('users_with_roles')
       .select(`
         id,
         email,
-        full_name,
-        role,
+        name,
+        roles,
         is_active,
         created_at,
         updated_at
@@ -96,15 +94,14 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'userId e role são obrigatórios' }, { status: 400 })
     }
 
-    const validRoles: UserRole[] = ['superadmin', 'admin', 'community_member']
+    const validRoles: UserRole[] = ['admin', 'mentor', 'community_member']
     if (!validRoles.includes(role)) {
       return NextResponse.json({ error: 'Role inválida' }, { status: 400 })
     }
 
     const { data: existingUser, error: userError } = await supabase
-      .schema('portfolio')
-      .from('users')
-      .select('id, email, role')
+      .from('users_with_roles')
+      .select('id, email, roles')
       .eq('id', userId)
       .single()
 
@@ -113,10 +110,9 @@ export async function PATCH(request: NextRequest) {
     }
 
     const { data: updatedUser, error: updateError } = await supabase
-      .schema('portfolio')
-      .from('users')
+      .from('users_with_roles')
       .update({ 
-        role,
+        roles: [role],
         updated_at: new Date().toISOString()
       })
       .eq('id', userId)

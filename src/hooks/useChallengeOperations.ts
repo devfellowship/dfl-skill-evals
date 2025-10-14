@@ -6,8 +6,6 @@ import { getBrazilianDateTime } from '@/lib/utils/timezone'
 import { useCrudOperations } from './useCrudOperations'
 import { useUserValidation } from './useUserValidation'
 import { useBroadcastOperations } from './useBroadcastOperations'
-import '@/lib/utils/profile-setup' // Carrega a função setupProfile no window
-import '@/lib/utils/debug-soft-delete' // Carrega as funções de debug no window
 
 export interface ChallengeOperationData {
   title: string

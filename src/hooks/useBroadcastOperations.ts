@@ -49,8 +49,7 @@ export function useBroadcastOperations() {
             break
         }
       } catch (broadcastError) {
-        console.warn('Broadcast falhou, recarregando dados:', broadcastError)
-        loadAllChallenges() 
+        loadAllChallenges()
       }
       if (showToast && toastMessages.success) {
         toast.success(toastMessages.success)

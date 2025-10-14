@@ -15,13 +15,12 @@ export async function PATCH(
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
     const { data: profile, error: profileError } = await supabase
-      .schema('portfolio')
-      .from('users')
-      .select('role')
+      .from('users_with_roles')
+      .select('roles')
       .eq('id', user.id)
       .single()
 
-    if (profileError || profile?.role !== 'admin') {
+    if (profileError || !profile?.roles?.includes('admin')) {
       return NextResponse.json({ error: 'Acesso negado. Apenas administradores podem atualizar credenciais.' }, { status: 403 })
     }
 
@@ -35,8 +34,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Email ou senha deve ser fornecido' }, { status: 400 })
     }
     const { data: before, error: beforeError } = await supabase
-      .schema('portfolio')
-      .from('users')
+      .from('users_with_roles')
       .select('email')
       .eq('id', userId)
       .single()
@@ -64,8 +62,7 @@ export async function PATCH(
     }
     if (email && email !== before.email) {
       await supabase
-        .schema('portfolio')
-        .from('users')
+        .from('users_with_roles')
         .update({ email, updated_at: new Date().toISOString() })
         .eq('id', userId)
     }
