@@ -47,7 +47,12 @@ export const DeleteChallengeModal: React.FC<DeleteChallengeModalProps> = ({
     onClose()
   }
 
-  if (!isOpen) return null
+  if (!isOpen) {
+    console.log('🔍 Modal não está aberto, não renderizando')
+    return null
+  }
+
+  console.log('🔍 Modal está aberto, renderizando...')
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
