@@ -42,7 +42,6 @@ export function LoginForm() {
 
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {
-          // Por enquanto, assumir que todos são community_member
           // O role real será carregado pelo useUserRole
           const isAdmin = false
           

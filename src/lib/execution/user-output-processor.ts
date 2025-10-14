@@ -90,7 +90,6 @@ function createExecutableCode(
     return `// Código do usuário - Execução ${timestamp}
 ${userCode}
 
-// Teste - ${timestamp}
 try {
   const result_${timestamp} = ${functionName}(${paramsString});
   console.log(result_${timestamp});
@@ -121,7 +120,6 @@ try {
     return `// Código do usuário - Execução ${timestamp}
 ${cleanCode}
 
-// Teste - ${timestamp}
 try {
   const result_${timestamp} = ${functionName}(${paramsString});
   console.log(result_${timestamp});
@@ -133,7 +131,6 @@ try {
   return `// Código do usuário
 ${userCode}
 
-// Teste
 console.log(${functionName}(${paramsString}));`
 }
 

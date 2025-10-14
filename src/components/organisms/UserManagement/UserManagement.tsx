@@ -130,7 +130,6 @@ export function UserManagement() {
       const headers: HeadersInit = { 'Content-Type': 'application/json' }
       if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`
 
-      // Gerar uma senha temporária mais segura
       const tempPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8).toUpperCase() + '!'
       
       const res = await fetch(`/api/admin/users/${selected.id}/credentials`, {

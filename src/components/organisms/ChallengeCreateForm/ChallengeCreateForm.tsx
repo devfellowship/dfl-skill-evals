@@ -129,11 +129,6 @@ export function ChallengeCreateForm() {
       return
     }
 
-    // Remover validação de casos de teste por enquanto para testar
-    // if ((formData.testCases || []).length === 0) {
-    //   toast.error("Adicione pelo menos um caso de teste")
-    //   return
-    // }
 
 
     try {
