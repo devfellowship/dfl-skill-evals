@@ -33,4 +33,4 @@ export function GlobalAuthGuard({ children }: { children: React.ReactNode }) {
     )
   }
   return <>{children}</>
-}
+}
