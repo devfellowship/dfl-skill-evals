@@ -50,10 +50,15 @@ const DashboardAdminContent = () => {
 
   // Wrapper que converte a assinatura para o DashboardTabs
   const handleDeleteForTabs = async (id: string) => {
+    console.log('🔍 handleDeleteForTabs chamado com ID:', id)
     // Buscar o título da challenge para mostrar no modal
     const challenge = [...published, ...pending, ...archived].find(c => c.id === id)
+    console.log('🔍 Challenge encontrada:', challenge)
     if (challenge) {
+      console.log('🔍 Abrindo modal para:', challenge.title)
       openDeleteModal(id, challenge.title)
+    } else {
+      console.error('❌ Challenge não encontrada com ID:', id)
     }
   }
 

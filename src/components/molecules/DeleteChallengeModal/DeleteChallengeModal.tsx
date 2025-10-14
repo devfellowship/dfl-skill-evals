@@ -22,6 +22,8 @@ export const DeleteChallengeModal: React.FC<DeleteChallengeModalProps> = ({
   const [reason, setReason] = useState('')
   const [error, setError] = useState('')
 
+  console.log('🔍 DeleteChallengeModal renderizado com:', { isOpen, challengeTitle })
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     

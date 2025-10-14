@@ -16,8 +16,10 @@ export const useDeleteChallengeModal = (): UseDeleteChallengeModalReturn => {
   const { deleteChallenge, isDeleting } = useChallengeOperations()
 
   const openDeleteModal = useCallback((id: string, title: string) => {
+    console.log('🔍 openDeleteModal chamado com:', { id, title })
     setChallengeToDelete({ id, title })
     setIsModalOpen(true)
+    console.log('🔍 Modal deve estar aberto agora')
   }, [])
 
   const closeDeleteModal = useCallback(() => {
