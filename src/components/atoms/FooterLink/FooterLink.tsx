@@ -1,10 +1,8 @@
 import Link from "next/link"
-
 interface FooterLinkProps {
   href: string
   children: React.ReactNode
 }
-
 export function FooterLink({ href, children }: FooterLinkProps) {
   return (
     <Link 
@@ -14,4 +12,4 @@ export function FooterLink({ href, children }: FooterLinkProps) {
       {children}
     </Link>
   )
-}
+}

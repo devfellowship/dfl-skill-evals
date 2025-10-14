@@ -1,12 +1,10 @@
 'use client'
-
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
 import { ProfileFormData } from '@/types/profile/profile'
 import { canChangeName, getDaysUntilNameChange, validateEmail, getUserDisplayName, getUserInitials } from '@/lib/utils/profile-utils'
 import { UserRole } from '@/lib/supabase'
-
 export interface Profile {
   id: string
   email: string
@@ -18,20 +16,16 @@ export interface Profile {
   last_name_change?: string
   avatar_url?: string
 }
-
 export const useProfile = () => {
   const { user } = useAuth()
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-
   const fetchProfile = useCallback(async () => {
     if (!user?.id) return
     try {
       setLoading(true)
       setError(null)
-      
-      // Buscar dados do perfil e do users_with_roles em paralelo
       const [profileResult, userRolesResult] = await Promise.all([
         supabase
           .from('profiles')
@@ -44,14 +38,11 @@ export const useProfile = () => {
           .eq('id', user.id)
           .maybeSingle()
       ])
-
       const profileData = profileResult.data
       const userRolesData = userRolesResult.data
-
       if (profileResult.error && !profileData) {
         throw profileResult.error
       }
-
       const mapped: Profile = {
         id: user.id,
         email: profileData?.email || user.email || '',
@@ -70,11 +61,9 @@ export const useProfile = () => {
       setLoading(false)
     }
   }, [user?.id])
-
   useEffect(() => {
     if (user?.id) fetchProfile()
   }, [user?.id, fetchProfile])
-
   const updateProfile = useCallback(async (data: ProfileFormData) => {
     if (!user?.id) return
     try {
@@ -107,14 +96,12 @@ export const useProfile = () => {
       throw err
     }
   }, [user?.id, fetchProfile])
-
   const changePassword = useCallback(async (_current: string, next: string) => {
     if (!user) return
     const { error } = await supabase.auth.updateUser({ password: next })
     if (error) throw error
     return true
   }, [user])
-
   const changeEmail = useCallback(async (newEmail: string) => {
     if (!user) return
     if (!validateEmail(newEmail)) throw new Error('Email inválido')
@@ -123,10 +110,8 @@ export const useProfile = () => {
     if (error) throw error
     return true
   }, [user])
-
   const canChangeNameNow = canChangeName(profile)
   const daysUntilNameChange = getDaysUntilNameChange(profile)
-
   return {
     profile,
     loading,
@@ -139,4 +124,4 @@ export const useProfile = () => {
     getUserDisplayName: () => getUserDisplayName(user, profile),
     getUserInitials: () => getUserInitials(getUserDisplayName(user, profile))
   }
-}
+}

@@ -1,5 +1,4 @@
 "use client"
-
 import { ReactNode, useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/atoms/Button/Button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -11,20 +10,17 @@ import { useProfile } from '@/hooks/useProfile'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { getUserDisplayName, getUserInitials } from '@/lib/utils/profile-utils'
-
 export interface NavigationItem {
   label: string
   href: string
   icon?: ReactNode
 }
-
 export interface QuickAction {
   label: string
   href: string
   icon?: ReactNode
   variant?: 'default' | 'outline' | 'ghost'
 }
-
 interface AdminNavigationProps {
   items: NavigationItem[]
   showBackButton?: boolean
@@ -36,7 +32,6 @@ interface AdminNavigationProps {
   userName?: string
   userRole?: string
 }
-
 export function AdminNavigation({ 
   items = [], 
   showBackButton = false, 
@@ -56,28 +51,21 @@ export function AdminNavigation({
   const dropdownRef = useRef<HTMLDivElement>(null)
   const [displayName, setDisplayName] = useState('')
   const [userInitials, setUserInitials] = useState('')
-
   const getDisplayName = () => {
     if (userName) return userName
     return getUserDisplayName(user, profile as any)
   }
-
   useEffect(() => {
     const name = getDisplayName()
     const initials = getUserInitials(name)
     setDisplayName(name)
     setUserInitials(initials)
-    
   }, [user, profile, userName])
-
   const getUserRoleDisplay = () => {
     if (userRole) return userRole
-    
     if (roleLoading) return 'Carregando...'
-    
     return roleLabel || 'Usuário'
   }
-
   const handleSignOut = async () => {
     try {
       await signOut()
@@ -87,14 +75,12 @@ export function AdminNavigation({
       toast.error('Erro ao fazer logout')
     }
   }
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false)
       }
     }
-
     document.addEventListener('mousedown', handleClickOutside)
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
@@ -116,7 +102,6 @@ export function AdminNavigation({
                 Dashboard
               </Link>
             </Button>
-
             {items.map((item, index) => (
               <div key={index} className="flex items-center gap-2">
                 <ChevronRight className="h-4 w-4 text-muted-foreground/60 mx-1" />
@@ -134,7 +119,6 @@ export function AdminNavigation({
               </div>
             ))}
           </div>
-
           {quickActions.length > 0 && (
             <div className="flex items-center gap-3 px-6 py-2 rounded-full border border-border/30">
               {quickActions.map((action, index) => (
@@ -153,7 +137,6 @@ export function AdminNavigation({
               ))}
             </div>
           )}
-
           <div className="flex items-center gap-4">
             {showBackButton && backHref && quickActions.length === 0 && (
               <Button 
@@ -168,7 +151,6 @@ export function AdminNavigation({
                 </Link>
               </Button>
             )}
-
             {showUserInfo && (
               <div className="relative z-[9998]" ref={dropdownRef}>
                 <button
@@ -198,7 +180,6 @@ export function AdminNavigation({
                     }`} 
                   />
                 </button>
-
                 {isDropdownOpen && (
                   <div className="absolute right-0 top-full mt-2 w-48 bg-slate-800/95 backdrop-blur border border-slate-700/50 rounded-lg shadow-lg py-2 z-[9999]">
                     <Link
@@ -209,7 +190,6 @@ export function AdminNavigation({
                       <Settings className="h-4 w-4" />
                       Configurações
                     </Link>
-                    
                     <button
                       onClick={() => {
                         setIsDropdownOpen(false)
@@ -229,4 +209,4 @@ export function AdminNavigation({
       </div>
     </div>
   )
-}
+}

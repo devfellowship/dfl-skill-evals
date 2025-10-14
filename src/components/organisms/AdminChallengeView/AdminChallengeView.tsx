@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/atoms/Button/Button"
@@ -13,20 +12,17 @@ import { DifficultyIndicator } from "@/components/molecules/DifficultyIndicator/
 import { AdminRouteWrapper } from "@/components/atoms/AdminRouteWrapper/AdminRouteWrapper"
 import { AdminChallengeViewProps } from "@/interface"
 import type { RealtimeChannel } from '@supabase/supabase-js'
-
 export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
   const router = useRouter()
   const [challenge, setChallenge] = useState<AdminChallenge | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const channelRef = useRef<RealtimeChannel | null>(null)
-
   useEffect(() => {
     if (challengeId) {
       loadChallenge(challengeId)
       setupRealtimeSubscription(challengeId)
     }
-
     return () => {
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current)
@@ -34,7 +30,6 @@ export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
       }
     }
   }, [challengeId])
-
   const adaptChallenge = (raw: any): AdminChallenge => {
     const mapStatus = raw.status === 'approved'
       ? 'published'
@@ -43,7 +38,6 @@ export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
       : raw.status === 'archived'
       ? 'archived'
       : 'draft'
-
     const mapDifficulty = (difficulty: number) => {
       switch (difficulty) {
         case 1: return 'easy'
@@ -53,7 +47,6 @@ export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
         default: return 'easy'
       }
     }
-
     return {
       id: raw.id,
       slug: raw.slug,
@@ -70,7 +63,6 @@ export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
       orderIndex: raw.order_index ?? null
     }
   }
-
   const loadChallenge = async (id: string) => {
     try {
       setLoading(true)
@@ -80,12 +72,10 @@ export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
         .select('*')
         .eq('id', id)
         .single()
-
       if (error) {
         setError('Erro ao carregar challenge')
         return
       }
-
       if (data) {
         const adaptedChallenge = adaptChallenge(data)
         setChallenge(adaptedChallenge)
@@ -96,18 +86,15 @@ export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
       setLoading(false)
     }
   }
-
   const setupRealtimeSubscription = (challengeId: string) => {
     if (channelRef.current) {
       supabase.removeChannel(channelRef.current)
     }
-
     const channel = supabase.channel(`challenge-${challengeId}`, {
       config: {
         broadcast: { self: true }
       }
     })
-    
     channelRef.current = channel
     channel
       .on('broadcast', { event: 'challenge-updated' }, ({ payload }) => {
@@ -127,7 +114,6 @@ export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
           }
       })
   }
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'published': return 'bg-blue-100 text-blue-800 hover:bg-blue-200 hover:text-blue-600 transition-colors'
@@ -136,7 +122,6 @@ export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
       default: return 'bg-gray-100 text-gray-800 hover:bg-gray-200 hover:text-gray-900 transition-colors'
     }
   }
-
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'published': return 'Publicado'
@@ -145,7 +130,6 @@ export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
       default: return status
     }
   }
-
   const getDifficultyNumber = (difficulty: string) => {
     switch (difficulty) {
       case 'easy': return 1
@@ -155,7 +139,6 @@ export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
       default: return 1
     }
   }
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background p-6">
@@ -167,7 +150,6 @@ export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
       </div>
     )
   }
-
   if (error || !challenge) {
     return (
       <div className="min-h-screen bg-background p-6">
@@ -184,7 +166,6 @@ export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
       </div>
     )
   }
-
   return (
     <AdminRouteWrapper allowedRoles={['admin']}>
       <div className="min-h-screen bg-background p-6">
@@ -232,7 +213,6 @@ export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
               Informações
             </TabsTrigger>
           </TabsList>
-
           <TabsContent value="description" className="space-y-4">
             <Card>
               <CardHeader>
@@ -246,7 +226,6 @@ export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
                 </div>
               </CardContent>
             </Card>
-
             <Card>
               <CardHeader>
                 <CardTitle>Detalhes</CardTitle>
@@ -267,7 +246,6 @@ export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
               </CardContent>
             </Card>
           </TabsContent>
-
           <TabsContent value="code" className="space-y-4">
             <Card>
               <CardHeader>
@@ -283,7 +261,6 @@ export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
               </CardContent>
             </Card>
           </TabsContent>
-
           <TabsContent value="tests" className="space-y-4">
             <Card>
               <CardHeader>
@@ -323,7 +300,6 @@ export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
               </CardContent>
             </Card>
           </TabsContent>
-
           <TabsContent value="info" className="space-y-4">
             <Card>
               <CardHeader>
@@ -360,4 +336,4 @@ export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
       </div>
     </AdminRouteWrapper>
   )
-}
+}

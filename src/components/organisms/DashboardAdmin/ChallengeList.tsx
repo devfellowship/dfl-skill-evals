@@ -6,7 +6,6 @@ import { AdminChallenge as Challenge, DIFFICULTY_OPTIONS, STATUS_OPTIONS } from 
 import { SortButton } from "@/components/atoms/SortButton/SortButton"
 import { ChallengeSorter, SortType } from "@/lib/challenge-sorter"
 import { TrendingToggle } from "@/components/molecules/TrendingToggle/TrendingToggle"
-
 interface ChallengeListProps {
   challenges: Challenge[]
   isInitialLoading: boolean
@@ -19,7 +18,6 @@ interface ChallengeListProps {
   onCreateNew: () => void
   searchQuery?: string
 }
-
 export function ChallengeList({
   challenges,
   isInitialLoading,
@@ -33,31 +31,24 @@ export function ChallengeList({
   searchQuery = ""
 }: ChallengeListProps) {
   const [sortType, setSortType] = useState<SortType>('created_desc')
-  
   const filteredAndSortedChallenges = useMemo(() => {
     let filtered = challenges
-    
     if (searchQuery.trim()) {
       filtered = challenges.filter(challenge => 
         challenge.title.toLowerCase().includes(searchQuery.toLowerCase())
       )
     }
-    
     return ChallengeSorter.sortChallenges(filtered, sortType)
   }, [challenges, sortType, searchQuery])
-
   const getDifficultyColor = useMemo(() => (difficulty: string) => {
     return DIFFICULTY_OPTIONS.find((opt: any) => opt.value === difficulty)?.color || ""
   }, [])
-
   const getStatusColor = useMemo(() => (status: string) => {
     return STATUS_OPTIONS.find((opt: any) => opt.value === status)?.color || ""
   }, [])
-
   const getStatusLabel = useMemo(() => (status: string) => {
     return STATUS_OPTIONS.find((opt: any) => opt.value === status)?.label || status
   }, [])
-
   if (isInitialLoading) {
     return (
       <div className="text-center py-8">
@@ -66,7 +57,6 @@ export function ChallengeList({
       </div>
     )
   }
-
   if (challenges.length === 0) {
     return (
       <div className="text-center py-8">
@@ -78,7 +68,6 @@ export function ChallengeList({
       </div>
     )
   }
-
   return (
     <div className="space-y-4">
              <div className="flex items-center justify-between">
@@ -95,7 +84,6 @@ export function ChallengeList({
           onSortChange={(sort) => setSortType(sort as SortType)}
         />
       </div>
-      
              {filteredAndSortedChallenges.map(challenge => (
         <div
           key={challenge.id}
@@ -131,7 +119,6 @@ export function ChallengeList({
               )}
             </div>
           </div>
-          
           <div className="flex gap-2 items-center">
             <Button
               variant="outline"
@@ -141,7 +128,6 @@ export function ChallengeList({
             >
               <Edit className="w-4 h-4" />
             </Button>
-            
                                     <Button
                           variant="outline"
                           size="sm"
@@ -150,7 +136,6 @@ export function ChallengeList({
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
-
             {}
             {challenge.status === 'published' && (
               <Button
@@ -163,7 +148,6 @@ export function ChallengeList({
                 <RefreshCw className="w-4 h-4" />
               </Button>
             )}
-
             {}
             {challenge.status === 'published' && (
               <Button
@@ -177,7 +161,6 @@ export function ChallengeList({
                 <Archive className="w-4 h-4" />
               </Button>
             )}
-
             <Button
               variant="outline"
               size="sm"
@@ -192,4 +175,4 @@ export function ChallengeList({
       ))}
     </div>
   )
-}
+}

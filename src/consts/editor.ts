@@ -6,13 +6,11 @@ export const LANGUAGES = [
   { value: "cpp", label: "C++", extension: "cpp" },
   { value: "go", label: "Go", extension: "go" },
 ] as const
-
 export const THEMES = [
   { value: "dark", label: "Dark" },
   { value: "light", label: "Light" },
   { value: "high-contrast", label: "High Contrast" },
 ] as const
-
 export const EDITOR_CONFIG = {
   AUTO_SAVE_DELAY: 2000,
   DEFAULT_THEME: "dark",

@@ -1,5 +1,4 @@
 "use client"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useChallengeOperations, ChallengeOperationData } from "@/hooks/useChallengeOperations"
@@ -16,24 +15,20 @@ import Link from "next/link"
 import { toast } from "sonner"
 import { DIFFICULTY_OPTIONS } from "@/types/admin/admin-dashboard"
 import { CATEGORY_OPTIONS } from "@/consts/challenge-form"
-
 interface TestCase {
   input: string
   expectedOutput: string
 }
-
 interface Example {
   input: string
   output: string
   explanation: string
 }
-
 export function ChallengeCreateForm() {
   const router = useRouter()
   const { createChallenge } = useChallengeOperations()
   const { loading } = useBaseStates()
   const { isAdmin } = useUserRole()
-  
   const [formData, setFormData] = useState<ChallengeOperationData>({
     title: "",
     description: "",
@@ -41,33 +36,27 @@ export function ChallengeCreateForm() {
     category: [],
     function_name: "",
     initial_code: `function solution() {
-    // Seu código aqui
     return null;
 }`,
     testCases: [],
     examples: [],
     status: isAdmin ? "draft" : "to_approve"
-    // mentor removido - será derivado automaticamente do usuário logado
   })
-
   const [testCase, setTestCase] = useState<TestCase>({
     input: "",
     expectedOutput: ""
   })
-
   const [example, setExample] = useState<Example>({
     input: "",
     output: "",
     explanation: ""
   })
-
   const handleInputChange = (field: keyof ChallengeOperationData, value: any) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }))
   }
-
   const handleCategoryChange = (category: string, checked: boolean) => {
     setFormData(prev => ({
       ...prev,
@@ -76,7 +65,6 @@ export function ChallengeCreateForm() {
         : (Array.isArray(prev.category) ? prev.category : []).filter((c: string) => c !== category)
     }))
   }
-
   const addTestCase = () => {
     if (testCase.input.trim() && testCase.expectedOutput.trim()) {
       const newTestCase = {
@@ -90,14 +78,12 @@ export function ChallengeCreateForm() {
       setTestCase({ input: "", expectedOutput: "" })
     }
   }
-
   const removeTestCase = (index: number) => {
     setFormData(prev => ({
       ...prev,
       testCases: (prev.testCases || []).filter((_: any, i: number) => i !== index)
     }))
   }
-
   const addExample = () => {
     if (example.input.trim() && example.output.trim()) {
       const newExample = {
@@ -112,30 +98,18 @@ export function ChallengeCreateForm() {
       setExample({ input: "", output: "", explanation: "" })
     }
   }
-
   const removeExample = (index: number) => {
     setFormData(prev => ({
       ...prev,
       examples: prev.examples?.filter((_: any, i: number) => i !== index) || []
     }))
   }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    
     if (!formData.title.trim() || !formData.description.trim() || !formData.function_name.trim() || !formData.initial_code?.trim()) {
       toast.error("Por favor, preencha todos os campos obrigatórios")
       return
     }
-
-    // Remover validação de casos de teste por enquanto para testar
-    // if ((formData.testCases || []).length === 0) {
-    //   toast.error("Adicione pelo menos um caso de teste")
-    //   return
-    // }
-
-
     try {
       const result = await createChallenge(formData)
       if (result) {
@@ -149,7 +123,6 @@ export function ChallengeCreateForm() {
       toast.error("Erro ao criar challenge")
     }
   }
-
   return (
     <form onSubmit={handleSubmit} className="space-y-6" onKeyDown={(e) => {
       if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
@@ -170,7 +143,6 @@ export function ChallengeCreateForm() {
               required
             />
           </div>
-
           <div className="space-y-2">
             <Label htmlFor="description">Descrição *</Label>
             <Textarea
@@ -182,7 +154,6 @@ export function ChallengeCreateForm() {
               required
             />
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="difficulty">Dificuldade</Label>
@@ -202,7 +173,6 @@ export function ChallengeCreateForm() {
                 </SelectContent>
               </Select>
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="function_name">Nome da Função *</Label>
               <Input
@@ -214,7 +184,6 @@ export function ChallengeCreateForm() {
               />
             </div>
           </div>
-
           <div className="space-y-2">
             <Label htmlFor="category">Categorias</Label>
             <div className="grid grid-cols-2 gap-2 p-3 border rounded-md">
@@ -241,8 +210,6 @@ export function ChallengeCreateForm() {
           </div>
         </CardContent>
       </Card>
-
-
       <Card>
         <CardHeader>
           <CardTitle>Código Inicial</CardTitle>
@@ -261,7 +228,6 @@ export function ChallengeCreateForm() {
           </div>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle>Exemplos</CardTitle>
@@ -289,7 +255,6 @@ export function ChallengeCreateForm() {
               />
             </div>
           </div>
-          
           <div className="space-y-2">
             <Label htmlFor="exampleExplanation">Explicação (Opcional)</Label>
             <Textarea
@@ -300,12 +265,10 @@ export function ChallengeCreateForm() {
               rows={2}
             />
           </div>
-          
           <Button type="button" onClick={addExample} variant="outline">
             <Plus className="w-4 h-4 mr-2" />
             Adicionar Exemplo
           </Button>
-
           {formData.examples && formData.examples.length > 0 && (
             <div className="space-y-2">
               <Label>Exemplos Adicionados ({formData.examples.length})</Label>
@@ -342,7 +305,6 @@ export function ChallengeCreateForm() {
           )}
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle>Casos de Teste</CardTitle>
@@ -370,12 +332,10 @@ export function ChallengeCreateForm() {
               />
             </div>
           </div>
-          
           <Button type="button" onClick={addTestCase} variant="outline">
             <Plus className="w-4 h-4 mr-2" />
             Adicionar Caso de Teste
           </Button>
-
           {(formData.testCases || []).length > 0 && (
             <div className="space-y-2">
               <Label>Casos de Teste Adicionados ({(formData.testCases || []).length})</Label>
@@ -403,7 +363,6 @@ export function ChallengeCreateForm() {
           )}
         </CardContent>
       </Card>
-
       <div className="flex justify-between">
         <Button variant="outline" asChild>
           <Link href="/teacher">
@@ -411,7 +370,6 @@ export function ChallengeCreateForm() {
             Voltar
           </Link>
         </Button>
-        
         <div className="flex gap-2">
           <Button variant="outline" asChild>
             <Link href="/">Inicio</Link>
@@ -424,4 +382,4 @@ export function ChallengeCreateForm() {
       </div>
     </form>
   )
-}
+}

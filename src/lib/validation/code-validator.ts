@@ -2,22 +2,18 @@ export interface ValidationResult {
   isValid: boolean;
   error?: string;
 }
-
 export function validateCodeStructure(code: string, functionName: string): ValidationResult {
   const hasFunctionDecl = new RegExp(`(?:export\\s+default\\s+|export\\s+)?function\\s+${functionName}\\s*\\(`)
   const hasVarFunction = new RegExp(`(?:const|let|var)\\s+${functionName}\\s*=\\s*(?:async\\s*)?function\\s*\\(`)
   const hasArrowFunction = new RegExp(`(?:const|let|var)\\s+${functionName}\\s*=\\s*(?:async\\s*)?\\([^)]*\\)\\s*=>\\s*{`)
-  
   if (!(hasFunctionDecl.test(code) || hasVarFunction.test(code) || hasArrowFunction.test(code))) {
     return {
       isValid: false,
       error: `Função '${functionName}' não foi encontrada`
     }
   }
-
   return { isValid: true }
 }
-
 export function validateNoExtraCode(code: string, functionName: string): ValidationResult {
   const extraAfter = extractCodeAfterFunction(code, functionName)
   if (extraAfter && extraAfter.trim().length > 0) {
@@ -28,7 +24,6 @@ export function validateNoExtraCode(code: string, functionName: string): Validat
   }
   return { isValid: true }
 }
-
 export function validateFunctionBody(code: string, functionName: string): ValidationResult {
   const bodyCode = extractFunctionBody(code, functionName)
   if (bodyCode !== null) {
@@ -39,11 +34,9 @@ export function validateFunctionBody(code: string, functionName: string): Valida
       const okEnds = /[;})]$/
       const hasOperator = /[=+\-*/<>!&|?:.]/
       const justBraces = /^[{}()\[\]]+$/
-      
       const isLikelyValid = okStarts.test(l) || okEnds.test(l) || hasOperator.test(l) || justBraces.test(l)
       return !isLikelyValid
     })
-    
     if (invalidLines.length > 0) {
       return {
         isValid: false,
@@ -53,7 +46,6 @@ export function validateFunctionBody(code: string, functionName: string): Valida
   }
   return { isValid: true }
 }
-
 function extractFunctionBody(code: string, functionName: string): string | null {
   const startRegex = new RegExp(`function\\s+${functionName}\\s*\\([^)]*\\)\\s*{`)
   const startMatch = startRegex.exec(code)
@@ -70,7 +62,6 @@ function extractFunctionBody(code: string, functionName: string): string | null 
   }
   return body
 }
-
 function extractCodeAfterFunction(code: string, functionName: string): string | null {
   const startRegex = new RegExp(`function\\s+${functionName}\\s*\\([^)]*\\)\\s*{`)
   const startMatch = startRegex.exec(code)
@@ -85,7 +76,6 @@ function extractCodeAfterFunction(code: string, functionName: string): string | 
   }
   return code.substring(pos).trim()
 }
-
 function sanitizeForCheck(code: string): string {
   return code
     .replace(/\/\/.*$/gm, '')
@@ -93,4 +83,4 @@ function sanitizeForCheck(code: string): string {
     .replace(/"(?:[^"\\]|\\.)*"/g, '""')
     .replace(/'(?:[^'\\]|\\.)*'/g, "''")
     .replace(/`(?:[^`\\]|\\.)*`/g, '``')
-}
+}

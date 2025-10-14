@@ -1,5 +1,4 @@
 'use client'
-
 import { useState, useEffect, useMemo } from 'react'
 import { Button } from '@/components/atoms/Button/Button'
 import { Card } from '@/components/ui/card'
@@ -11,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner'
 import { UserRole, supabase } from '@/lib/supabase'
 import { Loader2, Users, Search, Pencil } from 'lucide-react'
-
 interface User {
   id: string
   email: string
@@ -22,19 +20,16 @@ interface User {
   created_at: string
   updated_at: string
 }
-
 const roleLabels: Record<UserRole, string> = {
   admin: 'Administrador',
   mentor: 'Mentor',
   community_member: 'Membro da Comunidade',
 }
-
 const roleColors: Record<UserRole, string> = {
   admin: 'bg-red-100 text-red-800',
   mentor: 'bg-green-100 text-green-800',
   community_member: 'bg-blue-100 text-blue-800',
 }
-
 export function UserManagement() {
   const [loading, setLoading] = useState(true)
   const [users, setUsers] = useState<User[]>([])
@@ -45,19 +40,16 @@ export function UserManagement() {
   const [credSaving, setCredSaving] = useState(false)
   const [saving, setSaving] = useState(false)
   const [formData, setFormData] = useState<Partial<User>>({})
-
   async function fetchUsers() {
     try {
       setLoading(true)
       const { data: { session } } = await supabase.auth.getSession()
       const headers: HeadersInit = {}
       if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`
-
       const sp = new URLSearchParams()
       if (q) sp.set('q', q)
       if (from) sp.set('from', from)
       if (to) sp.set('to', to)
-
       const res = await fetch(`/api/admin/users?${sp.toString()}`, { headers })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
@@ -71,27 +63,22 @@ export function UserManagement() {
       setLoading(false)
     }
   }
-
   const counts = useMemo(() => {
     const acc: Record<UserRole, number> = { admin: 0, mentor: 0, community_member: 0 }
     users.forEach(u => { acc[u.role]++ })
     return acc
   }, [users])
-
   function openUser(u: User) {
     setSelected(u)
     setFormData({ ...u })
   }
-
   async function saveProfile() {
     if (!selected) return
-    
     try {
       setSaving(true)
       const { data: { session } } = await supabase.auth.getSession()
       const headers: HeadersInit = { 'Content-Type': 'application/json' }
       if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`
-
       const res = await fetch(`/api/admin/users`, {
         method: 'PUT',
         headers,
@@ -104,12 +91,10 @@ export function UserManagement() {
           is_active: formData.is_active,
         }),
       })
-      
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         throw new Error(err.error || 'Erro ao salvar perfil')
       }
-      
       const data = await res.json()
       setUsers(prev => prev.map(u => u.id === data.user.id ? data.user : u))
       toast.success('Perfil atualizado com sucesso!')
@@ -120,19 +105,14 @@ export function UserManagement() {
       setSaving(false)
     }
   }
-
   async function resetPassword() {
     if (!selected) return
-    
     try {
       setCredSaving(true)
       const { data: { session } } = await supabase.auth.getSession()
       const headers: HeadersInit = { 'Content-Type': 'application/json' }
       if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`
-
-      // Gerar uma senha temporária mais segura
       const tempPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8).toUpperCase() + '!'
-      
       const res = await fetch(`/api/admin/users/${selected.id}/credentials`, {
         method: 'PATCH',
         headers,
@@ -140,14 +120,11 @@ export function UserManagement() {
           password: tempPassword,
         }),
       })
-      
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         throw new Error(err.error || 'Erro ao resetar senha')
       }
-      
       const result = await res.json()
-      
       toast.success(`Senha resetada! Nova senha temporária: ${tempPassword}`)
     } catch (e: any) {
       toast.error(e.message || 'Erro ao resetar senha')
@@ -155,11 +132,9 @@ export function UserManagement() {
       setCredSaving(false)
     }
   }
-
   useEffect(() => {
     fetchUsers()
   }, [])
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -172,7 +147,6 @@ export function UserManagement() {
         </div>
         <Button onClick={fetchUsers} variant="outline">Atualizar</Button>
       </div>
-
       <Card className="p-4">
         <div className="grid gap-3 md:grid-cols-[1fr,160px,160px,120px]">
           <div className="relative">
@@ -189,7 +163,6 @@ export function UserManagement() {
           <Button onClick={fetchUsers}>Pesquisar</Button>
         </div>
       </Card>
-
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {(Object.keys(roleLabels) as UserRole[]).map(role => (
           <Card key={role} className="p-4 flex items-center justify-between">
@@ -198,7 +171,6 @@ export function UserManagement() {
           </Card>
         ))}
       </div>
-
       {loading ? (
         <div className="flex items-center justify-center p-8">
           <Loader2 className="h-6 w-6 animate-spin" />
@@ -213,12 +185,10 @@ export function UserManagement() {
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-4">
-
                     <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-lg">
                       {u.full_name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)}
                     </div>
-                    
-                    {/* Informações principais */}
+                    {}
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="text-lg font-semibold text-white">{u.full_name}</h3>
@@ -233,7 +203,6 @@ export function UserManagement() {
                           </span>
                         )}
                       </div>
-                      
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
                         <div>
                           <span className="font-medium">Email:</span> {u.email}
@@ -245,7 +214,6 @@ export function UserManagement() {
                           <span className="font-medium">ID:</span> {u.id.slice(0, 8)}...
                         </div>
                       </div>
-                      
                       <div className="mt-2 text-xs text-gray-500">
                         Criado em {new Date(u.created_at).toLocaleDateString('pt-BR')} às {new Date(u.created_at).toLocaleTimeString('pt-BR')}
                         {u.updated_at !== u.created_at && (
@@ -257,8 +225,7 @@ export function UserManagement() {
                     </div>
                   </div>
                 </div>
-                
-                {/* Botão de ação */}
+                {}
                 <div className="ml-4">
                   <Button onClick={() => openUser(u)} className="flex items-center gap-2">
                     <Pencil className="h-4 w-4" />
@@ -270,8 +237,7 @@ export function UserManagement() {
           ))}
         </div>
       )}
-
-      {/* Modal de gerenciamento */}
+      {}
       <Dialog open={!!selected} onOpenChange={(v)=>!v && setSelected(null)}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card">
           <DialogHeader>
@@ -282,10 +248,9 @@ export function UserManagement() {
               Gerenciar Usuário: {selected?.full_name}
             </DialogTitle>
           </DialogHeader>
-
           {selected && (
             <div className="space-y-8 bg-background p-6 rounded-lg">
-              {/* Formulário de Edição */}
+              {}
               <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
                 <h3 className="text-lg font-semibold text-foreground mb-6">Editar Informações do Usuário</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -360,7 +325,6 @@ export function UserManagement() {
                     </div>
                   </div>
                 </div>
-                
                 <div className="mt-6 pt-6 border-t border-border">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground">
                     <div>
@@ -374,8 +338,7 @@ export function UserManagement() {
                   </div>
                 </div>
               </div>
-
-              {/* Ações Administrativas */}
+              {}
               <div className="bg-muted/50 rounded-lg p-6">
                 <h3 className="text-lg font-semibold text-foreground mb-4">Ações Administrativas</h3>
                 <div className="space-y-4">
@@ -400,7 +363,6 @@ export function UserManagement() {
               </div>
             </div>
           )}
-
           <DialogFooter className="bg-transparent -mx-6 -mb-6 px-6 py-4">
             <div className="flex justify-between w-full">
               <Button variant="outline" onClick={()=>setSelected(null)}>Cancelar</Button>

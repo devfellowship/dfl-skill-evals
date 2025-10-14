@@ -1,6 +1,5 @@
 import Image from 'next/image'
 import { getDefaultImageForChallenge } from '@/consts/challenge-images'
-
 interface ChallengeImageProps {
   imageUrl?: string
   category?: string[]
@@ -8,7 +7,6 @@ interface ChallengeImageProps {
   title?: string
   className?: string
 }
-
 export function ChallengeImage({ 
   imageUrl, 
   category, 
@@ -19,7 +17,6 @@ export function ChallengeImage({
   const isGradient = imageUrl?.startsWith('linear-gradient')
   const imageSrc = !isGradient ? getDefaultImageForChallenge(category, difficulty) : null
   const fallbackImage = getDefaultImageForChallenge(category, difficulty)
-  
   return (
     <div className="relative overflow-hidden rounded-lg group">
       {isGradient ? (
@@ -53,4 +50,4 @@ export function ChallengeImage({
       </div>
     </div>
   )
-}
+}

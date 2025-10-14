@@ -1,11 +1,9 @@
 "use client"
-
 import { useMemo } from "react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { Edit, Trash2, CheckCircle, Plus, Eye, ArrowLeft } from "lucide-react"
 import Link from "next/link"
-
 interface TeacherChallenge {
   id: string
   title: string
@@ -17,14 +15,12 @@ interface TeacherChallenge {
   mentor?: string
   created_by?: string
 }
-
 interface TeacherChallengeListProps {
   challenges: TeacherChallenge[]
   onDelete: (id: string) => void
   onSendBackForReview?: (id: string) => void
   searchQuery?: string
 }
-
 export function TeacherChallengeList({ challenges, onDelete, onSendBackForReview, searchQuery = "" }: TeacherChallengeListProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -36,7 +32,6 @@ export function TeacherChallengeList({ challenges, onDelete, onSendBackForReview
       default: return 'bg-gray-100 text-gray-800 hover:bg-gray-200 hover:text-gray-900 transition-colors'
     }
   }
-
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'published': return 'Publicado'
@@ -47,15 +42,12 @@ export function TeacherChallengeList({ challenges, onDelete, onSendBackForReview
       default: return status
     }
   }
-
   const filteredChallenges = useMemo(() => {
     if (!searchQuery.trim()) return challenges
-    
     return challenges.filter(challenge => 
       challenge.title.toLowerCase().includes(searchQuery.toLowerCase())
     )
   }, [challenges, searchQuery])
-
   if (filteredChallenges.length === 0) {
     return (
       <div className="text-center py-12">
@@ -69,7 +61,6 @@ export function TeacherChallengeList({ challenges, onDelete, onSendBackForReview
       </div>
     )
   }
-
   return (
     <div className="space-y-4">
              {filteredChallenges.map((challenge) => (
@@ -110,7 +101,6 @@ export function TeacherChallengeList({ challenges, onDelete, onSendBackForReview
             >
               <Eye className="w-4 h-4" />
             </Button>
-
             {challenge.status === 'to_approve' && (
               <Button
                 variant="outline"
@@ -122,8 +112,7 @@ export function TeacherChallengeList({ challenges, onDelete, onSendBackForReview
                 <CheckCircle className="w-4 h-4" />
               </Button>
             )}
-            
-            {/* Botão de exclusão - apenas para challenges em rascunho, rejeitadas ou arquivadas */}
+            {}
             {(challenge.status === 'draft' || challenge.status === 'rejected' || challenge.status === 'archived') && (
               <Button
                 variant="outline"
@@ -135,8 +124,7 @@ export function TeacherChallengeList({ challenges, onDelete, onSendBackForReview
                 <Trash2 className="w-4 h-4" />
               </Button>
             )}
-            
-            {/* Para challenges pendentes de aprovação - mostrar botão desabilitado */}
+            {}
             {challenge.status === 'to_approve' && (
               <Button
                 variant="outline"
@@ -148,8 +136,7 @@ export function TeacherChallengeList({ challenges, onDelete, onSendBackForReview
                 <Trash2 className="w-4 h-4" />
               </Button>
             )}
-            
-            {/* Para challenges publicadas - botão para enviar de volta para análise */}
+            {}
             {challenge.status === 'approved' && onSendBackForReview && (
               <Button
                 variant="outline"
@@ -161,8 +148,7 @@ export function TeacherChallengeList({ challenges, onDelete, onSendBackForReview
                 <ArrowLeft className="w-4 h-4" />
               </Button>
             )}
-            
-            {/* Para challenges publicadas sem função de envio - mostrar botão desabilitado */}
+            {}
             {challenge.status === 'approved' && !onSendBackForReview && (
               <Button
                 variant="outline"
@@ -179,4 +165,4 @@ export function TeacherChallengeList({ challenges, onDelete, onSendBackForReview
       ))}
     </div>
   )
-}
+}

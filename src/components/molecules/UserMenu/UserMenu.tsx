@@ -1,18 +1,15 @@
 "use client"
-
 import { Button } from "@/components/atoms/Button/Button"
 import { User, LogOut } from "lucide-react"
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-
 interface UserMenuProps {
   user: any
   onSignOut: () => void
   getUserDisplayName: () => string
   getUserInitials: () => string
 }
-
 export function UserMenu({ user, onSignOut, getUserDisplayName, getUserInitials }: UserMenuProps) {
   if (!user) {
     return (
@@ -24,7 +21,6 @@ export function UserMenu({ user, onSignOut, getUserDisplayName, getUserInitials 
       </Button>
     )
   }
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -56,4 +52,4 @@ export function UserMenu({ user, onSignOut, getUserDisplayName, getUserInitials 
       </DropdownMenuContent>
     </DropdownMenu>
   )
-}
+}

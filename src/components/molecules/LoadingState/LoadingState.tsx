@@ -1,10 +1,8 @@
 "use client"
-
 interface LoadingStateProps {
   title?: string
   message?: string
 }
-
 export function LoadingState({ 
   title = "Carregando...", 
   message = "Aguarde um momento." 
@@ -15,4 +13,4 @@ export function LoadingState({
       <p className="text-lg text-muted-foreground">{message}</p>
     </div>
   )
-}
+}

@@ -3,7 +3,6 @@ interface SocialIconProps {
   label: string
   children: React.ReactNode
 }
-
 export function SocialIcon({ href, label, children }: SocialIconProps) {
   return (
     <a 
@@ -16,4 +15,4 @@ export function SocialIcon({ href, label, children }: SocialIconProps) {
       {children}
     </a>
   )
-}
+}

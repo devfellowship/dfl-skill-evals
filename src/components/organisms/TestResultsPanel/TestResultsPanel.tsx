@@ -1,14 +1,11 @@
 "use client"
-
 import { Progress } from "@/components/atoms/Progress/Progress"
 import { TestResultCard } from "@/components/molecules/TestResultCard/TestResultCard"
-
 interface TestResultsPanelProps {
   results: any
   passedTests: number
   totalTests: number
 }
-
 export function TestResultsPanel({ results, passedTests, totalTests }: TestResultsPanelProps) {
   return (
     <div className="w-[20%] border-l border-border/40 overflow-auto bg-background">
@@ -22,12 +19,9 @@ export function TestResultsPanel({ results, passedTests, totalTests }: TestResul
           </div>
           <Progress value={(passedTests / totalTests) * 100} className="h-2" />
         </div>
-
         <div className="space-y-2">
           {results?.details && results.details.length > 0 ? (
             <>
-
-              
               {results.details.map((result: any, index: number) => (
                 <TestResultCard
                   key={index}
@@ -46,4 +40,4 @@ export function TestResultsPanel({ results, passedTests, totalTests }: TestResul
       </div>
     </div>
   )
-}
+}

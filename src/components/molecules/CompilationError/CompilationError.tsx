@@ -1,10 +1,8 @@
 import { AlertTriangle } from "lucide-react"
 import { CODE_EXECUTION } from "@/consts/ui"
-
 interface CompilationErrorProps {
   error: string
 }
-
 export function CompilationError({ error }: CompilationErrorProps) {
   return (
     <div className="border-b border-border/40 bg-red-50 p-4">
@@ -19,4 +17,4 @@ export function CompilationError({ error }: CompilationErrorProps) {
       </div>
     </div>
   )
-}
+}

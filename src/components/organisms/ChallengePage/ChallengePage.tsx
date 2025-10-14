@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { useChallengeDetails } from "@/hooks/useChallengeDetails"
 import { useChallengeExecution } from "@/hooks/useChallengeExecution"
@@ -10,19 +9,15 @@ import { TestResultsPanel } from "@/components/organisms/TestResultsPanel/TestRe
 import { NotFoundState } from "@/components/molecules/NotFoundState/NotFoundState"
 import { LoadingState } from "@/components/molecules/LoadingState/LoadingState"
 import type { ChallengePageProps, ChallengeProblem } from "@/types/challenges/challenge-page"
-
 export function ChallengePage({ challengeId }: ChallengePageProps) {
   const { challenge, loading: challengeLoading, error: challengeError } = useChallengeDetails(challengeId)
-  
   const [code, setCode] = useState('')
   const [language, setLanguage] = useState("typescript")
-
   useEffect(() => {
     if (challenge?.initial_code && !code) {
       setCode(challenge.initial_code)
     }
   }, [challenge?.initial_code])
-
   const {
     compilationError,
     finalResults,
@@ -35,11 +30,9 @@ export function ChallengePage({ challengeId }: ChallengePageProps) {
     problemId: challengeId,
     functionName: challenge?.function_name || 'solution'
   })
-
   if (challengeLoading) {
     return <LoadingState message="Carregando challenge..." />
   }
-
   if (challengeError || !challenge) {
     return (
       <NotFoundState 
@@ -48,7 +41,6 @@ export function ChallengePage({ challengeId }: ChallengePageProps) {
       />
     )
   }
-
   const mapDifficulty = (difficulty: number): "Easy" | "Medium" | "Hard" => {
     switch (difficulty) {
       case 1:
@@ -62,7 +54,6 @@ export function ChallengePage({ challengeId }: ChallengePageProps) {
         return 'Easy'
     }
   }
-
   const adaptedProblem = {
     id: challenge.id,
     title: challenge.title,
@@ -84,12 +75,9 @@ export function ChallengePage({ challengeId }: ChallengePageProps) {
       description: `Test case ${index + 1}`
     })) || []
   }
-
   const passedTests = finalResults?.details?.filter((test) => test.status === "passed").length || 0
   const totalTests = finalResults?.totalCount || 0
-
   const handleRunCode = () => executeCode(code)
-
   return (
     <div className="flex h-screen flex-col bg-background">
       <ChallengeHeader title={challenge.title} />
@@ -116,4 +104,4 @@ export function ChallengePage({ challengeId }: ChallengePageProps) {
       </div>
     </div>
   )
-}
+}

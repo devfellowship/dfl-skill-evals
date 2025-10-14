@@ -27,26 +27,20 @@ export function transpileTsToJs(code: string): string {
     throw new Error(`Erro na transpilação TypeScript para JavaScript: ${error instanceof Error ? error.message : 'Erro desconhecido'}`)
   }
 }
-
 export function parseTestCaseInput(input: string): any[] {
   try {
     const cleanInput = input.trim()
     const jsonMatch = cleanInput.match(/^(\[.*\]|\{.*\}|".*"|'.*'|\d+(?:\.\d+)?|true|false|null)(?:\s*,\s*(.*))?$/)
-    
     if (!jsonMatch) {
       throw new Error(`Invalid input format: ${input}`)
     }
-
     const result = []
     let remaining = cleanInput
-
     while (remaining.trim()) {
       const match = remaining.match(/^(\[.*?\]|\{.*?\}|"[^"]*"|'[^']*'|-?\d+(?:\.\d+)?|true|false|null)(?:\s*,\s*(.*))?/)
-      
       if (!match) {
         break
       }
-
       try {
         const parsed = JSON.parse(match[1])
         result.push(parsed)
@@ -59,10 +53,8 @@ export function parseTestCaseInput(input: string): any[] {
           result.push(match[1])
         }
       }
-
       remaining = match[2] || ''
     }
-
     if (result.length === 0) {
       try {
         return [JSON.parse(cleanInput)]
@@ -70,35 +62,26 @@ export function parseTestCaseInput(input: string): any[] {
         return [cleanInput]
       }
     }
-
     return result
-
   } catch (error) {
     throw new Error(`Failed to parse test case input: ${input}`)
   }
 }
-
 export function createExecutableCode(userCode: string, functionName: string, testInput: string, languageId: number): string {
   const params = parseTestCaseInput(testInput)
   const paramsString = params.map(p => JSON.stringify(p)).join(', ')
-  
   if (languageId === 74) {
     const timestamp = Date.now()
-    
     const executableCode = `// Código do usuário - Execução ${timestamp}
 ${userCode}
-
-// Teste - ${timestamp}
 try {
   const result_${timestamp} = ${functionName}(${paramsString});
   console.log(result_${timestamp});
 } catch (error_${timestamp}) {
   console.error(error_${timestamp});
 }`
-    
     return executableCode
   }
-  
   if (languageId === 63) {
     const cleanCode = userCode
       .replace(/:\s*number\[\]/g, '')
@@ -117,12 +100,9 @@ try {
       .replace(/import\s+.*?from\s+['"][^'"]*['"];?\s*/g, '')
       .replace(/\s+/g, ' ')
       .trim()
-    
     const timestamp = Date.now()
     return `// Código do usuário - Execução ${timestamp}
 ${cleanCode}
-
-// Teste - ${timestamp}
 try {
   const result_${timestamp} = ${functionName}(${paramsString});
   console.log(result_${timestamp});
@@ -130,10 +110,7 @@ try {
   console.error(error_${timestamp});
 }`
   }
-  
   return `// Código do usuário
 ${userCode}
-
-// Teste
 console.log(${functionName}(${paramsString}));`
-}
+}

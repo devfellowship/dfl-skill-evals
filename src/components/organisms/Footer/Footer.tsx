@@ -1,19 +1,16 @@
 "use client"
-
 import { Mail, MapPin, ExternalLink } from "lucide-react"
 import { BrandSection } from "@/components/molecules/BrandSection/BrandSection"
 import { FooterSection } from "@/components/molecules/FooterSection/FooterSection"
 import { FooterBottom } from "@/components/molecules/FooterBottom/FooterBottom"
 import { FooterLink } from "@/components/atoms/FooterLink/FooterLink"
 import { ContactItem } from "@/components/atoms/ContactItem/ContactItem"
-
 export function Footer() {
   return (
     <footer className="bg-background/95 backdrop-blur border-t border-border/40 text-foreground">
       <div className="max-w-7xl mx-auto px-8 lg:px-12 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
           <BrandSection />
-          
           <FooterSection title="Para Desenvolvedores">
             <li>
               <a 
@@ -38,7 +35,6 @@ export function Footer() {
               </a>
             </li>
           </FooterSection>
-
           <FooterSection title="Para Empresas">
             <li>
               <a 
@@ -52,7 +48,6 @@ export function Footer() {
               </a>
             </li>
           </FooterSection>
-
           <FooterSection title="Contato">
             <ContactItem icon={Mail}>
               <a 
@@ -68,9 +63,8 @@ export function Footer() {
             </ContactItem>
           </FooterSection>
         </div>
-
         <FooterBottom />
       </div>
     </footer>
   )
-}
+}

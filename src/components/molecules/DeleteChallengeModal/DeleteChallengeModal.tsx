@@ -3,7 +3,6 @@ import { Button } from '@/components/atoms/Button/Button'
 import { Textarea } from '@/components/atoms/Textarea/Textarea'
 import { Label } from '@/components/atoms/Label/Label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-
 interface DeleteChallengeModalProps {
   isOpen: boolean
   onClose: () => void
@@ -11,7 +10,6 @@ interface DeleteChallengeModalProps {
   challengeTitle: string
   isDeleting?: boolean
 }
-
 export const DeleteChallengeModal: React.FC<DeleteChallengeModalProps> = ({
   isOpen,
   onClose,
@@ -21,35 +19,27 @@ export const DeleteChallengeModal: React.FC<DeleteChallengeModalProps> = ({
 }) => {
   const [reason, setReason] = useState('')
   const [error, setError] = useState('')
-
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    
     if (!reason.trim()) {
       setError('Motivo é obrigatório')
       return
     }
-    
     if (reason.trim().length < 10) {
       setError('Motivo deve ter pelo menos 10 caracteres')
       return
     }
-    
     setError('')
     onConfirm(reason.trim())
   }
-
   const handleClose = () => {
     setReason('')
     setError('')
     onClose()
   }
-
   if (!isOpen) {
     return null
   }
-
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <Card className="w-full max-w-md">
@@ -66,7 +56,6 @@ export const DeleteChallengeModal: React.FC<DeleteChallengeModalProps> = ({
                 "{challengeTitle}"
               </p>
             </div>
-            
             <div className="space-y-2">
               <Label htmlFor="reason" className="text-sm font-medium">
                 Motivo da exclusão <span className="text-destructive">*</span>
@@ -92,7 +81,6 @@ export const DeleteChallengeModal: React.FC<DeleteChallengeModalProps> = ({
                 <p className="text-sm text-destructive">{error}</p>
               )}
             </div>
-
             <div className="flex gap-2 pt-4">
               <Button
                 type="button"
@@ -103,7 +91,6 @@ export const DeleteChallengeModal: React.FC<DeleteChallengeModalProps> = ({
               >
                 Cancelar
               </Button>
-              
               <Button
                 type="submit"
                 variant="destructive"
@@ -123,4 +110,4 @@ export const DeleteChallengeModal: React.FC<DeleteChallengeModalProps> = ({
       </Card>
     </div>
   )
-}
+}

@@ -1,5 +1,4 @@
 "use client";
-
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,17 +8,14 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { BREADCRUMB_LABELS } from "@/consts/ui";
-
 interface BreadcrumbItem {
   href?: string;
   label: string;
   isCurrentPage?: boolean;
 }
-
 interface AppBreadcrumbProps {
   items: BreadcrumbItem[];
 }
-
 export function AppBreadcrumb({ items }: AppBreadcrumbProps) {
   return (
     <Breadcrumb>
@@ -40,7 +36,6 @@ export function AppBreadcrumb({ items }: AppBreadcrumbProps) {
     </Breadcrumb>
   );
 }
-
 export function createChallengeBreadcrumb(challengeId: string): BreadcrumbItem[] {
   return [
     {
@@ -56,4 +51,4 @@ export function createChallengeBreadcrumb(challengeId: string): BreadcrumbItem[]
       isCurrentPage: true,
     },
   ];
-}
+}

@@ -1,18 +1,14 @@
 "use client"
-
 import { CheckCircle, AlertCircle, Monitor, Wifi } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { UI_MESSAGES } from "@/consts/ui"
-
 interface SystemChecks {
   browser: boolean
   internet: boolean
 }
-
 interface SystemCheckCardProps {
   systemChecks: SystemChecks
 }
-
 export function SystemCheckCard({ systemChecks }: SystemCheckCardProps) {
   return (
     <Card className="border-border/40">
@@ -32,7 +28,6 @@ export function SystemCheckCard({ systemChecks }: SystemCheckCardProps) {
             <AlertCircle className="h-5 w-5 text-red-500" />
           )}
         </div>
-
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Wifi className="h-5 w-5 text-muted-foreground" />
@@ -47,4 +42,4 @@ export function SystemCheckCard({ systemChecks }: SystemCheckCardProps) {
       </CardContent>
     </Card>
   )
-}
+}

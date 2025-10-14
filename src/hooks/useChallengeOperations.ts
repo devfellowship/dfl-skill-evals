@@ -6,9 +6,6 @@ import { getBrazilianDateTime } from '@/lib/utils/timezone'
 import { useCrudOperations } from './useCrudOperations'
 import { useUserValidation } from './useUserValidation'
 import { useBroadcastOperations } from './useBroadcastOperations'
-import '@/lib/utils/profile-setup' // Carrega a função setupProfile no window
-import '@/lib/utils/debug-soft-delete' // Carrega as funções de debug no window
-
 export interface ChallengeOperationData {
   title: string
   description: string
@@ -22,19 +19,15 @@ export interface ChallengeOperationData {
   trending_priority?: number | null
   [key: string]: any
 }
-
 export function useChallengeOperations() {
   const { user, validateUser } = useUserValidation()
   const { executeWithBroadcastAndToast } = useBroadcastOperations()
-  
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
   const [isApproving, setIsApproving] = useState<string | null>(null)
   const [isArchiving, setIsArchiving] = useState<string | null>(null)
   const [isRestoring, setIsRestoring] = useState<string | null>(null)
-
   const createChallenge = useCallback(async (challengeData: ChallengeOperationData) => {
     const { user } = validateUser()
-
     const [profileResult, userRolesResult] = await Promise.all([
       supabase
         .from('profiles')
@@ -47,13 +40,11 @@ export function useChallengeOperations() {
         .eq('id', user.id)
         .maybeSingle()
     ])
-
     const mentorName = profileResult.data?.full_name || 
                       userRolesResult.data?.name || 
                       user.user_metadata?.full_name || 
                       user.email?.split('@')[0] || 
                       'Usuário'
-
     const challengePayload = {
       title: challengeData.title,
       slug: generateUniqueSlug(challengeData.title),
@@ -70,7 +61,6 @@ export function useChallengeOperations() {
       max_score: 100,
       order_index: 0
     }
-
     return executeWithBroadcastAndToast(
       async () => {
         const { data: challenge, error } = await supabase
@@ -79,11 +69,9 @@ export function useChallengeOperations() {
           .insert([challengePayload])
           .select()
           .single()
-
         if (error) {
           throw new Error(error.message || 'Erro ao criar challenge')
         }
-
         return challenge
       },
       'create',
@@ -91,7 +79,6 @@ export function useChallengeOperations() {
       'Erro ao criar challenge'
     )
   }, [validateUser, executeWithBroadcastAndToast])
-
   const updateChallenge = useCallback(async (id: string, updateData: Partial<ChallengeOperationData>) => {
     const { user, isAdmin } = validateUser()
     const mappedUpdates: any = {
@@ -113,13 +100,11 @@ export function useChallengeOperations() {
       if (updateData.trending !== undefined) mappedUpdates.trending = updateData.trending
       if (updateData.trending_priority !== undefined) mappedUpdates.trending_priority = updateData.trending_priority
     }
-
     Object.keys(mappedUpdates).forEach(key => {
       if ((mappedUpdates as any)[key] === undefined) {
         delete (mappedUpdates as any)[key]
       }
     })
-
     return executeWithBroadcastAndToast(
       async () => {
         const { data: challenge, error } = await supabase
@@ -128,15 +113,12 @@ export function useChallengeOperations() {
           .update(mappedUpdates)
           .eq('id', id)
           .select()
-
         if (error) {
           throw new Error(error.message || 'Erro ao atualizar challenge')
         }
-
         if (!challenge || challenge.length === 0) {
           throw new Error('Nenhuma linha foi atualizada. Verifique se você tem permissão para atualizar este challenge.')
         }
-
         return challenge[0]
       },
       'update',
@@ -144,10 +126,8 @@ export function useChallengeOperations() {
       'Erro ao atualizar challenge'
     )
   }, [validateUser, executeWithBroadcastAndToast])
-
   const deleteChallenge = useCallback(async (id: string, reason: string) => {
     const { user: validatedUser, isAdmin } = validateUser()
-
     if (!reason || reason.trim().length < 10) {
       throw new Error('Motivo deve ter pelo menos 10 caracteres')
     }
@@ -169,7 +149,6 @@ export function useChallengeOperations() {
             })
             .eq('id', id)
             .select()
-
           if (error) {
             throw new Error(error.message || 'Erro ao excluir challenge')
           }
@@ -183,19 +162,15 @@ export function useChallengeOperations() {
       setIsDeleting(null)
     }
   }, [validateUser, executeWithBroadcastAndToast])
-
   const restoreChallenge = useCallback(async (id: string) => {
     const { isAdmin } = validateUser()
-
     if (!isAdmin) {
       alert('Apenas administradores podem restaurar challenges')
       return null
     }
-
     if (!confirm('Tem certeza que deseja restaurar este challenge?')) {
       return null
     }
-
     setIsRestoring(id)
     try {
       return executeWithBroadcastAndToast(
@@ -214,11 +189,9 @@ export function useChallengeOperations() {
             })
             .eq('id', id)
             .select()
-
           if (error) {
             throw new Error(error.message || 'Erro ao restaurar challenge')
           }
-
           return challenge?.[0] || { id }
         },
         'update',
@@ -229,19 +202,15 @@ export function useChallengeOperations() {
       setIsRestoring(null)
     }
   }, [validateUser, executeWithBroadcastAndToast])
-
   const permanentDeleteChallenge = useCallback(async (id: string) => {
     const { isAdmin } = validateUser()
-
     if (!isAdmin) {
       alert('Apenas administradores podem deletar permanentemente')
       return null
     }
-
     if (!confirm('ATENÇÃO: Esta ação é irreversível!\n\nTem certeza que deseja deletar permanentemente este challenge?')) {
       return null
     }
-
     try {
       return executeWithBroadcastAndToast(
         async () => {
@@ -250,11 +219,9 @@ export function useChallengeOperations() {
             .from('challenges')
             .delete()
             .eq('id', id)
-
           if (error) {
             throw new Error(error.message || 'Erro ao deletar permanentemente')
           }
-
           return { id }
         },
         'delete',
@@ -265,7 +232,6 @@ export function useChallengeOperations() {
       throw error
     }
   }, [validateUser, executeWithBroadcastAndToast])
-
   const approveChallenge = useCallback(async (id: string) => {
     setIsApproving(id)
     try {
@@ -282,11 +248,9 @@ export function useChallengeOperations() {
             .eq('id', id)
             .select()
             .single()
-
           if (error) {
             throw new Error(error.message || 'Erro ao aprovar challenge')
           }
-
           return challenge
         },
         'approve',
@@ -297,7 +261,6 @@ export function useChallengeOperations() {
       setIsApproving(null)
     }
   }, [executeWithBroadcastAndToast])
-
   const rejectChallenge = useCallback(async (id: string) => {
     return executeWithBroadcastAndToast(
       async () => {
@@ -312,11 +275,9 @@ export function useChallengeOperations() {
           .eq('id', id)
           .select()
           .single()
-
         if (error) {
           throw new Error(error.message || 'Erro ao rejeitar challenge')
         }
-
         return challenge
       },
       'reject',
@@ -324,7 +285,6 @@ export function useChallengeOperations() {
       'Erro ao rejeitar challenge'
     )
   }, [executeWithBroadcastAndToast])
-
   const archiveChallenge = useCallback(async (id: string) => {
     setIsArchiving(id)
     try {
@@ -341,11 +301,9 @@ export function useChallengeOperations() {
             .eq('id', id)
             .select()
             .single()
-
           if (error) {
             throw new Error(error.message || 'Erro ao arquivar challenge')
           }
-
           return challenge
         },
         'archive',
@@ -356,12 +314,10 @@ export function useChallengeOperations() {
       setIsArchiving(null)
     }
   }, [executeWithBroadcastAndToast])
-
   const sendBackForReview = useCallback(async (id: string) => {
     if (!confirm('Tem certeza que deseja enviar este challenge de volta para análise?')) {
       return null
     }
-
     return executeWithBroadcastAndToast(
       async () => {
         const { data: challenge, error } = await supabase
@@ -375,11 +331,9 @@ export function useChallengeOperations() {
           .eq('id', id)
           .select()
           .single()
-
         if (error) {
           throw new Error(error.message || 'Erro ao enviar challenge de volta')
         }
-
         return challenge
       },
       'update',
@@ -387,13 +341,11 @@ export function useChallengeOperations() {
       'Erro ao enviar challenge de volta'
     )
   }, [executeWithBroadcastAndToast])
-
   return {
     isDeleting,
     isApproving,
     isArchiving,
     isRestoring,
-    
     createChallenge,
     updateChallenge,
     deleteChallenge,

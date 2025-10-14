@@ -1,15 +1,12 @@
 "use client"
-
 import { RefreshCw, Square } from "lucide-react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Progress } from "@/components/atoms/Progress/Progress"
-
 interface ExecutionControlsProps {
   isLoading: boolean
   progress: number
   onCancel: () => void
 }
-
 export function ExecutionControls({ isLoading, progress, onCancel }: ExecutionControlsProps) {
   return (
     <div className="border-t border-border/40 p-4 bg-muted/20">
@@ -31,4 +28,4 @@ export function ExecutionControls({ isLoading, progress, onCancel }: ExecutionCo
       <Progress value={progress} className="h-2" />
     </div>
   )
-}
+}

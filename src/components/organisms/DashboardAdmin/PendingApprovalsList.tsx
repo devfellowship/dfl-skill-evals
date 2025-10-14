@@ -3,7 +3,6 @@ import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { Edit, Trash2, Eye, CheckCircle, XCircle, Archive, GitCompare } from "lucide-react"
 import { AdminChallenge as Challenge, DIFFICULTY_OPTIONS, STATUS_OPTIONS } from "@/types/admin/admin-dashboard"
-
 interface PendingApprovalsListProps {
   challenges: Challenge[]
   isInitialLoading: boolean
@@ -18,7 +17,6 @@ interface PendingApprovalsListProps {
   isArchiving?: string | null
   searchQuery?: string
 }
-
 export function PendingApprovalsList({
   challenges,
   isInitialLoading,
@@ -36,23 +34,18 @@ export function PendingApprovalsList({
   const getDifficultyColor = useMemo(() => (difficulty: string) => {
     return DIFFICULTY_OPTIONS.find(opt => opt.value === difficulty)?.color || ""
   }, [])
-
   const getStatusColor = useMemo(() => (status: string) => {
     return STATUS_OPTIONS.find(opt => opt.value === status)?.color || ""
   }, [])
-
   const getStatusLabel = useMemo(() => (status: string) => {
     return STATUS_OPTIONS.find(opt => opt.value === status)?.label || status
   }, [])
-
   const filteredChallenges = useMemo(() => {
     if (!searchQuery.trim()) return challenges
-    
     return challenges.filter(challenge => 
       challenge.title.toLowerCase().includes(searchQuery.toLowerCase())
     )
   }, [challenges, searchQuery])
-
   if (isInitialLoading) {
     return (
       <div className="text-center py-8">
@@ -61,7 +54,6 @@ export function PendingApprovalsList({
       </div>
     )
   }
-
   if (filteredChallenges.length === 0) {
     return (
       <div className="text-center py-12 text-gray-500">
@@ -71,7 +63,6 @@ export function PendingApprovalsList({
       </div>
     )
   }
-
   return (
     <div className="space-y-4">
              {filteredChallenges.map(challenge => (
@@ -99,7 +90,6 @@ export function PendingApprovalsList({
               <span>⚡ {challenge.functionName}</span>
             </div>
           </div>
-          
                      <div className="flex gap-2">
              <Button
                variant="outline"
@@ -110,7 +100,6 @@ export function PendingApprovalsList({
              >
                <Edit className="w-4 h-4" />
              </Button>
-             
              <Button
                variant="outline"
                size="sm"
@@ -120,7 +109,6 @@ export function PendingApprovalsList({
              >
                <Eye className="w-4 h-4" />
              </Button>
-            
             {onCompare && (
               <Button
                 variant="outline"
@@ -132,7 +120,6 @@ export function PendingApprovalsList({
                 <GitCompare className="w-4 h-4" />
               </Button>
             )}
-            
             <Button
               variant="outline"
               size="sm"
@@ -143,7 +130,6 @@ export function PendingApprovalsList({
             >
               <CheckCircle className="w-4 h-4" />
             </Button>
-            
             <Button
               variant="outline"
               size="sm"
@@ -153,7 +139,6 @@ export function PendingApprovalsList({
             >
               <XCircle className="w-4 h-4" />
             </Button>
-            
             <Button
               variant="outline"
               size="sm"
@@ -164,7 +149,6 @@ export function PendingApprovalsList({
             >
               <Archive className="w-4 h-4" />
             </Button>
-            
             <Button
               variant="outline"
               size="sm"
@@ -179,4 +163,4 @@ export function PendingApprovalsList({
       ))}
     </div>
   )
-}
+}

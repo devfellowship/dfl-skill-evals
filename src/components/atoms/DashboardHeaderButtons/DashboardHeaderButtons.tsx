@@ -1,9 +1,7 @@
 "use client"
-
 import { Button } from "@/components/atoms/Button/Button"
 import { Plus } from "lucide-react"
 import Link from "next/link"
-
 interface DashboardHeaderButtonsProps {
   onCreateClick?: () => void
   createButtonText?: string
@@ -13,7 +11,6 @@ interface DashboardHeaderButtonsProps {
   homeButtonText?: string
   homeButtonHref?: string
 }
-
 export function DashboardHeaderButtons({
   onCreateClick,
   createButtonText = "Novo Challenge",
@@ -42,7 +39,6 @@ export function DashboardHeaderButtons({
           {isSubmitting ? "Salvando..." : createButtonText}
         </Button>
       )}
-      
       {showHomeButton && (
         <Button variant="outline" asChild>
           <Link href={homeButtonHref}>
@@ -52,4 +48,4 @@ export function DashboardHeaderButtons({
       )}
     </div>
   )
-}
+}

@@ -1,12 +1,10 @@
 import { DashboardHeaderButtons } from "@/components/atoms/DashboardHeaderButtons/DashboardHeaderButtons"
 import { ConnectionStatus } from "@/components/atoms/ConnectionStatus/ConnectionStatus"
-
 interface DashboardHeaderProps {
   broadcastWorking: boolean
   lastUpdate: Date
   isSubmitting?: boolean
 }
-
 export function DashboardHeader({
   broadcastWorking,
   lastUpdate,
@@ -30,4 +28,4 @@ export function DashboardHeader({
       </div>
     </div>
   )
-}
+}

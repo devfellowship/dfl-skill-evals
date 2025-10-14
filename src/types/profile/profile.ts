@@ -1,5 +1,4 @@
 import { UserRole } from '@/lib/supabase'
-
 export interface ProfileData {
   id: string
   email: string
@@ -11,7 +10,6 @@ export interface ProfileData {
   updated_at: string
   last_name_change?: string
 }
-
 export interface UseProfileReturn {
   profile: ProfileData | null
   loading: boolean
@@ -23,21 +21,17 @@ export interface UseProfileReturn {
   changeEmail: (newEmail: string) => Promise<{ error: any }>
   refreshProfile: () => Promise<void>
 }
-
 export interface ProfileEditFormProps {
   onClose?: () => void
 }
-
 export interface ProfileFormData {
   full_name: string
 }
-
 export interface PasswordFormData {
   currentPassword: string
   newPassword: string
   confirmPassword: string
 }
-
 export interface EmailFormData {
   newEmail: string
-}
+}

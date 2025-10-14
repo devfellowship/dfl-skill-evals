@@ -1,19 +1,15 @@
 "use client"
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { BookOpen, CheckCircle, TrendingUp } from "lucide-react"
-
 interface TeacherStats {
   totalChallenges: number
   approvedChallenges: number
   toApproveChallenges: number
   totalSubmissions: number
 }
-
 interface TeacherStatsCardsProps {
   stats: TeacherStats
 }
-
 export function TeacherStatsCards({ stats }: TeacherStatsCardsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -29,7 +25,6 @@ export function TeacherStatsCards({ stats }: TeacherStatsCardsProps) {
           </p>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Aguardando Aprovação</CardTitle>
@@ -40,7 +35,6 @@ export function TeacherStatsCards({ stats }: TeacherStatsCardsProps) {
           <p className="text-xs text-muted-foreground">Em revisão pelo admin</p>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total de Submissões</CardTitle>
@@ -55,4 +49,4 @@ export function TeacherStatsCards({ stats }: TeacherStatsCardsProps) {
       </Card>
     </div>
   )
-}
+}

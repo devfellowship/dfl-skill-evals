@@ -6,7 +6,6 @@ import { invalidateChallengesCache } from '@/hooks/useChallenges'
 import { useUserRole } from '@/hooks/useUserRole'
 import { useAuth } from '@/hooks/useAuth'
 import { toast } from 'sonner'
-
 interface ChallengeMenuProps {
   challengeId: string
   isTrending: boolean
@@ -16,19 +15,15 @@ interface ChallengeMenuProps {
     title?: string
   }
 }
-
 export function ChallengeMenu({ challengeId, isTrending, onUpdate, challenge }: ChallengeMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
   const { toggleTrending } = useTrendingChallenges()
   const { isAdmin } = useUserRole()
   const { user } = useAuth()
-
   const canEdit = isAdmin || (user?.id && challenge?.created_by === user.id)
-
   const handleToggleTrending = async () => {
     if (isUpdating) return
-
     setIsUpdating(true)
     try {
       await toggleTrending(challengeId, isTrending, 1)
@@ -38,24 +33,20 @@ export function ChallengeMenu({ challengeId, isTrending, onUpdate, challenge }: 
         onUpdate?.()
       }, 500)
     } catch (error) {
-      console.error('Erro ao atualizar trending:', error)
       toast.error('Erro ao atualizar trending')
     } finally {
       setIsUpdating(false)
       setIsOpen(false)
     }
   }
-
   const handleEdit = () => {
     window.open(`/admin/challenge/${challengeId}`, '_blank')
     setIsOpen(false)
   }
-
   const handleView = () => {
     window.open(`/challenge/${challengeId}`, '_blank')
     setIsOpen(false)
   }
-
   return (
     <div className="relative">
       {canEdit && (
@@ -68,7 +59,6 @@ export function ChallengeMenu({ challengeId, isTrending, onUpdate, challenge }: 
           <Edit className="w-5 h-5 text-white" />
         </Button>
       )}
-      
       <Button
         variant="ghost"
         size="sm"
@@ -77,7 +67,6 @@ export function ChallengeMenu({ challengeId, isTrending, onUpdate, challenge }: 
       >
         <MoreVertical className="w-4 h-4" />
       </Button>
-
       {isOpen && (
         <>
           <div 
@@ -92,7 +81,6 @@ export function ChallengeMenu({ challengeId, isTrending, onUpdate, challenge }: 
               <Eye className="w-4 h-4 text-gray-600" />
               Visualizar
             </button>
-            
             <button
               onClick={handleToggleTrending}
               disabled={isUpdating}
@@ -115,4 +103,4 @@ export function ChallengeMenu({ challengeId, isTrending, onUpdate, challenge }: 
       )}
     </div>
   )
-}
+}

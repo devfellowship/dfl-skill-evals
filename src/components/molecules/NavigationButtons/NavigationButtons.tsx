@@ -1,15 +1,12 @@
 "use client"
-
 import { Button } from "@/components/atoms/Button/Button"
 import Link from "next/link"
-
 interface NavigationButtonsProps {
   isAdmin: boolean
   isTeacher: boolean
   canCreateChallenges: boolean
   roleLoading: boolean
 }
-
 export function NavigationButtons({ 
   isAdmin, 
   isTeacher, 
@@ -17,7 +14,6 @@ export function NavigationButtons({
   roleLoading 
 }: NavigationButtonsProps) {
   if (roleLoading) return null
-
   return (
     <div className="flex items-center gap-2">
       {isAdmin && (
@@ -31,7 +27,6 @@ export function NavigationButtons({
           </Link>
         </Button>
       )}
-
       {isTeacher && (
         <Button 
           asChild 
@@ -43,7 +38,6 @@ export function NavigationButtons({
           </Link>
         </Button>
       )}
-
       {canCreateChallenges && (
         <Button 
           asChild 
@@ -57,4 +51,4 @@ export function NavigationButtons({
       )}
     </div>
   )
-}
+}

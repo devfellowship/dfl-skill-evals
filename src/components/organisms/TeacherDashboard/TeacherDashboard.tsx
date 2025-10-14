@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect, useMemo } from "react"
 import { useChallengesGlobal } from "@/hooks/useChallengesGlobal"
 import { useChallengeOperations } from "@/hooks/useChallengeOperations"
@@ -12,7 +11,6 @@ import { DashboardHeaderButtons } from "@/components/atoms/DashboardHeaderButton
 import { TeacherStatsCards } from "@/components/molecules/TeacherStatsCards/TeacherStatsCards"
 import { TeacherChallengeList } from "@/components/molecules/TeacherChallengeList/TeacherChallengeList"
 import { SearchButton } from "@/components/atoms/SearchButton/SearchButton"
-
 export function TeacherDashboard() {
   const { user } = useAuth()
   const { 
@@ -22,7 +20,6 @@ export function TeacherDashboard() {
     isInitialLoading, 
     loadAllChallenges
   } = useChallengesGlobal()
-
   const {
     isDeleting,
     isArchiving,
@@ -30,24 +27,19 @@ export function TeacherDashboard() {
     handleArchive,
     handleSendBackForReview
   } = useChallengeOperations()
-
   const myPublished = useMemo(
     () => (user?.id ? published.filter(c => c.created_by === user.id) : []),
     [published, user?.id]
   )
-
   const myPending = useMemo(
     () => (user?.id ? pending.filter(c => c.created_by === user.id) : []),
     [pending, user?.id]
   )
-
   const myArchived = useMemo(
     () => (user?.id ? archived.filter(c => c.created_by === user.id) : []),
     [archived, user?.id]
   )
-
   const [searchQuery, setSearchQuery] = useState("")
-
   const teacherStats = useMemo(() => {
     const allMine = [...myPublished, ...myPending, ...myArchived]
     return {
@@ -61,11 +53,9 @@ export function TeacherDashboard() {
           : 0
     }
   }, [myPublished, myPending, myArchived])
-
   useEffect(() => {
     loadAllChallenges()
   }, [loadAllChallenges])
-
   const handleDeleteChallenge = async (id: string) => {
     if (confirm("Tem certeza que deseja excluir este challenge?")) {
       try {
@@ -81,7 +71,6 @@ export function TeacherDashboard() {
       }
     }
   }
-
   const onSendBackForReviewClick = async (id: string) => {
     if (confirm("Tem certeza que deseja enviar este challenge de volta para análise? Isso permitirá que ele seja excluído posteriormente.")) {
       try {
@@ -94,11 +83,9 @@ export function TeacherDashboard() {
       }
     }
   }
-
   const handleTitleSearch = (query: string) => {
     setSearchQuery(query)
   }
-
   return (
     <div className="min-h-screen bg-background">
       <AdminNavigation
@@ -106,7 +93,6 @@ export function TeacherDashboard() {
         quickActions={[]}
         showBackButton={false}
       />
-
       <header className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
@@ -130,10 +116,8 @@ export function TeacherDashboard() {
           </div>
         </div>
       </header>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <TeacherStatsCards stats={teacherStats} />
-
         <Tabs defaultValue="published" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="published" className="flex items-center gap-2">
@@ -149,7 +133,6 @@ export function TeacherDashboard() {
               Arquivados ({myArchived.length})
             </TabsTrigger>
           </TabsList>
-
           <TabsContent value="published" className="space-y-6">
             <Card>
               <CardHeader>
@@ -173,7 +156,6 @@ export function TeacherDashboard() {
               </CardContent>
             </Card>
           </TabsContent>
-
           <TabsContent value="pending" className="space-y-6">
             <Card>
               <CardHeader>
@@ -197,7 +179,6 @@ export function TeacherDashboard() {
               </CardContent>
             </Card>
           </TabsContent>
-
           <TabsContent value="archived" className="space-y-6">
             <Card>
               <CardHeader>
@@ -224,9 +205,4 @@ export function TeacherDashboard() {
       </div>
     </div>
   )
-}
-
-
-
-
-
+}

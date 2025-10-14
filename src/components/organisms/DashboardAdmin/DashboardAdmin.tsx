@@ -1,11 +1,9 @@
 "use client"
-
 import { useDashboardAdmin } from "@/hooks/useDashboardAdmin"
 import { DashboardHeader } from "./DashboardHeader"
 import { DashboardTabs } from "./DashboardTabs"
 import { DashboardModals } from "./DashboardModals"
 import { DeleteChallengeWrapper, useDeleteChallenge } from "@/components/organisms/DeleteChallengeWrapper/DeleteChallengeWrapper"
-
 const DashboardAdminContent = () => {
   const {
     published,
@@ -43,27 +41,22 @@ const DashboardAdminContent = () => {
     setIsCreating,
     setActiveTab
   } = useDashboardAdmin()
-
   const { openDeleteModal } = useDeleteChallenge()
-
   const handleDeleteClick = (id: string, title: string) => {
     openDeleteModal(id, title)
   }
-
   const handleDeleteForTabs = async (id: string) => {
     const challenge = [...published, ...pending, ...archived].find(c => c.id === id)
     if (challenge) {
       openDeleteModal(id, challenge.title)
     }
   }
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       <DashboardHeader
         broadcastWorking={broadcastWorking}
         lastUpdate={lastUpdate as Date}
       />
-
       <DashboardTabs
         activeTab={activeTab}
         onTabChange={setActiveTab}
@@ -89,7 +82,6 @@ const DashboardAdminContent = () => {
         isArchiving={isArchiving as string | null}
         isRestoring={isRestoring as string | null}
       />
-
       <DashboardModals
         comparisonModalOpen={comparisonModalOpen}
         challengeToCompare={challengeToCompare}
@@ -100,7 +92,6 @@ const DashboardAdminContent = () => {
     </div>
   )
 }
-
 export function DashboardAdmin() {
   return (
     <DeleteChallengeWrapper>

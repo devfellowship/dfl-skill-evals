@@ -1,31 +1,26 @@
 "use client"
-
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/atoms/Button/Button"
 import { Textarea } from "@/components/atoms/Textarea/Textarea"
 import { Label } from "@/components/atoms/Label/Label"
 import { Plus, Trash2 } from "lucide-react"
-
 interface Example {
   input: string
   output: string
   explanation: string
 }
-
 interface ExampleManagerProps {
   examples: Example[]
   onAdd: (example: Example) => void
   onRemove: (index: number) => void
 }
-
 export function ExampleManager({ examples, onAdd, onRemove }: ExampleManagerProps) {
   const [example, setExample] = useState<Example>({
     input: "",
     output: "",
     explanation: ""
   })
-
   const addExample = () => {
     if (example.input.trim() && example.output.trim()) {
       const newExample = {
@@ -37,7 +32,6 @@ export function ExampleManager({ examples, onAdd, onRemove }: ExampleManagerProp
       setExample({ input: "", output: "", explanation: "" })
     }
   }
-
   return (
     <Card>
       <CardHeader>
@@ -66,7 +60,6 @@ export function ExampleManager({ examples, onAdd, onRemove }: ExampleManagerProp
             />
           </div>
         </div>
-        
         <div className="space-y-2">
           <Label htmlFor="exampleExplanation">Explicação (Opcional)</Label>
           <Textarea
@@ -77,12 +70,10 @@ export function ExampleManager({ examples, onAdd, onRemove }: ExampleManagerProp
             rows={2}
           />
         </div>
-        
         <Button type="button" onClick={addExample} variant="outline">
           <Plus className="w-4 h-4 mr-2" />
           Adicionar Exemplo
         </Button>
-
         {examples.length > 0 && (
           <div className="space-y-2">
             <Label>Exemplos Adicionados ({examples.length})</Label>
@@ -120,4 +111,4 @@ export function ExampleManager({ examples, onAdd, onRemove }: ExampleManagerProp
       </CardContent>
     </Card>
   )
-}
+}

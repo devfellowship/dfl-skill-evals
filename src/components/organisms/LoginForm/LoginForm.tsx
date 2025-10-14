@@ -1,5 +1,4 @@
 'use client'
-
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent } from '@/components/ui/card'
@@ -8,7 +7,6 @@ import { LoginHeader } from '@/components/molecules/LoginHeader/LoginHeader'
 import { LoginFormFields } from '@/components/molecules/LoginFormFields/LoginFormFields'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
-
 export function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -16,15 +14,12 @@ export function LoginForm() {
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const { signIn } = useAuth()
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError(null)
-
     try {
       const { error: authError } = await signIn(email, password)
-      
       if (authError) {
         if (authError.message.includes('Invalid login credentials') || 
             authError.message.includes('Email not confirmed') ||
@@ -39,13 +34,9 @@ export function LoginForm() {
         }
       } else {
         toast.success('Login realizado com sucesso!')
-
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {
-          // Por enquanto, assumir que todos são community_member
-          // O role real será carregado pelo useUserRole
           const isAdmin = false
-          
           if (isAdmin) {
             router.push('/admin')
           } else {
@@ -62,15 +53,12 @@ export function LoginForm() {
       setIsLoading(false)
     }
   }
-
   const handleForgotPassword = () => {
     router.push('/reset-password')
   }
-
   return (
     <div className="space-y-8">
       <LoginHeader />
-
       <Card className="border-0 shadow-2xl bg-gray-800/90 backdrop-blur-md rounded-3xl overflow-hidden">
         <CardContent className="p-8">
           <LoginFormFields
@@ -85,7 +73,6 @@ export function LoginForm() {
           />
         </CardContent>
       </Card>
-
       <div className="text-center">
         <p className="text-gray-300">
           Não tem uma conta?{' '}
@@ -96,4 +83,4 @@ export function LoginForm() {
       </div>
     </div>
   )
-}
+}

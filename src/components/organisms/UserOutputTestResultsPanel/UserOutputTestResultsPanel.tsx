@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { Progress } from "@/components/atoms/Progress/Progress"
 import { UserOutputTestResultCard } from "@/components/molecules/UserOutputTestResultCard/UserOutputTestResultCard"
@@ -9,7 +8,6 @@ import {
   UserOutputTestCase,
   UserOutputResult 
 } from "@/lib/execution/user-output-processor"
-
 interface UserOutputTestResultsPanelProps {
   results: any
   passedTests: number
@@ -21,7 +19,6 @@ interface UserOutputTestResultsPanelProps {
   showUserOutputs?: boolean // Flag para ativar/desativar outputs reais do usuário
   userOutputRatio?: number // Proporção de outputs reais vs seeds (0.0 a 1.0)
 }
-
 export function UserOutputTestResultsPanel({ 
   results, 
   passedTests, 
@@ -36,48 +33,38 @@ export function UserOutputTestResultsPanel({
   const [userOutputResults, setUserOutputResults] = useState<UserOutputResult[]>([])
   const [combinedResults, setCombinedResults] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
-
   useEffect(() => {
     if (showUserOutputs && userCode && functionName && testCases.length > 0) {
       generateUserOutputs()
     } else {
-      // Se não estiver mostrando outputs do usuário, usa os resultados originais
       setCombinedResults(results?.details || [])
     }
   }, [userCode, functionName, testCases, showUserOutputs, userOutputRatio, results])
-
   const generateUserOutputs = async () => {
     setLoading(true)
     try {
-      // Gera outputs reais do usuário
       const userResults = await generateUserOutputTestCases(
         userCode,
         functionName,
         testCases,
         languageId
       )
-
-      // Combina com os resultados originais (seeds)
       const combined = combineUserAndSeedOutputs(
         userResults,
         results?.details || [],
         userOutputRatio
       )
-
       setUserOutputResults(userResults)
       setCombinedResults(combined)
     } catch (error) {
       console.error('Erro ao gerar outputs do usuário:', error)
-      // Fallback para resultados originais
       setCombinedResults(results?.details || [])
     } finally {
       setLoading(false)
     }
   }
-
   const userOutputCount = combinedResults.filter(r => r.isUserOutput).length
   const seedOutputCount = combinedResults.filter(r => !r.isUserOutput).length
-
   return (
     <div className="w-[20%] border-l border-border/40 overflow-auto bg-background">
       <div className="p-4">
@@ -89,7 +76,6 @@ export function UserOutputTestResultsPanel({
             </div>
           </div>
           <Progress value={(passedTests / totalTests) * 100} className="h-2" />
-          
           {showUserOutputs && (
             <div className="mt-2 text-xs text-muted-foreground">
               <div className="flex items-center gap-4">
@@ -105,7 +91,6 @@ export function UserOutputTestResultsPanel({
             </div>
           )}
         </div>
-
         <div className="space-y-2">
           {loading ? (
             <div className="text-center text-muted-foreground text-sm py-8">
@@ -129,7 +114,6 @@ export function UserOutputTestResultsPanel({
             </div>
           )}
         </div>
-
         {showUserOutputs && (
           <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="text-xs text-blue-700">
@@ -144,5 +128,4 @@ export function UserOutputTestResultsPanel({
       </div>
     </div>
   )
-}
-
+}

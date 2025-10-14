@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { useChallengeDetails } from "@/hooks/useChallengeDetails"
 import { useUserOutputExecution } from "@/hooks/useUserOutputExecution"
@@ -10,28 +9,23 @@ import { UserOutputTestResultsPanel } from "@/components/organisms/UserOutputTes
 import { NotFoundState } from "@/components/molecules/NotFoundState/NotFoundState"
 import { LoadingState } from "@/components/molecules/LoadingState/LoadingState"
 import type { ChallengePageProps, ChallengeProblem } from "@/types/challenges/challenge-page"
-
 interface UserOutputChallengePageProps extends ChallengePageProps {
   showUserOutputs?: boolean
   userOutputRatio?: number
 }
-
 export function UserOutputChallengePage({ 
   challengeId, 
   showUserOutputs = true, 
   userOutputRatio = 0.5 
 }: UserOutputChallengePageProps) {
   const { challenge, loading: challengeLoading, error: challengeError } = useChallengeDetails(challengeId)
-  
   const [code, setCode] = useState('')
   const [language, setLanguage] = useState("typescript")
-
   useEffect(() => {
     if (challenge?.initial_code && !code) {
       setCode(challenge.initial_code)
     }
   }, [challenge?.initial_code])
-
   const {
     compilationError,
     finalResults,
@@ -52,11 +46,9 @@ export function UserOutputChallengePage({
     showUserOutputs,
     userOutputRatio
   })
-
   if (challengeLoading) {
     return <LoadingState message="Carregando challenge..." />
   }
-
   if (challengeError || !challenge) {
     return (
       <NotFoundState 
@@ -65,7 +57,6 @@ export function UserOutputChallengePage({
       />
     )
   }
-
   const mapDifficulty = (difficulty: number): "Easy" | "Medium" | "Hard" => {
     switch (difficulty) {
       case 1:
@@ -79,7 +70,6 @@ export function UserOutputChallengePage({
         return 'Easy'
     }
   }
-
   const adaptedProblem = {
     id: challenge.id,
     title: challenge.title,
@@ -100,12 +90,9 @@ export function UserOutputChallengePage({
       description: `Test case ${index + 1}`
     })) || []
   }
-
   const passedTests = finalResults?.details?.filter((test) => test.status === "passed").length || 0
   const totalTests = finalResults?.details?.length || 0
-
   const handleRunCode = () => executeCode(code)
-
   return (
     <div className="flex h-screen flex-col bg-background">
       <ChallengeHeader title={challenge.title} />
@@ -141,8 +128,7 @@ export function UserOutputChallengePage({
           userOutputRatio={userOutputRatio}
         />
       </div>
-      
-      {/* Indicador de status dos outputs do usuário */}
+      {}
       {isUserOutputEnabled && userOutputError && (
         <div className="absolute bottom-4 right-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3 max-w-sm">
           <div className="text-sm text-yellow-700">
@@ -153,8 +139,7 @@ export function UserOutputChallengePage({
           </div>
         </div>
       )}
-      
-      {/* Estatísticas dos outputs */}
+      {}
       {isUserOutputEnabled && (userOutputCount > 0 || seedOutputCount > 0) && (
         <div className="absolute bottom-4 left-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
           <div className="text-sm text-blue-700">
@@ -167,4 +152,4 @@ export function UserOutputChallengePage({
       )}
     </div>
   )
-}
+}

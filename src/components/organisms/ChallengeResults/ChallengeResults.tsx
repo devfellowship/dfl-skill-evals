@@ -1,6 +1,5 @@
 import { TestResultsPanel } from "@/components/organisms/TestResultsPanel/TestResultsPanel"
 import type { ChallengeResultsProps } from "@/types/challenges/challenge-page"
-
 export function ChallengeResults({
   results,
   passedTests,
@@ -13,4 +12,4 @@ export function ChallengeResults({
       totalTests={totalTests}
     />
   )
-}
+}

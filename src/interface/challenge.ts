@@ -16,17 +16,14 @@ export interface ChallengeData {
   created_at: string
   updated_at: string
 }
-
 export interface TestCase {
   input: string
   expectedOutput: string
 }
-
 export interface Example {
   input: string
   output: string
 }
-
 export interface MentorChallenge {
   id: string
   title: string
@@ -36,7 +33,6 @@ export interface MentorChallenge {
   created_at: string
   updated_at: string
 }
-
 export interface Challenge {
   id: string
   title: string
@@ -52,33 +48,27 @@ export interface Challenge {
   testCases?: any[]
   orderIndex?: number | null
 }
-
 export interface ChallengeFormProps {
   isCreating: boolean
   editingChallenge: Challenge | null
 }
-
 export interface ChallengeControlsProps {
   language: string
   setLanguage: (language: string) => void
 }
-
 export interface ChallengeHeaderProps {
   title: string
   backHref?: string
 }
-
 export interface ChallengeRightSidebarProps {
   problem: any
 }
-
 export interface ChallengeComparisonModalProps {
   isOpen: boolean
   onClose: () => void
   challengeId: string | null
   onCompare: (challengeId: string) => void
 }
-
 export interface ComparisonResult {
   hasChanges: boolean
   changes: {
@@ -86,4 +76,4 @@ export interface ComparisonResult {
     oldValue: any
     newValue: any
   }[]
-}
+}

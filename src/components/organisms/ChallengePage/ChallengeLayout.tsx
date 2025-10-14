@@ -3,7 +3,6 @@ import { ProblemPanel } from "@/components/organisms/ProblemPanel/ProblemPanel"
 import { CodeExecutionPanel } from "@/components/organisms/CodeExecutionPanel/CodeExecutionPanel"
 import { TestResultsPanel } from "@/components/organisms/TestResultsPanel/TestResultsPanel"
 import type { ChallengeLayoutProps} from "@/types/challenges/challenge-page"
-
 export function ChallengeLayout({
   title,
   problem,
@@ -21,7 +20,6 @@ export function ChallengeLayout({
 }: ChallengeLayoutProps) {
   const passedTests = results?.details?.filter((test: any) => test.status === "passed").length || 0
   const totalTests = results?.totalCount || 0
-
   return (
     <div className="flex h-screen flex-col bg-background">
       <ChallengeHeader title={title} />
@@ -48,4 +46,4 @@ export function ChallengeLayout({
       </div>
     </div>
   )
-}
+}

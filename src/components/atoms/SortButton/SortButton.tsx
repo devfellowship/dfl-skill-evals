@@ -1,24 +1,20 @@
 "use client"
-
 import { useState } from "react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { ArrowUpDown, ArrowUp, ArrowDown, Calendar, Zap } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-
 export type SortOption = {
   value: string
   label: string
   icon: React.ReactNode
   direction: 'asc' | 'desc'
 }
-
 export interface SortButtonProps {
   currentSort: string
   onSortChange: (sort: string) => void
   className?: string
 }
-
 const SORT_OPTIONS: SortOption[] = [
   {
     value: 'created_desc',
@@ -44,7 +40,6 @@ const SORT_OPTIONS: SortOption[] = [
     icon: <Zap className="w-4 h-4" />,
     direction: 'desc'
   },
-
   {
     value: 'title_asc',
     label: 'Título A-Z',
@@ -58,10 +53,8 @@ const SORT_OPTIONS: SortOption[] = [
     direction: 'desc'
   }
 ]
-
 export function SortButton({ currentSort, onSortChange, className = "" }: SortButtonProps) {
   const currentOption = SORT_OPTIONS.find(option => option.value === currentSort) || SORT_OPTIONS[0]
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -90,4 +83,4 @@ export function SortButton({ currentSort, onSortChange, className = "" }: SortBu
       </DropdownMenuContent>
     </DropdownMenu>
   )
-}
+}

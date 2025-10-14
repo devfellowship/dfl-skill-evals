@@ -2,7 +2,6 @@ import { Button } from '@/components/atoms/Button/Button'
 import { Input } from '@/components/atoms/Input/Input'
 import { Label } from '@/components/ui/label'
 import { Mail, ArrowLeft, Send } from 'lucide-react'
-
 interface ResetPasswordFieldsProps {
   email: string
   isLoading: boolean
@@ -11,7 +10,6 @@ interface ResetPasswordFieldsProps {
   onSubmit: (e: React.FormEvent) => void
   onBackToLogin: () => void
 }
-
 export function ResetPasswordFields({
   email,
   isLoading,
@@ -22,14 +20,13 @@ export function ResetPasswordFields({
 }: ResetPasswordFieldsProps) {
   return (
     <form onSubmit={onSubmit} className="space-y-6">
-      {/* Error Message */}
+      {}
       {error && (
         <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
           <p className="text-red-400 text-sm font-medium">{error}</p>
         </div>
       )}
-      
-      {/* Email Field */}
+      {}
       <div className="space-y-2">
         <Label htmlFor="email" className="text-sm font-semibold text-gray-200">
           Email
@@ -47,8 +44,7 @@ export function ResetPasswordFields({
           />
         </div>
       </div>
-
-      {/* Submit Button */}
+      {}
       <Button
         type="submit"
         disabled={isLoading}
@@ -66,8 +62,7 @@ export function ResetPasswordFields({
           </div>
         )}
       </Button>
-
-      {/* Back to Login Button */}
+      {}
       <Button
         type="button"
         onClick={onBackToLogin}
@@ -81,4 +76,4 @@ export function ResetPasswordFields({
       </Button>
     </form>
   )
-}
+}

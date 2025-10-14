@@ -52,7 +52,7 @@ export function CodeExecutionPanel({
           isRunning={isLoading}
           showRunButton={true}
         />
-        
+
         {isLoading && (
           <ExecutionControls
             isLoading={isLoading}
@@ -60,7 +60,7 @@ export function CodeExecutionPanel({
             onCancel={onCancel}
           />
         )}
-        
+
         {results && !isLoading && (
           <ExecutionSummary
             results={results}

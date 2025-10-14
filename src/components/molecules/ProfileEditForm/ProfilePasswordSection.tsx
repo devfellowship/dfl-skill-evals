@@ -1,5 +1,4 @@
 'use client'
-
 import { useState } from 'react'
 import { Button } from '@/components/atoms/Button/Button'
 import { Input } from '@/components/atoms/Input/Input'
@@ -7,7 +6,6 @@ import { Label } from '@/components/atoms/Label/Label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Lock } from 'lucide-react'
 import { PasswordFormData } from '@/types/profile/profile'
-
 interface ProfilePasswordSectionProps {
   isChangingPassword: boolean
   passwordSaving: boolean
@@ -17,7 +15,6 @@ interface ProfilePasswordSectionProps {
   onSave: () => void
   onPasswordDataChange: (data: PasswordFormData) => void
 }
-
 export function ProfilePasswordSection({
   isChangingPassword,
   passwordSaving,
@@ -61,7 +58,6 @@ export function ProfilePasswordSection({
                 placeholder="Digite sua senha atual"
               />
             </div>
-
             <div>
               <Label htmlFor="newPassword">Nova Senha</Label>
               <Input
@@ -72,7 +68,6 @@ export function ProfilePasswordSection({
                 placeholder="Digite sua nova senha"
               />
             </div>
-
             <div>
               <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
               <Input
@@ -83,7 +78,6 @@ export function ProfilePasswordSection({
                 placeholder="Confirme sua nova senha"
               />
             </div>
-
             <div className="flex gap-2">
               <Button
                 onClick={onSave}
@@ -105,4 +99,4 @@ export function ProfilePasswordSection({
       </CardContent>
     </Card>
   )
-}
+}

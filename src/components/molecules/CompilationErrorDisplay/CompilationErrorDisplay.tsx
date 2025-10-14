@@ -1,12 +1,9 @@
 "use client"
-
 import { AlertTriangle } from "lucide-react"
 import { CODE_EXECUTION } from "@/consts/ui"
-
 interface CompilationErrorDisplayProps {
   error: string
 }
-
 export function CompilationErrorDisplay({ error }: CompilationErrorDisplayProps) {
   return (
     <div className="border-b border-border/40 bg-red-50 p-4">
@@ -21,4 +18,4 @@ export function CompilationErrorDisplay({ error }: CompilationErrorDisplayProps)
       </div>
     </div>
   )
-}
+}

@@ -2,7 +2,6 @@ import { useState } from "react"
 import { AdminChallenge as Challenge, ChallengeFormData } from "@/types/admin/admin-dashboard"
 import { useChallengesGlobal } from "@/hooks/useChallengesGlobal"
 import { useChallengeOperations } from "@/hooks/useChallengeOperations"
-
 export function useDashboardAdmin() {
   const { 
     published, 
@@ -16,7 +15,6 @@ export function useDashboardAdmin() {
     removeChallengeFromList,
     loadAllChallenges
   } = useChallengesGlobal()
-
   const {
     isDeleting,
     isApproving,
@@ -32,14 +30,12 @@ export function useDashboardAdmin() {
     archiveChallenge,
     sendBackForReview
   } = useChallengeOperations()
-
   const [comparisonModalOpen, setComparisonModalOpen] = useState(false)
   const [challengeToCompare, setChallengeToCompare] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [isCreating, setIsCreating] = useState(false)
   const [editingChallenge, setEditingChallenge] = useState<Challenge | null>(null)
   const [activeTab, setActiveTab] = useState<string>("challenges")
-
   const handleSubmit = async (formData: ChallengeFormData) => {
     if (editingChallenge) {
       const updateData = {
@@ -53,7 +49,6 @@ export function useDashboardAdmin() {
         status: formData.status,
         slug: formData.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
       }
-      
       updateChallengeInList(editingChallenge.id, {
         title: formData.title,
         description: formData.description,
@@ -61,9 +56,7 @@ export function useDashboardAdmin() {
         category: formData.category,
         status: formData.status
       })
-      
       const result = await updateChallenge(editingChallenge.id, updateData)
-      
       if (!result) {
         loadAllChallenges()
       }
@@ -79,20 +72,16 @@ export function useDashboardAdmin() {
       }
       await createChallenge(createData)
     }
-    
     setIsCreating(false)
     setEditingChallenge(null)
   }
-
   const handleEdit = (challenge: Challenge) => {
     window.location.href = `/edit/${challenge.id}`
   }
-
   const handleCancel = () => {
     setIsCreating(false)
     setEditingChallenge(null)
   }
-
   const handleDeleteWithOptimistic = async (id: string, reason: string) => {
     removeChallengeFromList(id)
     const result = await deleteChallenge(id, reason)
@@ -100,7 +89,6 @@ export function useDashboardAdmin() {
       loadAllChallenges()
     }
   }
-
   const handleApproveWithOptimistic = async (id: string) => {
     updateChallengeInList(id, { status: 'published' as any })
     const result = await approveChallenge(id)
@@ -108,7 +96,6 @@ export function useDashboardAdmin() {
       loadAllChallenges()
     }
   }
-
   const handleRejectWithOptimistic = async (id: string) => {
     updateChallengeInList(id, { status: 'draft' as any })
     const reason = prompt("Motivo da rejeição (opcional):")
@@ -117,7 +104,6 @@ export function useDashboardAdmin() {
       loadAllChallenges()
     }
   }
-
   const handleArchiveWithOptimistic = async (id: string) => {
     updateChallengeInList(id, { status: 'archived' as any })
     const result = await archiveChallenge(id)
@@ -125,7 +111,6 @@ export function useDashboardAdmin() {
       loadAllChallenges()
     }
   }
-
   const handleSendBackWithOptimistic = async (id: string) => {
     updateChallengeInList(id, { status: 'draft' as any })
     const result = await sendBackForReview(id)
@@ -133,17 +118,14 @@ export function useDashboardAdmin() {
       loadAllChallenges()
     }
   }
-
   const handleOpenComparison = (challengeId: string) => {
     setChallengeToCompare(challengeId)
     setComparisonModalOpen(true)
   }
-
   const handleCloseComparison = () => {
     setComparisonModalOpen(false)
     setChallengeToCompare(null)
   }
-
   const handleApproveFromComparison = async () => {
     if (challengeToCompare) {
       try {
@@ -153,7 +135,6 @@ export function useDashboardAdmin() {
         }
     }
   }
-
   const handleRejectFromComparison = async () => {
     if (challengeToCompare) {
       try {
@@ -163,11 +144,9 @@ export function useDashboardAdmin() {
         }
     }
   }
-
   const handleTitleSearch = (query: string) => {
     setSearchQuery(query)
   }
-
   const handleRestoreWithOptimistic = async (id: string) => {
     removeChallengeFromList(id)
     const result = await restoreChallenge(id)
@@ -175,7 +154,6 @@ export function useDashboardAdmin() {
       loadAllChallenges()
     }
   }
-
   const handlePermanentDeleteWithOptimistic = async (id: string) => {
     removeChallengeFromList(id)
     const result = await permanentDeleteChallenge(id)
@@ -183,7 +161,6 @@ export function useDashboardAdmin() {
       loadAllChallenges()
     }
   }
-
   return {
     published,
     pending,
@@ -220,4 +197,4 @@ export function useDashboardAdmin() {
     setIsCreating,
     setActiveTab
   }
-}
+}

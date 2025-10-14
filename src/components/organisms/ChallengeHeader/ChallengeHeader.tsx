@@ -1,13 +1,10 @@
 "use client"
-
 import Link from "next/link"
 import { Separator } from "@/components/ui/separator"
-
 interface ChallengeHeaderProps {
   title: string
   backHref?: string
 }
-
 export function ChallengeHeader({ title, backHref = "/" }: ChallengeHeaderProps) {
   return (
     <header className="shrink-0 border-b border-border/40 bg-background/95 p-4">

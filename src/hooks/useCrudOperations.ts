@@ -2,11 +2,9 @@ import { useCallback } from 'react'
 import { useBaseStates } from './useBaseStates'
 import { useBroadcastOperations } from './useBroadcastOperations'
 import { useUserValidation } from './useUserValidation'
-
 export interface CrudOperation<T = any> {
   (data: T): Promise<any>
 }
-
 export interface CrudOperationsConfig<T = any> {
   create?: CrudOperation<T>
   update?: (id: string, data: Partial<T>) => Promise<any>
@@ -14,12 +12,10 @@ export interface CrudOperationsConfig<T = any> {
   requireAuth?: boolean
   requirePermission?: 'create' | 'approve' | 'delete'
 }
-
 export function useCrudOperations<T = any>(config: CrudOperationsConfig<T> = {}) {
   const { loading, error, executeWithLoading } = useBaseStates()
   const { executeWithBroadcastAndToast } = useBroadcastOperations()
   const { validateUser, executeIfAuthorized } = useUserValidation()
-
   const {
     create: createFn,
     update: updateFn,
@@ -27,7 +23,6 @@ export function useCrudOperations<T = any>(config: CrudOperationsConfig<T> = {})
     requireAuth = true,
     requirePermission
   } = config
-
   const executeOperation = useCallback(async <R>(
     operation: () => Promise<R>,
     permission?: 'create' | 'approve' | 'delete'
@@ -35,23 +30,18 @@ export function useCrudOperations<T = any>(config: CrudOperationsConfig<T> = {})
     if (requireAuth) {
       validateUser()
     }
-
     if (permission && requirePermission) {
       return executeIfAuthorized(permission, operation)
     }
-
     return operation()
   }, [requireAuth, validateUser, executeIfAuthorized, requirePermission])
-
   const create = useCallback(async (data: T) => {
     if (!createFn) {
       throw new Error('Função de criação não configurada')
     }
-
     return executeWithLoading(async () => {
       const operation = () => createFn(data)
       const result = await executeOperation(operation, 'create')
-      
       return executeWithBroadcastAndToast(
         () => Promise.resolve(result),
         'create',
@@ -60,16 +50,13 @@ export function useCrudOperations<T = any>(config: CrudOperationsConfig<T> = {})
       )
     })
   }, [createFn, executeWithLoading, executeOperation, executeWithBroadcastAndToast])
-
   const update = useCallback(async (id: string, data: Partial<T>) => {
     if (!updateFn) {
       throw new Error('Função de atualização não configurada')
     }
-
     return executeWithLoading(async () => {
       const operation = () => updateFn(id, data)
       const result = await executeOperation(operation, 'approve')
-      
       return executeWithBroadcastAndToast(
         () => Promise.resolve(result),
         'update',
@@ -78,16 +65,13 @@ export function useCrudOperations<T = any>(config: CrudOperationsConfig<T> = {})
       )
     })
   }, [updateFn, executeWithLoading, executeOperation, executeWithBroadcastAndToast])
-
   const remove = useCallback(async (id: string) => {
     if (!deleteFn) {
       throw new Error('Função de exclusão não configurada')
     }
-
     return executeWithLoading(async () => {
       const operation = () => deleteFn(id)
       const result = await executeOperation(operation, 'delete')
-      
       return executeWithBroadcastAndToast(
         () => Promise.resolve(result),
         'delete',
@@ -96,7 +80,6 @@ export function useCrudOperations<T = any>(config: CrudOperationsConfig<T> = {})
       )
     })
   }, [deleteFn, executeWithLoading, executeOperation, executeWithBroadcastAndToast])
-
   return {
     loading,
     error,
@@ -104,5 +87,4 @@ export function useCrudOperations<T = any>(config: CrudOperationsConfig<T> = {})
     update,
     delete: remove
   }
-}
-
+}

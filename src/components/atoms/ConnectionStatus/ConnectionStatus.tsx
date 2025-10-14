@@ -1,12 +1,9 @@
 "use client"
-
 import { Wifi, WifiOff, RefreshCw } from "lucide-react"
-
 interface ConnectionStatusProps {
   isConnected: boolean
   lastUpdate: Date
 }
-
 export function ConnectionStatus({ isConnected, lastUpdate }: ConnectionStatusProps) {
   return (
     <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -25,4 +22,4 @@ export function ConnectionStatus({ isConnected, lastUpdate }: ConnectionStatusPr
       <span>Atualizado: {lastUpdate.toLocaleTimeString()}</span>
     </div>
   )
-}
+}

@@ -3,10 +3,8 @@ interface HintsProps {
   hintsUsed: number
   showHints: boolean
 }
-
 export function Hints({ hints, hintsUsed, showHints }: HintsProps) {
   if (!showHints || hintsUsed === 0) return null
-
   return (
     <div>
       <h3 className="font-medium mb-3">💡 Hints</h3>
@@ -21,4 +19,4 @@ export function Hints({ hints, hintsUsed, showHints }: HintsProps) {
       </div>
     </div>
   )
-}
+}

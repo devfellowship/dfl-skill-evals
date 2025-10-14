@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useChallengeOperations } from '@/hooks/useChallengeOperations'
@@ -19,30 +18,25 @@ import { AdminRouteWrapper } from "@/components/atoms/AdminRouteWrapper/AdminRou
 import { AdminNavigation } from "@/components/atoms/AdminNavigation/AdminNavigation"
 import { toast } from 'sonner'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-
 interface TestCase {
   input: string
   expectedOutput: string
   description: string
   hidden: boolean
 }
-
 interface Example {
   input: string
   output: string
   explanation: string
 }
-
 interface EditChallengeProps {
   challengeId: string
 }
-
 export function EditChallenge({ challengeId }: EditChallengeProps) {
   const router = useRouter()
   const { updateChallenge } = useChallengeOperations()
   const { loading: updateLoading } = useBaseStates()
   const { role, label } = useUserRole()
-  
   const [formData, setFormData] = useState<ChallengeOperationData>({
     title: '',
     description: '',
@@ -51,7 +45,6 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
     skills: [],
     function_name: 'solution',
     initial_code: `function solution() {
-
     return null;
 }`,
     test_cases: [],
@@ -62,42 +55,33 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
     trending: false,
     trending_priority: null,
   })
-
   const [testCases, setTestCases] = useState<TestCase[]>([
     { input: '', expectedOutput: '', description: '', hidden: false }
   ])
-
   const [examples, setExamples] = useState<Example[]>([
     { input: '', output: '', explanation: '' }
   ])
-
   const [skillInput, setSkillInput] = useState('')
   const [constraintInput, setConstraintInput] = useState('')
   const [hintInput, setHintInput] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [challenge, setChallenge] = useState<any>(null)
-
   useEffect(() => {
     if (challengeId) {
       loadChallenge()
     }
   }, [challengeId])
-
   const loadChallenge = async () => {
     try {
       setIsLoading(true)
-      
       const response = await fetch(`/api/challenges/${challengeId}`)
       const result = await response.json()
-      
       if (!response.ok) {
         throw new Error(result.error || 'Erro ao carregar challenge')
       }
-
       if (result.data) {
         const challengeData = result.data
         setChallenge(challengeData)
-        // Mapear dificuldade de número para string
         const getDifficultyString = (difficulty: number) => {
           switch (difficulty) {
             case 1: return 'easy'
@@ -107,7 +91,6 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
             default: return 'easy'
           }
         }
-
         setFormData({
           title: challengeData.title || '',
           description: challengeData.description || '',
@@ -124,7 +107,6 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
           trending: challengeData.trending || false,
           trending_priority: challengeData.trending_priority || null,
         })
-
         if (challengeData.test_cases) {
           setTestCases(challengeData.test_cases.map((tc: any) => ({
             input: tc.input || '',
@@ -133,7 +115,6 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
             hidden: tc.hidden || false
           })))
         }
-
         if (challengeData.examples) {
           setExamples(challengeData.examples.map((ex: any) => ({
             input: ex.input || '',
@@ -148,41 +129,32 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
       setIsLoading(false)
     }
   }
-
   const handleInputChange = (field: string, value: string | boolean | number) => {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
     if (!formData.title.trim()) {
       toast.error('Título é obrigatório')
       return
     }
-    
     if (!formData.description.trim()) {
       toast.error('Descrição é obrigatória')
       return
     }
-    
     if (!formData.function_name.trim()) {
       toast.error('Nome da função é obrigatório')
       return
     }
-    
     if (!formData.initial_code || !formData.initial_code.trim()) {
       toast.error('Código inicial é obrigatório')
       return
     }
-    
     const { test_cases, examples, constraints, hints, ...challengeData } = formData
-    
     const updateData: ChallengeOperationData = {
       ...challengeData,
       mentor: formData.mentor || challenge?.mentor || 'default_mentor',
     }
-
     try {
       const result = await updateChallenge(challengeId, updateData)
       if (result) {
@@ -195,35 +167,28 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
       toast.error('Erro ao atualizar challenge')
     }
   }
-
   const addTestCase = () => {
     setTestCases([...testCases, { input: '', expectedOutput: '', description: '', hidden: false }])
   }
-
   const removeTestCase = (index: number) => {
     setTestCases(testCases.filter((_, i) => i !== index))
   }
-
   const updateTestCase = (index: number, field: keyof TestCase, value: string | boolean) => {
     const updated = [...testCases]
     updated[index] = { ...updated[index], [field]: value }
     setTestCases(updated)
   }
-
   const addExample = () => {
     setExamples([...examples, { input: '', output: '', explanation: '' }])
   }
-
   const removeExample = (index: number) => {
     setExamples(examples.filter((_, i) => i !== index))
   }
-
   const updateExample = (index: number, field: keyof Example, value: string) => {
     const updated = [...examples]
     updated[index] = { ...updated[index], [field]: value }
     setExamples(updated)
   }
-
   const addSkill = () => {
     if (skillInput.trim() && !formData.skills?.includes(skillInput.trim())) {
       setFormData({
@@ -233,14 +198,12 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
       setSkillInput('')
     }
   }
-
   const removeSkill = (skill: string) => {
       setFormData({
         ...formData,
         skills: formData.skills?.filter((s: string) => s !== skill) || []
       })
   }
-
   const addConstraint = () => {
     if (constraintInput.trim()) {
       setFormData({
@@ -250,14 +213,12 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
       setConstraintInput('')
     }
   }
-
   const removeConstraint = (index: number) => {
       setFormData({
         ...formData,
         constraints: formData.constraints?.filter((_: any, i: number) => i !== index) || []
       })
   }
-
   const addHint = () => {
     if (hintInput.trim()) {
       setFormData({
@@ -267,22 +228,18 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
       setHintInput('')
     }
   }
-
   const removeHint = (index: number) => {
       setFormData({
         ...formData,
         hints: formData.hints?.filter((_: any, i: number) => i !== index) || []
       })
   }
-
   if (isLoading) {
     return <LoadingState />
   }
-
   if (!challenge) {
     return <NotFoundState title="Challenge não encontrado" message="O challenge solicitado não foi encontrado." />
   }
-
   return (
     <AdminRouteWrapper allowedRoles={['superadmin', 'admin', 'mentor']}>
       <div className="min-h-screen bg-background">
@@ -297,9 +254,8 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
           userName={label}
           userRole={label}
         />
-        
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Header */}
+          {}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
               <Button variant="outline" size="sm" asChild>
@@ -316,10 +272,9 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
               </div>
             </div>
           </div>
-
-          {/* Formulário */}
+          {}
           <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Informações Básicas */}
+            {}
             <Card>
               <CardHeader>
                 <CardTitle>Informações Básicas</CardTitle>
@@ -347,7 +302,6 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
                     />
                   </div>
                 </div>
-
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="difficulty">Dificuldade</Label>
@@ -376,7 +330,6 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
                     />
                   </div>
                 </div>
-
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="trending">Status Trending</Label>
@@ -407,7 +360,6 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
                     </div>
                   )}
                 </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="description">Descrição *</Label>
                   <Textarea
@@ -419,7 +371,6 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
                     required
                   />
                 </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="initialCode">Código Inicial *</Label>
                   <Textarea
@@ -434,8 +385,7 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Habilidades */}
+            {}
             <Card>
               <CardHeader>
                 <CardTitle>Habilidades Necessárias</CardTitle>
@@ -468,8 +418,7 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Restrições */}
+            {}
             <Card>
               <CardHeader>
                 <CardTitle>Restrições</CardTitle>
@@ -502,8 +451,7 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Dicas */}
+            {}
             <Card>
               <CardHeader>
                 <CardTitle>Dicas</CardTitle>
@@ -589,8 +537,7 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
                 </Button>
               </CardContent>
             </Card>
-
-            {/* Exemplos */}
+            {}
             <Card>
               <CardHeader>
                 <CardTitle>Exemplos</CardTitle>
@@ -645,7 +592,6 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
               </CardContent>
             </Card>
           </form>
-          
           <div className="flex gap-3 pt-6 border-t mt-6">
             <Button 
               onClick={handleSubmit} 
@@ -668,4 +614,4 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
       </div>
     </AdminRouteWrapper>
   )
-}
+}

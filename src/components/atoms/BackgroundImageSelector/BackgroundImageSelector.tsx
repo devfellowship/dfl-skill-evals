@@ -2,13 +2,11 @@ import { useState } from "react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Check } from "lucide-react"
-
 interface BackgroundImageSelectorProps {
   currentImage?: string
   onImageSelect: (imageUrl: string) => void
   className?: string
 }
-
 const BACKGROUND_IMAGES = [
   {
     id: 'gradient-1',
@@ -59,19 +57,16 @@ const BACKGROUND_IMAGES = [
     type: 'gradient'
   }
 ]
-
 export function BackgroundImageSelector({ 
   currentImage, 
   onImageSelect, 
   className = "" 
 }: BackgroundImageSelectorProps) {
   const [selectedImage, setSelectedImage] = useState(currentImage || BACKGROUND_IMAGES[0].url)
-
   const handleImageSelect = (imageUrl: string) => {
     setSelectedImage(imageUrl)
     onImageSelect(imageUrl)
   }
-
   return (
     <div className={`space-y-4 ${className}`}>
       <div>
@@ -80,7 +75,6 @@ export function BackgroundImageSelector({
           Escolha uma imagem de fundo para o seu challenge
         </p>
       </div>
-
       <div className="grid grid-cols-4 gap-3">
         {BACKGROUND_IMAGES.map((image) => (
           <Card
@@ -110,4 +104,4 @@ export function BackgroundImageSelector({
       </div>
     </div>
   )
-}
+}

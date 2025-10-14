@@ -3,12 +3,10 @@ interface Example {
   output: string
   explanation: string
 }
-
 interface ProblemExampleProps {
   example: Example
   index: number
 }
-
 export function ProblemExample({ example, index }: ProblemExampleProps) {
   return (
     <div className="rounded-lg border bg-muted/50 p-3">
@@ -31,4 +29,4 @@ export function ProblemExample({ example, index }: ProblemExampleProps) {
       </div>
     </div>
   )
-}
+}

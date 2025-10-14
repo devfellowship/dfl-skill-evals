@@ -1,9 +1,7 @@
 "use client"
-
 import { AdminRouteWrapper } from "@/components/atoms/AdminRouteWrapper/AdminRouteWrapper"
 import { AdminNavigation } from "@/components/atoms/AdminNavigation/AdminNavigation"
 import { ChallengeCreateForm } from "@/components/organisms/ChallengeCreateForm/ChallengeCreateForm"
-
 export function TeacherCreatePage() {
   return (
     <AdminRouteWrapper allowedRoles={['superadmin', 'admin', 'mentor']}>
@@ -20,7 +18,6 @@ export function TeacherCreatePage() {
           userName="Professor"
           userRole="Teacher"
         />
-
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-primary">Criar Novo Desafio</h1>
@@ -28,10 +25,9 @@ export function TeacherCreatePage() {
               Crie um novo desafio para seus alunos resolverem
             </p>
           </div>
-
           <ChallengeCreateForm />
         </div>
       </div>
     </AdminRouteWrapper>
   )
-}
+}

@@ -1,11 +1,8 @@
 "use client"
-
 import { UI_MESSAGES } from "@/consts/ui"
-
 interface PreChallengeHeroProps {
   title: string
 }
-
 export function PreChallengeHero({ title }: PreChallengeHeroProps) {
   return (
     <div className="text-center py-12">
@@ -13,4 +10,4 @@ export function PreChallengeHero({ title }: PreChallengeHeroProps) {
       <p className="text-muted-foreground">{UI_MESSAGES.PRE_CHALLENGE.SUBTITLE}</p>
     </div>
   )
-}
+}

@@ -1,15 +1,12 @@
 "use client"
-
 interface Example {
   input: string
   output: string
   explanation: string
 }
-
 interface ProblemExamplesProps {
   examples: Example[]
 }
-
 export function ProblemExamples({ examples }: ProblemExamplesProps) {
   return (
     <div>
@@ -39,4 +36,4 @@ export function ProblemExamples({ examples }: ProblemExamplesProps) {
       </div>
     </div>
   )
-}
+}

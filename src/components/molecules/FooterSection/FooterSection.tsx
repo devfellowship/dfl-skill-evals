@@ -2,7 +2,6 @@ interface FooterSectionProps {
   title: string
   children: React.ReactNode
 }
-
 export function FooterSection({ title, children }: FooterSectionProps) {
   return (
     <div>
@@ -12,4 +11,4 @@ export function FooterSection({ title, children }: FooterSectionProps) {
       </ul>
     </div>
   )
-}
+}

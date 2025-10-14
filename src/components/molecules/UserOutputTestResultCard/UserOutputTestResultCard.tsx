@@ -1,7 +1,6 @@
 import { CheckCircle, Target, User, Shuffle } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/atoms/Badge/Badge"
-
 interface UserOutputTestResult {
   status: 'passed' | 'failed' | 'error'
   input: string
@@ -11,30 +10,24 @@ interface UserOutputTestResult {
   errorMessage?: string
   isUserOutput?: boolean 
 }
-
 interface UserOutputTestResultCardProps {
   result: UserOutputTestResult
   index: number
   isHidden?: boolean
 }
-
 export function UserOutputTestResultCard({ result, index, isHidden = false }: UserOutputTestResultCardProps) {
-  
   const simplifyErrorMessage = (error: string): string => {
     if (!error || typeof error !== 'string') {
       return 'Erro desconhecido'
     }
-    
     if (error.includes('SyntaxError')) {
       const match = error.match(/SyntaxError: (.+?)(?:\s+at\s+|$)/)
       return match ? match[1] : 'Syntax Error'
     }
-    
     if (error.includes('Runtime Error')) {
       const lines = error.split('\n')
       let errorMessage = ''
       let lineInfo = ''
-      
       for (const line of lines) {
         if (line.includes('ReferenceError:') || line.includes('TypeError:') || line.includes('Error:')) {
           const match = line.match(/(\w+Error): (.+)/)
@@ -44,7 +37,6 @@ export function UserOutputTestResultCard({ result, index, isHidden = false }: Us
           }
         }
       }
-      
       for (const line of lines) {
         if (line.includes('at Object.<anonymous>') || line.includes('at Module._compile')) {
           const lineMatch = line.match(/\((.+):(\d+):(\d+)\)/)
@@ -55,20 +47,16 @@ export function UserOutputTestResultCard({ result, index, isHidden = false }: Us
           }
         }
       }
-      
       if (errorMessage && lineInfo) {
         return `${errorMessage}${lineInfo}`
       } else if (errorMessage) {
         return errorMessage
       }
-      
       const match = error.match(/Runtime Error: (.+?)(?:\s+at\s+|$)/)
       return match ? match[1] : 'Runtime Error'
     }
-    
     return error.split('\n')[0]
   }
-  
   return (
     <Card className={`${
       result.status === "passed" ? "border-green-200 bg-green-50" : 
@@ -110,7 +98,6 @@ export function UserOutputTestResultCard({ result, index, isHidden = false }: Us
             <Target className="h-4 w-4 text-red-600" />
           )}
         </div>
-        
         {!isHidden && (
           <>
             <div className="text-xs text-muted-foreground mb-1">
@@ -130,7 +117,6 @@ export function UserOutputTestResultCard({ result, index, isHidden = false }: Us
                 <span className="ml-1 text-blue-600 text-xs">(seu código)</span>
               )}
             </div>
-            
             {(result.status === 'failed' || result.status === 'error') && result.errorMessage && (
               <div className="text-xs text-orange-600 mt-2 p-2 bg-orange-50 rounded border border-orange-200">
                 <div className="font-medium text-orange-700 mb-1">
@@ -145,12 +131,10 @@ export function UserOutputTestResultCard({ result, index, isHidden = false }: Us
             )}
           </>
         )}
-        
         <div className="text-xs text-muted-foreground">
           <span className="font-medium">Time:</span> {result.executionTime || 0}ms
         </div>
       </CardContent>
     </Card>
   )
-}
-
+}

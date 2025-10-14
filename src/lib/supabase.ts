@@ -1,19 +1,14 @@
 import { createClient } from '@supabase/supabase-js'
-
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables')
 }
-
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
-
 export type UserRole = 'admin' | 'mentor' | 'community_member'
 export type ChallengeStatus = 'to_approve' | 'approved' | 'rejected' | 'archived'
 export type DifficultyLevel = 'easy' | 'medium' | 'hard' | 'expert'
 export type ProgrammingLanguage = 'typescript' | 'javascript' | 'python' | 'java' | 'cpp' | 'csharp'
-
 export interface Database {
   public: {
     Tables: {
@@ -354,7 +349,6 @@ export interface Database {
     }
   }
 }
-
 export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
 export type Inserts<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Insert']
-export type Updates<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Update']
+export type Updates<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Update']

@@ -1,5 +1,4 @@
 import type { MainSortType } from "@/lib/main-challenge-sorter"
-
 export const MAIN_SORT_OPTIONS = [
   {
     value: 'difficulty_asc' as MainSortType,
@@ -36,4 +35,4 @@ export const MAIN_SORT_OPTIONS = [
     label: 'Mais Populares',
     iconName: 'Users'
   }
-]
+]

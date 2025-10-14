@@ -1,7 +1,5 @@
 "use client"
-
 import { Label } from "@/components/atoms/Label/Label"
-
 const CATEGORY_OPTIONS = [
   "Algoritmos",
   "Estruturas de Dados", 
@@ -14,12 +12,10 @@ const CATEGORY_OPTIONS = [
   "Guloso",
   "Backtracking"
 ]
-
 interface CategorySelectorProps {
   selectedCategories: string[]
   onCategoryChange: (category: string, checked: boolean) => void
 }
-
 export function CategorySelector({ selectedCategories, onCategoryChange }: CategorySelectorProps) {
   return (
     <div className="space-y-2">
@@ -47,4 +43,4 @@ export function CategorySelector({ selectedCategories, onCategoryChange }: Categ
       )}
     </div>
   )
-}
+}

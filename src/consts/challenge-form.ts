@@ -9,4 +9,4 @@ export const CATEGORY_OPTIONS = [
   "Dinâmica",
   "Guloso",
   "Backtracking"
-]
+]

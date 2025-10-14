@@ -1,13 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card"
-
 interface ChallengeRightSidebarProps {
   problem: any
 }
-
 export function ChallengeRightSidebar({ problem }: ChallengeRightSidebarProps) {
   return (
     <div className="space-y-6">
-      {/* Exemplos do Problema */}
+      {}
       {problem.examples && problem.examples.length > 0 && (
         <Card className="bg-gray-900 text-white border-gray-700">
           <CardContent className="p-6">
@@ -35,8 +33,7 @@ export function ChallengeRightSidebar({ problem }: ChallengeRightSidebarProps) {
           </CardContent>
         </Card>
       )}
-
-      {/* Dicas */}
+      {}
       {problem.hints && problem.hints.length > 0 && (
         <Card className="bg-gray-900 text-white border-gray-700">
           <CardContent className="p-6">
@@ -53,8 +50,7 @@ export function ChallengeRightSidebar({ problem }: ChallengeRightSidebarProps) {
           </CardContent>
         </Card>
       )}
-
-      {/* Detalhes Técnicos */}
+      {}
       <Card className="bg-gray-900 text-white border-gray-700">
         <CardContent className="p-6">
           <h3 className="text-lg font-bold mb-4 text-white">📋 Detalhes</h3>
@@ -76,4 +72,4 @@ export function ChallengeRightSidebar({ problem }: ChallengeRightSidebarProps) {
       </Card>
     </div>
   )
-}
+}

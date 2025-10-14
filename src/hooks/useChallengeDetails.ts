@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Tables } from '@/lib/supabase'
-
 interface ChallengeDetails extends Tables<'challenges'> {
   challenge_examples?: Array<{
     id: string
@@ -24,22 +23,17 @@ interface ChallengeDetails extends Tables<'challenges'> {
     created_by?: string
   }>
 }
-
 export function useChallengeDetails(challengeId: string) {
   const [challenge, setChallenge] = useState<ChallengeDetails | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-
   useEffect(() => {
     if (!challengeId) return
-
     const fetchChallenge = async () => {
       try {
         setLoading(true)
         setError(null)
-
         const searchTitle = challengeId.replace(/-/g, ' ')
-        
         const { data, error: fetchError } = await supabase
           .schema('skill_evals')
           .from('challenges')
@@ -64,15 +58,12 @@ export function useChallengeDetails(challengeId: string) {
           .eq('is_public', true)
           .ilike('title', `%${searchTitle}%`)
           .single()
-
         if (fetchError) {
           throw fetchError
         }
-
         if (!data) {
           throw new Error('Challenge não encontrado')
         }
-
         setChallenge(data)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Erro desconhecido')
@@ -81,13 +72,11 @@ export function useChallengeDetails(challengeId: string) {
         setLoading(false)
       }
     }
-
     fetchChallenge()
   }, [challengeId])
-
   return {
     challenge,
     loading,
     error,
   }
-}
+}

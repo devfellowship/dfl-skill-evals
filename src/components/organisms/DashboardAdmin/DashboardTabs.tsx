@@ -7,7 +7,6 @@ import { ArchivedChallengesList } from "./ArchivedChallengesList"
 import { DeletedChallengesList } from "./DeletedChallengesList"
 import { AdminChallenge as Challenge, ChallengeFormData } from "@/types/admin/admin-dashboard"
 import { NotificationBadge } from "@/components/atoms/NotificationBadge/NotificationBadge"
-
 interface DashboardTabsProps {
   activeTab: string
   onTabChange: (tab: string) => void
@@ -33,7 +32,6 @@ interface DashboardTabsProps {
   isArchiving: string | null
   isRestoring: string | null
 }
-
 export function DashboardTabs({
   activeTab,
   onTabChange,
@@ -85,9 +83,8 @@ export function DashboardTabs({
           Deletados
         </TabsTrigger>
       </TabsList>
-
       <TabsContent value="challenges" className="space-y-6">
-        {/* Barra de busca para Challenges */}
+        {}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
@@ -97,7 +94,6 @@ export function DashboardTabs({
             className="pl-10"
           />
         </div>
-        
         <ChallengeList
           challenges={published}
           isInitialLoading={isInitialLoading}
@@ -111,7 +107,6 @@ export function DashboardTabs({
           searchQuery={searchQuery}
         />
       </TabsContent>
-
       <TabsContent value="approvals" className="space-y-6">
         <PendingApprovalsList
           challenges={pending}
@@ -128,7 +123,6 @@ export function DashboardTabs({
           searchQuery={searchQuery}
         />
       </TabsContent>
-
       <TabsContent value="archived" className="space-y-6">
         <ArchivedChallengesList
           challenges={archived}
@@ -141,7 +135,6 @@ export function DashboardTabs({
           isApproving={isApproving}
         />
       </TabsContent>
-
       <TabsContent value="deleted" className="space-y-6">
         <DeletedChallengesList
           challenges={deleted}
@@ -156,4 +149,4 @@ export function DashboardTabs({
       </TabsContent>
     </Tabs>
   )
-}
+}

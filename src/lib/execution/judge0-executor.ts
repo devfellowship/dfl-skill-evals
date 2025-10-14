@@ -4,9 +4,7 @@ import { checkRateLimit } from './rate-limiter'
 import { getCachedLanguages, isLanguageSupported, getLanguageName } from './language-manager'
 import { transpileTsToJs, createExecutableCode } from './code-processor'
 import { parseJudge0Result } from './result-parser'
-
 export { checkRateLimit, isLanguageSupported, getLanguageName }
-
 export async function executeCodeWithJudge0(
   code: string,
   testCases: TestCase[],
@@ -14,12 +12,9 @@ export async function executeCodeWithJudge0(
   timeoutMs: number = 5000,
   functionName: string
 ): Promise<TestResult[]> {
-  
   const results: TestResult[] = []
-  
   let processedCode = code
   let targetLanguage = { id: languageId }
-
   if (languageId === 74) {
     try {
       processedCode = transpileTsToJs(code)
@@ -35,10 +30,8 @@ export async function executeCodeWithJudge0(
       }))
     }
   }
-  
   for (const testCase of testCases) {
     const startTime = Date.now()
-    
     try {
       const result = await executeTestCase(processedCode, testCase, targetLanguage.id, timeoutMs, functionName)
       results.push({
@@ -56,10 +49,8 @@ export async function executeCodeWithJudge0(
       })
     }
   }
-  
   return results
 }
-
 async function executeTestCase(
   code: string,
   testCase: TestCase,
@@ -67,9 +58,7 @@ async function executeTestCase(
   timeoutMs: number,
   functionName: string
 ): Promise<Omit<TestResult, 'executionTime'>> {
-  
   const executableCode = createExecutableCode(code, functionName, testCase.input, languageId)
-
   const payload = {
     source_code: executableCode,
     language_id: languageId,
@@ -82,7 +71,6 @@ async function executeTestCase(
     enable_per_process_and_thread_memory_limit: false,
     number_of_runs: 1
   }
-
   const result = await executeCode(payload)
   return parseJudge0Result(result, testCase)
-}
+}

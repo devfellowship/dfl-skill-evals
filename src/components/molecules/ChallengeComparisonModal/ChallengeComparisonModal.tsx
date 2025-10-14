@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
@@ -8,7 +7,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { X, CheckCircle, XCircle, AlertTriangle, Code, TestTube, BookOpen, FileText } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-
 interface ChallengeComparisonModalProps {
   isOpen: boolean
   onClose: () => void
@@ -16,7 +14,6 @@ interface ChallengeComparisonModalProps {
   onApprove?: () => void
   onReject?: () => void
 }
-
 interface ChallengeData {
   id: string
   title: string
@@ -29,7 +26,6 @@ interface ChallengeData {
   createdAt: string
   updatedAt: string
 }
-
 interface ComparisonResult {
   hasChanges: boolean
   changes: {
@@ -42,7 +38,6 @@ interface ComparisonResult {
     testCases?: { old: any[]; new: any[] }
   }
 }
-
 export function ChallengeComparisonModal({ 
   isOpen, 
   onClose, 
@@ -54,29 +49,23 @@ export function ChallengeComparisonModal({
   const [originalChallenge, setOriginalChallenge] = useState<ChallengeData | null>(null)
   const [comparison, setComparison] = useState<ComparisonResult | null>(null)
   const [loading, setLoading] = useState(false)
-
   useEffect(() => {
     if (isOpen && challengeId) {
       loadChallengeData()
     }
   }, [isOpen, challengeId])
-
   const loadChallengeData = async () => {
     try {
       setLoading(true)
-      
-      // Carregar challenge atual
       const { data: currentData, error: currentError } = await supabase
         .schema('skill_evals')
         .from('challenges')
         .select('*')
         .eq('id', challengeId)
         .single()
-
       if (currentError) {
         return
       }
-
       if (currentData) {
         const adaptedCurrent: ChallengeData = {
           id: currentData.id,
@@ -91,9 +80,6 @@ export function ChallengeComparisonModal({
           updatedAt: currentData.updated_at
         }
         setCurrentChallenge(adaptedCurrent)
-
-        // Para este exemplo, vamos simular dados originais
-        // Em um sistema real, você salvaria os dados originais quando aprovado
         const originalData: ChallengeData = {
           ...adaptedCurrent,
           title: adaptedCurrent.title + ' (versão original)',
@@ -103,8 +89,6 @@ export function ChallengeComparisonModal({
           initialCode: adaptedCurrent.initialCode + '\n// Código original modificado'
         }
         setOriginalChallenge(originalData)
-
-        // Comparar as versões
         const comparisonResult = compareChallenges(originalData, adaptedCurrent)
         setComparison(comparisonResult)
       }
@@ -113,49 +97,39 @@ export function ChallengeComparisonModal({
       setLoading(false)
     }
   }
-
   const compareChallenges = (original: ChallengeData, current: ChallengeData): ComparisonResult => {
     const changes: ComparisonResult['changes'] = {}
     let hasChanges = false
-
     if (original.title !== current.title) {
       changes.title = { old: original.title, new: current.title }
       hasChanges = true
     }
-
     if (original.description !== current.description) {
       changes.description = { old: original.description, new: current.description }
       hasChanges = true
     }
-
     if (original.difficulty !== current.difficulty) {
       changes.difficulty = { old: original.difficulty, new: current.difficulty }
       hasChanges = true
     }
-
     if (JSON.stringify(original.category) !== JSON.stringify(current.category)) {
       changes.category = { old: original.category, new: current.category }
       hasChanges = true
     }
-
     if (original.functionName !== current.functionName) {
       changes.functionName = { old: original.functionName, new: current.functionName }
       hasChanges = true
     }
-
     if (original.initialCode !== current.initialCode) {
       changes.initialCode = { old: original.initialCode, new: current.initialCode }
       hasChanges = true
     }
-
     if (JSON.stringify(original.testCases) !== JSON.stringify(current.testCases)) {
       changes.testCases = { old: original.testCases, new: current.testCases }
       hasChanges = true
     }
-
     return { hasChanges, changes }
   }
-
   const getDifficultyLabel = (difficulty: number) => {
     switch (difficulty) {
       case 1: return 'Fácil'
@@ -165,7 +139,6 @@ export function ChallengeComparisonModal({
       default: return 'Fácil'
     }
   }
-
   const renderChange = (field: string, change: any) => {
     return (
       <div className="space-y-2">
@@ -199,9 +172,7 @@ export function ChallengeComparisonModal({
       </div>
     )
   }
-
   if (!isOpen) return null
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
@@ -214,14 +185,13 @@ export function ChallengeComparisonModal({
             Revise as alterações feitas nesta challenge antes de aprovar ou rejeitar
           </DialogDescription>
         </DialogHeader>
-
         {loading ? (
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           </div>
         ) : comparison && currentChallenge ? (
           <div className="space-y-6">
-            {/* Resumo das Alterações */}
+            {}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -259,8 +229,7 @@ export function ChallengeComparisonModal({
                 )}
               </CardContent>
             </Card>
-
-            {/* Detalhes das Alterações */}
+            {}
             {comparison.hasChanges && (
               <Tabs defaultValue="overview" className="w-full">
                 <TabsList className="grid w-full grid-cols-4">
@@ -269,7 +238,6 @@ export function ChallengeComparisonModal({
                   <TabsTrigger value="code">Código</TabsTrigger>
                   <TabsTrigger value="tests">Testes</TabsTrigger>
                 </TabsList>
-
                 <TabsContent value="overview" className="space-y-4">
                   <div className="space-y-4">
                     {comparison.changes.title && renderChange('Título', comparison.changes.title)}
@@ -296,15 +264,12 @@ export function ChallengeComparisonModal({
                     {comparison.changes.functionName && renderChange('Nome da Função', comparison.changes.functionName)}
                   </div>
                 </TabsContent>
-
                 <TabsContent value="content" className="space-y-4">
                   {comparison.changes.description && renderChange('Descrição', comparison.changes.description)}
                 </TabsContent>
-
                 <TabsContent value="code" className="space-y-4">
                   {comparison.changes.initialCode && renderChange('Código Inicial', comparison.changes.initialCode)}
                 </TabsContent>
-
                 <TabsContent value="tests" className="space-y-4">
                   {comparison.changes.testCases && (
                     <div className="space-y-2">
@@ -332,8 +297,7 @@ export function ChallengeComparisonModal({
                 </TabsContent>
               </Tabs>
             )}
-
-            {/* Ações */}
+            {}
             <div className="flex items-center justify-end gap-3 pt-4 border-t">
               <Button variant="outline" onClick={onClose}>
                 <X className="w-4 h-4 mr-2" />
@@ -361,5 +325,4 @@ export function ChallengeComparisonModal({
       </DialogContent>
     </Dialog>
   )
-}
-
+}

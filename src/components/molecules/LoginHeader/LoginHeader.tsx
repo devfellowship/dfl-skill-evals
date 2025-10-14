@@ -1,5 +1,4 @@
 import { Code } from 'lucide-react'
-
 export function LoginHeader() {
   return (
     <div className="text-center space-y-6">
@@ -10,7 +9,6 @@ export function LoginHeader() {
           </div>
           <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-2xl blur opacity-30 -z-10"></div>
         </div>
-        
                  <div className="space-y-2">
            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
              DevShapper
@@ -18,7 +16,6 @@ export function LoginHeader() {
            <p className="text-lg text-gray-300 font-medium">Challenge Platform</p>
          </div>
        </div>
-
        <div className="space-y-2">
          <p className="text-gray-300 max-w-md mx-auto">
            Faça login para acessar sua conta para se desafiar com os desafios de programação.
@@ -26,4 +23,4 @@ export function LoginHeader() {
        </div>
     </div>
   )
-}
+}

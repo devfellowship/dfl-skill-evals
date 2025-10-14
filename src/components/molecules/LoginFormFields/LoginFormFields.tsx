@@ -3,7 +3,6 @@ import { Button } from '@/components/atoms/Button/Button'
 import { Input } from '@/components/atoms/Input/Input'
 import { Label } from '@/components/ui/label'
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react'
-
 interface LoginFormFieldsProps {
   email: string
   password: string
@@ -14,7 +13,6 @@ interface LoginFormFieldsProps {
   onSubmit: (e: React.FormEvent) => void
   onForgotPassword?: () => void
 }
-
 export function LoginFormFields({
   email,
   password,
@@ -26,7 +24,6 @@ export function LoginFormFields({
   onForgotPassword
 }: LoginFormFieldsProps) {
   const [showPassword, setShowPassword] = useState(false)
-
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       {error && (
@@ -34,7 +31,6 @@ export function LoginFormFields({
           <p className="text-red-400 text-sm font-medium">{error}</p>
         </div>
       )}
-      
        <div className="space-y-2">
          <Label htmlFor="email" className="text-sm font-semibold text-gray-200">
            Email
@@ -52,7 +48,6 @@ export function LoginFormFields({
            />
          </div>
        </div>
-
        <div className="space-y-2">
          <Label htmlFor="password" className="text-sm font-semibold text-gray-200">
            Senha
@@ -77,7 +72,6 @@ export function LoginFormFields({
            </button>
          </div>
        </div>
-
        <div className="flex items-center justify-between">
          <label className="flex items-center space-x-3 cursor-pointer group">
            <input
@@ -96,7 +90,6 @@ export function LoginFormFields({
            Esqueceu a senha?
          </button>
        </div>
-
        <Button
          type="submit"
          disabled={isLoading}
@@ -116,4 +109,4 @@ export function LoginFormFields({
        </Button>
     </form>
   )
-}
+}

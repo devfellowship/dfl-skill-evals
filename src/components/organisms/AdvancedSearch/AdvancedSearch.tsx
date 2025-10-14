@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect, useCallback } from "react"
 import { Search } from "lucide-react"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
@@ -12,46 +11,38 @@ import { Slider } from "@/components/ui/slider"
 import type { Assessment, SearchFilters } from "@/types"
 import { availableSkills, categories } from "@/consts"
 import { getDifficultyLabel } from "@/lib/utils"
-
 interface AdvancedSearchProps {
   onSearch: (query: string, filters: SearchFilters) => void
   currentQuery: string
   currentFilters: SearchFilters
   assessments: Assessment[]
 }
-
 import { DIFFICULTY_OPTIONS as difficulties } from "@/consts/advanced-search"
-
 export function AdvancedSearch({ onSearch, currentQuery, currentFilters, assessments }: AdvancedSearchProps) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState(currentQuery)
   const [filters, setFilters] = useState(currentFilters)
   const [searchResults, setSearchResults] = useState<Assessment[]>([])
   const [recentSearches, setRecentSearches] = useState<string[]>([])
-
   const performSearch = useCallback(
     (term: string) => {
       if (!term.trim()) {
         setSearchResults([])
         return
       }
-
       const filtered = assessments.filter((assessment) =>
         assessment.title.toLowerCase().includes(term.toLowerCase()) ||
         assessment.description.toLowerCase().includes(term.toLowerCase()) ||
         assessment.skills.some((skill) => skill.toLowerCase().includes(term.toLowerCase())) ||
         assessment.category.toLowerCase().includes(term.toLowerCase())
       )
-
       setSearchResults(filtered.slice(0, 5))
     },
     [assessments]
   )
-
   useEffect(() => {
     performSearch(query)
   }, [query, performSearch])
-
   const handleSearchSubmit = () => {
     if (query.trim()) {
       setRecentSearches(prev => {
@@ -63,14 +54,12 @@ export function AdvancedSearch({ onSearch, currentQuery, currentFilters, assessm
       setOpen(false)
     }
   }
-
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault()
       handleSearchSubmit()
     }
   }
-
   const clearAllFilters = () => {
     setFilters({
       skills: [],
@@ -81,14 +70,12 @@ export function AdvancedSearch({ onSearch, currentQuery, currentFilters, assessm
       trending: false,
     })
   }
-
   const activeFiltersCount = filters.skills.length + 
     filters.difficulties.length + 
     filters.durations.length + 
     filters.categories.length + 
     (filters.minRating > 0 ? 1 : 0) + 
     (filters.trending ? 1 : 0)
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -105,7 +92,6 @@ export function AdvancedSearch({ onSearch, currentQuery, currentFilters, assessm
           )}
         </Button>
       </DialogTrigger>
-
       <DialogContent className="max-w-4xl max-h-[90vh] p-0">
         <div className="flex">
           <div className="flex-1 flex flex-col min-h-0">
@@ -124,7 +110,6 @@ export function AdvancedSearch({ onSearch, currentQuery, currentFilters, assessm
                   Search
                 </Button>
               </div>
-
               {recentSearches.length > 0 && !query && (
                 <div>
                   <h3 className="text-sm font-medium mb-2">Recent Searches</h3>
@@ -146,7 +131,6 @@ export function AdvancedSearch({ onSearch, currentQuery, currentFilters, assessm
                   </div>
                 </div>
               )}
-
               {searchResults.length > 0 && query && (
                 <div>
                   <h3 className="text-sm font-medium mb-2">Search Results</h3>
@@ -169,7 +153,6 @@ export function AdvancedSearch({ onSearch, currentQuery, currentFilters, assessm
               )}
             </div>
           </div>
-
           <div className="w-80 border-l bg-muted/30">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
@@ -180,7 +163,6 @@ export function AdvancedSearch({ onSearch, currentQuery, currentFilters, assessm
                   </Button>
                 )}
               </div>
-
               <div className="space-y-6">
                 <div>
                   <Label className="text-sm font-medium mb-2 block">Categories</Label>
@@ -209,7 +191,6 @@ export function AdvancedSearch({ onSearch, currentQuery, currentFilters, assessm
                     ))}
                   </div>
                 </div>
-
                 <div>
                   <Label className="text-sm font-medium mb-2 block">Skills</Label>
                   <div className="space-y-2 max-h-32 overflow-y-auto">
@@ -237,7 +218,6 @@ export function AdvancedSearch({ onSearch, currentQuery, currentFilters, assessm
                     ))}
                   </div>
                 </div>
-
                 <div>
                   <Label className="text-sm font-medium mb-2 block">Difficulty</Label>
                   <div className="space-y-2">
@@ -267,7 +247,6 @@ export function AdvancedSearch({ onSearch, currentQuery, currentFilters, assessm
                     ))}
                   </div>
                 </div>
-
                 <div>
                   <Label className="text-sm font-medium mb-2 block">Minimum Rating</Label>
                   <Slider
@@ -286,7 +265,6 @@ export function AdvancedSearch({ onSearch, currentQuery, currentFilters, assessm
                     <span>5</span>
                   </div>
                 </div>
-
                 <div>
                   <div className="flex items-center space-x-2">
                     <Checkbox
@@ -299,7 +277,6 @@ export function AdvancedSearch({ onSearch, currentQuery, currentFilters, assessm
                     <label htmlFor="trending" className="text-sm">Show only trending</label>
                   </div>
                 </div>
-
                 <div className="flex gap-2">
                   <Button 
                     onClick={() => {
@@ -318,4 +295,4 @@ export function AdvancedSearch({ onSearch, currentQuery, currentFilters, assessm
       </DialogContent>
     </Dialog>
   )
-}
+}
