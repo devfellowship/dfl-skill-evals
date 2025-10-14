@@ -181,7 +181,10 @@ export function ChallengeList({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => onDelete(challenge.id)}
+              onClick={() => {
+                console.log('🔍 Botão de exclusão clicado para challenge:', challenge.id, challenge.title)
+                onDelete(challenge.id)
+              }}
               disabled={isDeleting === challenge.id}
               className="text-red-600 hover:text-red-700 opacity-70 group-hover:opacity-100 transition-opacity duration-200"
             >
