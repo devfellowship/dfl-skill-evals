@@ -78,13 +78,9 @@ export function useChallengeOperations() {
 
   const updateChallenge = useCallback(async (id: string, updateData: Partial<ChallengeOperationData>) => {
     const { user, isAdmin } = validateUser()
-
-    // Criar payload com campos que existem na tabela real
     const mappedUpdates: any = {
       updated_at: new Date().toISOString()
     }
-
-    // Campos básicos que existem na tabela
     if (updateData.title) mappedUpdates.title = updateData.title
     if (updateData.description) mappedUpdates.description = updateData.description
     if (updateData.difficulty) mappedUpdates.difficulty = mapDifficultyToNumber(updateData.difficulty)
@@ -95,8 +91,6 @@ export function useChallengeOperations() {
     if (updateData.initial_code) mappedUpdates.initial_code = updateData.initial_code
     if (updateData.skills) mappedUpdates.skills = updateData.skills
     if (updateData.mentor) mappedUpdates.mentor = updateData.mentor
-    
-    // Campos de status e trending (apenas para admins)
     if (isAdmin) {
       if (updateData.status) mappedUpdates.status = updateData.status
       if (updateData.is_public !== undefined) mappedUpdates.is_public = updateData.is_public
@@ -135,8 +129,20 @@ export function useChallengeOperations() {
     )
   }, [validateUser, executeWithBroadcastAndToast])
 
-  const deleteChallenge = useCallback(async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir este challenge?')) {
+  const deleteChallenge = useCallback(async (id: string, reason?: string) => {
+    const { user: validatedUser, isAdmin } = validateUser()
+
+    // Se não tiver motivo, pedir para o usuário
+    if (!reason) {
+      const userReason = prompt('Digite o motivo da exclusão:')
+      if (!userReason || userReason.trim() === '') {
+        alert('Motivo é obrigatório para exclusão')
+        return null
+      }
+      reason = userReason.trim()
+    }
+
+    if (!confirm(`Tem certeza que deseja excluir este challenge?\n\nMotivo: ${reason}`)) {
       return null
     }
 
@@ -147,14 +153,18 @@ export function useChallengeOperations() {
           const { error } = await supabase
             .schema('skill_evals')
             .from('challenges')
-            .delete()
+            .update({
+              deleted_at: new Date().toISOString(),
+              deleted_by: validatedUser.id,
+              deletion_reason: reason
+            })
             .eq('id', id)
 
           if (error) {
             throw new Error(error.message || 'Erro ao excluir challenge')
           }
 
-          return { id }
+          return { id, reason }
         },
         'delete',
         'Challenge excluído com sucesso!',
@@ -163,7 +173,85 @@ export function useChallengeOperations() {
     } finally {
       setIsDeleting(null)
     }
-  }, [executeWithBroadcastAndToast])
+  }, [validateUser, executeWithBroadcastAndToast])
+
+  const restoreChallenge = useCallback(async (id: string) => {
+    const { isAdmin } = validateUser()
+
+    if (!isAdmin) {
+      alert('Apenas administradores podem restaurar challenges')
+      return null
+    }
+
+    if (!confirm('Tem certeza que deseja restaurar este challenge?')) {
+      return null
+    }
+
+    try {
+      return executeWithBroadcastAndToast(
+        async () => {
+          const { error } = await supabase
+            .schema('skill_evals')
+            .from('challenges')
+            .update({
+              deleted_at: null,
+              deleted_by: null,
+              deletion_reason: null
+            })
+            .eq('id', id)
+
+          if (error) {
+            throw new Error(error.message || 'Erro ao restaurar challenge')
+          }
+
+          return { id }
+        },
+        'update',
+        'Challenge restaurado com sucesso!',
+        'Erro ao restaurar challenge'
+      )
+    } catch (error) {
+      console.error('Erro ao restaurar challenge:', error)
+      throw error
+    }
+  }, [validateUser, executeWithBroadcastAndToast])
+
+  const permanentDeleteChallenge = useCallback(async (id: string) => {
+    const { isAdmin } = validateUser()
+
+    if (!isAdmin) {
+      alert('Apenas administradores podem deletar permanentemente')
+      return null
+    }
+
+    if (!confirm('ATENÇÃO: Esta ação é irreversível!\n\nTem certeza que deseja deletar permanentemente este challenge?')) {
+      return null
+    }
+
+    try {
+      return executeWithBroadcastAndToast(
+        async () => {
+          const { error } = await supabase
+            .schema('skill_evals')
+            .from('challenges')
+            .delete()
+            .eq('id', id)
+
+          if (error) {
+            throw new Error(error.message || 'Erro ao deletar permanentemente')
+          }
+
+          return { id }
+        },
+        'delete',
+        'Challenge deletado permanentemente!',
+        'Erro ao deletar permanentemente'
+      )
+    } catch (error) {
+      console.error('Erro ao deletar permanentemente:', error)
+      throw error
+    }
+  }, [validateUser, executeWithBroadcastAndToast])
 
   const approveChallenge = useCallback(async (id: string) => {
     setIsApproving(id)
@@ -295,6 +383,8 @@ export function useChallengeOperations() {
     createChallenge,
     updateChallenge,
     deleteChallenge,
+    restoreChallenge,
+    permanentDeleteChallenge,
     approveChallenge,
     rejectChallenge,
     archiveChallenge,
