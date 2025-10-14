@@ -47,10 +47,7 @@ export function ChallengeForm({
 
 
   useEffect(() => {
-    console.log('🔄 ChallengeForm: useEffect executado, editingChallenge:', editingChallenge, 'isAdmin:', isAdmin)
     if (editingChallenge) {
-      console.log('🔍 ChallengeForm: Editando challenge:', editingChallenge)
-      
       // Para não-admins, sempre define status como 'draft' (aguardando aprovação)
       const statusForUser = isAdmin ? (editingChallenge.status || "draft") : "draft"
       
@@ -64,9 +61,7 @@ export function ChallengeForm({
         initialCode: editingChallenge.initialCode || "",
         testCases: editingChallenge.testCases || []
       }
-      console.log('📝 ChallengeForm: Dados do formulário:', editFormData)
       setFormData(editFormData)
-      console.log('✅ ChallengeForm: FormData atualizado')
     } else {
       setFormData({
         title: "",
@@ -82,7 +77,6 @@ export function ChallengeForm({
   }, [editingChallenge, isAdmin])
 
   const handleInputChange = (field: string, value: string | string[]) => {
-    console.log(`🔄 handleInputChange: ${field} = ${JSON.stringify(value)}`)
     setFormData((prev: ChallengeFormData) => ({ ...prev, [field]: value }))
   }
 

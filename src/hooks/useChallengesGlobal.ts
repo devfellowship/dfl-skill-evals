@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { AdminChallenge as Challenge } from '@/types/admin/admin-dashboard'
 import type { RealtimeChannel } from '@supabase/supabase-js'
+import { mapDifficultyToString } from '@/lib/utils/difficulty-mapper'
 
 export function useChallengesGlobal() {
   const [challenges, setChallenges] = useState<Challenge[]>([])
@@ -12,8 +13,6 @@ export function useChallengesGlobal() {
   const pollingRef = useRef<NodeJS.Timeout | null>(null)
 
   const adaptChallenge = useCallback((raw: any): Challenge => {
-    console.log('🔍 adaptChallenge: Dados brutos:', raw)
-    
     const mapStatus = raw.status === 'approved'
       ? 'published'
       : raw.status === 'to_approve' || raw.status === 'rejected'
@@ -22,17 +21,10 @@ export function useChallengesGlobal() {
       ? 'archived'
       : 'draft'
 
-    const mapDifficulty = (difficulty: number) => {
-      switch (difficulty) {
-        case 1: return 'easy'
-        case 2: return 'medium'
-        case 3: return 'hard'
-        case 4: return 'expert'
-        default: return 'easy'
-      }
+    const mapDifficulty = (difficulty: number): 'easy' | 'medium' | 'hard' | 'expert' => {
+      const mapped = mapDifficultyToString(difficulty)
+      return mapped as 'easy' | 'medium' | 'hard' | 'expert'
     }
-    
-    console.log('📝 adaptChallenge: Status mapeado:', mapStatus, 'Difficulty mapeado:', mapDifficulty(raw.difficulty))
 
     return {
       id: raw.id,
@@ -48,8 +40,10 @@ export function useChallengesGlobal() {
       initialCode: raw.initial_code ?? '',
       testCases: [],
       orderIndex: raw.order_index ?? null,
-      created_by: raw.created_by, // Incluir o campo created_by
-      mentor: raw.mentor // Incluir o campo mentor
+      created_by: raw.created_by,
+      mentor: raw.mentor,
+      trending: raw.trending || false,
+      trending_priority: raw.trending_priority || null
     }
   }, [])
 
@@ -84,7 +78,7 @@ export function useChallengesGlobal() {
     
     pollingRef.current = setInterval(() => {
       loadAllChallenges()
-    }, 5000) // Polling a cada 5 segundos
+    }, 5000)
   }, [loadAllChallenges])
 
   const stopPolling = useCallback(() => {
@@ -105,7 +99,6 @@ export function useChallengesGlobal() {
     channelRef.current = channel
     channel
       .on('broadcast', { event: 'challenge-created' }, ({ payload }) => {
-
         const adaptedChallenge = adaptChallenge(payload.challenge)
         setChallenges(prev => [adaptedChallenge, ...prev])
         setLastUpdate(new Date())
@@ -120,7 +113,6 @@ export function useChallengesGlobal() {
         setBroadcastWorking(true)
       })
       .on('broadcast', { event: 'challenge-deleted' }, ({ payload }) => {
-
         setChallenges(prev => prev.filter(ch => ch.id !== payload.challengeId))
         setLastUpdate(new Date())
         setBroadcastWorking(true)
@@ -139,7 +131,7 @@ export function useChallengesGlobal() {
       if (!broadcastWorking) {
         startPolling()
       }
-    }, 5000) // 5 segundos de timeout
+    }, 5000)
 
     return () => {
       if (channelRef.current) {
@@ -192,8 +184,7 @@ export function useChallengesGlobal() {
         event: 'challenge-created',
         payload: { challenge }
       })
-    } else {
-      }
+    }
   }, [])
 
   const broadcastChallengeUpdated = useCallback((challenge: any) => {
@@ -203,8 +194,7 @@ export function useChallengesGlobal() {
         event: 'challenge-updated',
         payload: { challenge }
       })
-    } else {
-      }
+    }
   }, [])
 
   const broadcastChallengeDeleted = useCallback((challengeId: string) => {
@@ -214,8 +204,7 @@ export function useChallengesGlobal() {
         event: 'challenge-deleted',
         payload: { challengeId }
       })
-    } else {
-      }
+    }
   }, [])
 
   return {

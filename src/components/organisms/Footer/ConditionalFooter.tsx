@@ -9,7 +9,7 @@ export function ConditionalFooter() {
     "/admin",
     "/teacher",
     "/teacher/create",
-    "/teacher/edit",
+    "/edit",
     "/challenge",
     "/challenge/pre"
   ]

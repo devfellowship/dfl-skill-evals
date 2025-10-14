@@ -2,8 +2,9 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { useChallengeManagement, CreateChallengeData } from "@/hooks/useChallengeManagement"
+import { useChallengeOperations, ChallengeOperationData } from "@/hooks/useChallengeOperations"
 import { useUserRole } from "@/hooks/useUserRole"
+import { useBaseStates } from "@/hooks/useBaseStates"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/atoms/Button/Button"
 import { Input } from "@/components/atoms/Input/Input"
@@ -29,10 +30,11 @@ interface Example {
 
 export function ChallengeCreateForm() {
   const router = useRouter()
-  const { createChallenge, loading } = useChallengeManagement()
+  const { createChallenge } = useChallengeOperations()
+  const { loading } = useBaseStates()
   const { isAdmin } = useUserRole()
   
-  const [formData, setFormData] = useState<CreateChallengeData>({
+  const [formData, setFormData] = useState<ChallengeOperationData>({
     title: "",
     description: "",
     difficulty: "easy",
@@ -59,7 +61,7 @@ export function ChallengeCreateForm() {
     explanation: ""
   })
 
-  const handleInputChange = (field: keyof CreateChallengeData, value: any) => {
+  const handleInputChange = (field: keyof ChallengeOperationData, value: any) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -114,49 +116,32 @@ export function ChallengeCreateForm() {
   const removeExample = (index: number) => {
     setFormData(prev => ({
       ...prev,
-      examples: prev.examples?.filter((_, i) => i !== index) || []
+      examples: prev.examples?.filter((_: any, i: number) => i !== index) || []
     }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    console.log('🔍 ChallengeCreateForm: handleSubmit chamado')
-    console.log('🔍 ChallengeCreateForm: formData atual:', formData)
     
-    if (!formData.title.trim() || !formData.description.trim() || !formData.function_name.trim() || !formData.initial_code.trim()) {
-      console.log('❌ ChallengeCreateForm: Campos obrigatórios não preenchidos')
-      console.log('❌ ChallengeCreateForm: title:', formData.title)
-      console.log('❌ ChallengeCreateForm: description:', formData.description)
-      console.log('❌ ChallengeCreateForm: function_name:', formData.function_name)
-      console.log('❌ ChallengeCreateForm: initial_code:', formData.initial_code)
+    if (!formData.title.trim() || !formData.description.trim() || !formData.function_name.trim() || !formData.initial_code?.trim()) {
       toast.error("Por favor, preencha todos os campos obrigatórios")
       return
     }
 
     // Remover validação de casos de teste por enquanto para testar
     // if ((formData.testCases || []).length === 0) {
-    //   console.log('❌ ChallengeCreateForm: Nenhum caso de teste adicionado')
-    //   console.log('❌ ChallengeCreateForm: testCases:', formData.testCases)
     //   toast.error("Adicione pelo menos um caso de teste")
     //   return
     // }
 
-    // Debug: Log dos dados que serão enviados
-    console.log('🔍 ChallengeCreateForm: Dados que serão enviados:', formData)
-    console.log('🔍 ChallengeCreateForm: Iniciando criação do challenge...')
-    console.log('🔍 ChallengeCreateForm: loading state:', loading)
 
     try {
-      console.log('🔍 ChallengeCreateForm: Chamando createChallenge...')
       const result = await createChallenge(formData)
-      console.log('🔍 ChallengeCreateForm: Resultado da criação:', result)
       if (result) {
-        console.log('✅ ChallengeCreateForm: Challenge criado com sucesso!')
         toast.success("Challenge criado com sucesso!")
         router.push("/teacher")
       } else {
-        console.log('❌ ChallengeCreateForm: createChallenge retornou null')
         toast.error("Erro ao criar challenge")
       }
     } catch (error) {
@@ -168,7 +153,6 @@ export function ChallengeCreateForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6" onKeyDown={(e) => {
       if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
-        console.log('🔍 ChallengeCreateForm: Enter pressionado no input')
       }
     }}>
       <Card>
@@ -326,7 +310,7 @@ export function ChallengeCreateForm() {
             <div className="space-y-2">
               <Label>Exemplos Adicionados ({formData.examples.length})</Label>
               <div className="space-y-2">
-                {formData.examples.map((example, index) => (
+                {formData.examples.map((example: any, index: number) => (
                   <div key={index} className="flex items-center gap-2 p-2 border rounded">
                     <div className="flex-1">
                       <div className="text-sm font-medium">Exemplo {index + 1}</div>
@@ -432,7 +416,7 @@ export function ChallengeCreateForm() {
           <Button variant="outline" asChild>
             <Link href="/">Inicio</Link>
           </Button>
-          <Button type="submit" disabled={loading} onClick={() => console.log('🔍 ChallengeCreateForm: Botão clicado')}>
+          <Button type="submit" disabled={loading}>
             <Save className="w-4 h-4 mr-2" />
             {loading ? "Salvando..." : "Salvar Challenge"}
           </Button>

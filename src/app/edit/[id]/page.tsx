@@ -1,15 +1,15 @@
 "use client"
 
-import { useParams } from "next/navigation"
+import { use } from "react"
 import { EditChallenge } from "@/components/organisms/EditChallenge/EditChallenge"
 import { useUserRole } from "@/hooks/useUserRole"
 import { LoadingState } from "@/components/molecules/LoadingState/LoadingState"
 import { NotFoundState } from "@/components/molecules/NotFoundState/NotFoundState"
 
-export default function EditChallengePage() {
-  const params = useParams()
-  const { isLoading, isAdmin, isMentor } = useUserRole()
-  
+export default function EditChallengePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
+  const { role, isLoading, isAdmin, isMentor } = useUserRole()
+
   if (isLoading) {
     return <LoadingState message="Verificando permissões..." />
   }
@@ -23,6 +23,6 @@ export default function EditChallengePage() {
       />
     )
   }
-  
-  return <EditChallenge challengeId={params.id as string} />
+
+  return <EditChallenge challengeId={id} />
 }

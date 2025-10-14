@@ -1,6 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Code, TestTube, CheckCircle, Archive } from "lucide-react"
-import { ChallengeForm } from "./ChallengeForm"
 import { ChallengeList } from "./ChallengeList"
 import { PendingApprovalsList } from "./PendingApprovalsList"
 import { ArchivedChallengesList } from "./ArchivedChallengesList"
@@ -9,11 +8,6 @@ import { AdminChallenge as Challenge, ChallengeFormData } from "@/types/admin/ad
 interface DashboardTabsProps {
   activeTab: string
   onTabChange: (tab: string) => void
-  isCreating: boolean
-  editingChallenge: Challenge | null
-  onSubmit: (formData: ChallengeFormData) => Promise<void>
-  onCancel: () => void
-  isSubmitting: boolean
   published: Challenge[]
   pending: Challenge[]
   archived: Challenge[]
@@ -35,11 +29,6 @@ interface DashboardTabsProps {
 export function DashboardTabs({
   activeTab,
   onTabChange,
-  isCreating,
-  editingChallenge,
-  onSubmit,
-  onCancel,
-  isSubmitting,
   published,
   pending,
   archived,
@@ -75,13 +64,6 @@ export function DashboardTabs({
       </TabsList>
 
       <TabsContent value="challenges" className="space-y-6">
-        <ChallengeForm
-          isCreating={isCreating}
-          editingChallenge={editingChallenge}
-          onSubmit={onSubmit}
-          onCancel={onCancel}
-          isSubmitting={isSubmitting}
-        />
         <ChallengeList
           challenges={published}
           isInitialLoading={isInitialLoading}
@@ -97,13 +79,6 @@ export function DashboardTabs({
       </TabsContent>
 
       <TabsContent value="approvals" className="space-y-6">
-        <ChallengeForm
-          isCreating={isCreating}
-          editingChallenge={editingChallenge}
-          onSubmit={onSubmit}
-          onCancel={onCancel}
-          isSubmitting={isSubmitting}
-        />
         <PendingApprovalsList
           challenges={pending}
           isInitialLoading={isInitialLoading}
@@ -119,7 +94,6 @@ export function DashboardTabs({
           searchQuery={searchQuery}
         />
       </TabsContent>
-
 
       <TabsContent value="archived" className="space-y-6">
         <ArchivedChallengesList

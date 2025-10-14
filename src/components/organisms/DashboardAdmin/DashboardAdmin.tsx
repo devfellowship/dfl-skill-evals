@@ -47,18 +47,12 @@ export function DashboardAdmin() {
         lastUpdate={lastUpdate as Date}
         searchQuery={searchQuery}
         onSearch={handleTitleSearch}
-        onCreateClick={() => setIsCreating(true)}
         isSubmitting={isSubmitting}
       />
 
       <DashboardTabs
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        isCreating={isCreating}
-        editingChallenge={editingChallenge}
-        onSubmit={handleSubmit}
-        onCancel={handleCancel}
-        isSubmitting={isSubmitting}
         published={published}
         pending={pending}
         archived={archived}
@@ -70,7 +64,7 @@ export function DashboardAdmin() {
         onArchive={handleArchiveWithOptimistic}
         onSendBackForReview={handleSendBackWithOptimistic}
         onCompare={handleOpenComparison}
-        onCreateNew={() => setIsCreating(true)}
+        onCreateNew={() => window.location.href = '/create'}
         searchQuery={searchQuery}
         isDeleting={isDeleting as string | null}
         isApproving={isApproving as string | null}

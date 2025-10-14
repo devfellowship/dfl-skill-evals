@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { useChallengeManagement } from '@/hooks/useChallengeManagement'
-import { CreateChallengeData } from '@/hooks/useChallengeManagement'
+import { useChallengeOperations } from '@/hooks/useChallengeOperations'
+import { ChallengeOperationData } from '@/hooks/useChallengeOperations'
+import { useBaseStates } from '@/hooks/useBaseStates'
+import { useUserRole } from '@/hooks/useUserRole'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/atoms/Button/Button"
 import { Input } from "@/components/atoms/Input/Input"
@@ -37,9 +39,11 @@ interface EditChallengeProps {
 
 export function EditChallenge({ challengeId }: EditChallengeProps) {
   const router = useRouter()
-  const { updateChallenge, loading: updateLoading } = useChallengeManagement()
+  const { updateChallenge } = useChallengeOperations()
+  const { loading: updateLoading } = useBaseStates()
+  const { role, label } = useUserRole()
   
-  const [formData, setFormData] = useState<CreateChallengeData>({
+  const [formData, setFormData] = useState<ChallengeOperationData>({
     title: '',
     description: '',
     difficulty: 'easy',
@@ -55,6 +59,8 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
     constraints: [],
     hints: [],
     mentor: '',
+    trending: false,
+    trending_priority: null,
   })
 
   const [testCases, setTestCases] = useState<TestCase[]>([
@@ -115,6 +121,8 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
           constraints: challengeData.constraints || [],
           hints: challengeData.hints || [],
           mentor: challengeData.mentor || '', // Incluir o campo mentor
+          trending: challengeData.trending || false,
+          trending_priority: challengeData.trending_priority || null,
         })
 
         if (challengeData.test_cases) {
@@ -141,7 +149,7 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
     }
   }
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | boolean | number) => {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
@@ -163,31 +171,23 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
       return
     }
     
-    if (!formData.initial_code.trim()) {
+    if (!formData.initial_code || !formData.initial_code.trim()) {
       toast.error('Código inicial é obrigatório')
       return
     }
     
-    const challengeData: CreateChallengeData = {
-      ...formData,
-      test_cases: testCases.filter(tc => tc.input && tc.expectedOutput),
-      examples: examples.filter(ex => ex.input && ex.output),
-      mentor: formData.mentor || challenge?.mentor || 'default_mentor', // Incluir o campo mentor do formData ou challenge original
+    const { test_cases, examples, constraints, hints, ...challengeData } = formData
+    
+    const updateData: ChallengeOperationData = {
+      ...challengeData,
+      mentor: formData.mentor || challenge?.mentor || 'default_mentor',
     }
 
-    // Debug: Log dos dados que serão enviados
-    console.log('🔍 EditChallenge: Dados que serão enviados:', challengeData)
-    console.log('🔍 EditChallenge: Challenge original:', challenge)
-    console.log('🔍 EditChallenge: Mentor value:', formData.mentor || challenge?.mentor || 'default_mentor')
-    console.log('🔍 EditChallenge: FormData mentor:', formData.mentor)
-    console.log('🔍 EditChallenge: Challenge mentor:', challenge?.mentor)
-    console.log('🔍 EditChallenge: Challenge ID:', challengeId)
-
     try {
-      const result = await updateChallenge(challengeId, challengeData)
+      const result = await updateChallenge(challengeId, updateData)
       if (result) {
         toast.success('Challenge atualizada com sucesso!')
-        router.push('/teacher')
+        router.push(role === 'admin' ? '/admin' : '/teacher')
       } else {
         toast.error('Erro ao atualizar challenge')
       }
@@ -235,10 +235,10 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
   }
 
   const removeSkill = (skill: string) => {
-    setFormData({
-      ...formData,
-      skills: formData.skills?.filter(s => s !== skill) || []
-    })
+      setFormData({
+        ...formData,
+        skills: formData.skills?.filter((s: string) => s !== skill) || []
+      })
   }
 
   const addConstraint = () => {
@@ -252,10 +252,10 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
   }
 
   const removeConstraint = (index: number) => {
-    setFormData({
-      ...formData,
-      constraints: formData.constraints?.filter((_, i) => i !== index) || []
-    })
+      setFormData({
+        ...formData,
+        constraints: formData.constraints?.filter((_: any, i: number) => i !== index) || []
+      })
   }
 
   const addHint = () => {
@@ -269,10 +269,10 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
   }
 
   const removeHint = (index: number) => {
-    setFormData({
-      ...formData,
-      hints: formData.hints?.filter((_, i) => i !== index) || []
-    })
+      setFormData({
+        ...formData,
+        hints: formData.hints?.filter((_: any, i: number) => i !== index) || []
+      })
   }
 
   if (isLoading) {
@@ -288,14 +288,14 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
       <div className="min-h-screen bg-background">
         <AdminNavigation 
           items={[
-            { label: "Teacher", href: "/teacher" },
+            { label: role === 'admin' ? "Admin" : "Teacher", href: role === 'admin' ? "/admin" : "/teacher" },
             { label: "Editar Challenge", href: "#" }
           ]}
           showBackButton={true}
-          backHref="/teacher"
+          backHref={role === 'admin' ? "/admin" : "/teacher"}
           backLabel="Voltar ao Dashboard"
-          userName="Professor"
-          userRole="Teacher"
+          userName={label}
+          userRole={label}
         />
         
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -303,7 +303,7 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
               <Button variant="outline" size="sm" asChild>
-                <Link href="/teacher">
+                <Link href={role === 'admin' ? "/admin" : "/teacher"}>
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Voltar ao Dashboard
                 </Link>
@@ -377,6 +377,37 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
                   </div>
                 </div>
 
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="trending">Status Trending</Label>
+                    <Select
+                      value={formData.trending ? 'true' : 'false'}
+                      onValueChange={(value) => handleInputChange("trending", value === 'true')}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="false">Não Trending</SelectItem>
+                        <SelectItem value="true">🔥 Trending</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {formData.trending && (
+                    <div className="space-y-2">
+                      <Label htmlFor="trending_priority">Prioridade Trending</Label>
+                      <Input
+                        id="trending_priority"
+                        type="number"
+                        min="1"
+                        value={formData.trending_priority || 1}
+                        onChange={(e) => handleInputChange("trending_priority", (parseInt(e.target.value) || 1).toString())}
+                        placeholder="1 = maior prioridade"
+                      />
+                    </div>
+                  )}
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="description">Descrição *</Label>
                   <Textarea
@@ -422,7 +453,7 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
                   </Button>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {formData.skills?.map((skill, index) => (
+                  {formData.skills?.map((skill: string, index: number) => (
                     <div key={index} className="flex items-center gap-2 bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
                       <span>{skill}</span>
                       <button
@@ -456,7 +487,7 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
                   </Button>
                 </div>
                 <div className="space-y-2">
-                  {formData.constraints?.map((constraint, index) => (
+                  {formData.constraints?.map((constraint: string, index: number) => (
                     <div key={index} className="flex items-center gap-2">
                       <span className="flex-1">{constraint}</span>
                       <button
@@ -490,7 +521,7 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
                   </Button>
                 </div>
                 <div className="space-y-2">
-                  {formData.hints?.map((hint, index) => (
+                  {formData.hints?.map((hint: string, index: number) => (
                     <div key={index} className="flex items-center gap-2">
                       <span className="flex-1">{hint}</span>
                       <button
@@ -631,7 +662,7 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
               variant="outline" 
               asChild
             >
-              <Link href="/teacher">
+              <Link href={role === 'admin' ? "/admin" : "/teacher"}>
                 Cancelar
               </Link>
             </Button>

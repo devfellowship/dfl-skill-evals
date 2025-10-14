@@ -12,6 +12,10 @@ export interface AdminChallenge {
   initialCode?: string
   testCases?: any[]
   orderIndex?: number
+  mentor?: string
+  created_by?: string
+  trending?: boolean
+  trending_priority?: number | null
 }
 
 export interface ChallengeFormData {

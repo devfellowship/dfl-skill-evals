@@ -14,6 +14,8 @@ interface TeacherChallenge {
   status: string
   category: string | string[]
   createdAt: string
+  mentor?: string
+  created_by?: string
 }
 
 interface TeacherChallengeListProps {
@@ -83,6 +85,7 @@ export function TeacherChallengeList({ challenges, onDelete, onSendBackForReview
               {challenge.description}
             </p>
             <div className="flex items-center gap-4 text-xs text-muted-foreground/70 group-hover:text-muted-foreground transition-colors duration-200">
+              <span>👤 Criado por: {challenge.mentor || 'Usuário'}</span>
               <span>Dificuldade: {challenge.difficulty}</span>
               <span>Categoria: {Array.isArray(challenge.category) ? challenge.category.join(', ') : challenge.category}</span>
               <span>Criado: {new Date(challenge.createdAt).toLocaleDateString()}</span>
@@ -95,7 +98,7 @@ export function TeacherChallengeList({ challenges, onDelete, onSendBackForReview
               asChild
               className="opacity-70 group-hover:opacity-100 transition-opacity duration-200"
             >
-              <Link href={`/teacher/edit/${challenge.id}`}>
+              <Link href={`/edit/${challenge.id}`}>
                 <Edit className="w-4 h-4" />
               </Link>
             </Button>

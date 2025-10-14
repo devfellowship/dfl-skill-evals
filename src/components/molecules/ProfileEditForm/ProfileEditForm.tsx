@@ -49,16 +49,9 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
       return
     }
 
-    console.log('🔄 ProfileEditForm: Iniciando salvamento...')
-    console.log('📝 ProfileEditForm: Dados do formulário:', formData)
-    console.log('📝 ProfileEditForm: Perfil atual:', profile)
-    
     setSaving(true)
     try {
-      console.log('🔄 ProfileEditForm: Chamando updateProfile...')
       const result = await updateProfile(formData)
-      console.log('✅ ProfileEditForm: Resultado do updateProfile:', result)
-      console.log('✅ ProfileEditForm: Perfil atualizado com sucesso!')
       toast.success(PROFILE_MESSAGES.PROFILE_UPDATED)
       setIsEditing(false)
       onClose?.()
@@ -86,7 +79,7 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
 
     setPasswordSaving(true)
     try {
-      await changePassword(passwordData)
+      await changePassword(passwordData.currentPassword, passwordData.newPassword)
       toast.success(PROFILE_MESSAGES.PASSWORD_CHANGED)
       setIsChangingPassword(false)
       setPasswordData({
@@ -120,7 +113,7 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
 
     setEmailSaving(true)
     try {
-      await changeEmail(emailData)
+      await changeEmail(emailData.newEmail)
       toast.success(PROFILE_MESSAGES.EMAIL_CHANGED)
       setIsChangingEmail(false)
       setEmailData({

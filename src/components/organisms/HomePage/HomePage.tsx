@@ -32,16 +32,23 @@ export function HomePage() {
   const filteredAssessments = useMemo(() => {
     if (!challenges.length) return []
     
+    let filtered = challenges
+    
     if (searchQuery) {
-      return challenges.filter(
+      filtered = challenges.filter(
         (assessment) =>
           assessment.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           assessment.description.toLowerCase().includes(searchQuery.toLowerCase())
       )
     }
 
-    return challenges
-  }, [challenges, searchQuery])
+    // Aplicar filtro de trending se ativo
+    if (searchFilters.trending) {
+      filtered = filtered.filter(assessment => assessment.trending)
+    }
+
+    return filtered
+  }, [challenges, searchQuery, searchFilters.trending])
 
   const sortedAssessments = useMemo(() => {
     return MainChallengeSorter.sortChallenges(filteredAssessments, sortBy)

@@ -28,12 +28,12 @@ function pickHighestRole(input?: string[] | string | null): SupabaseRole {
 function mapSupabaseToAppRole(role: SupabaseRole): AppRole {
   switch (role) {
     case 'superadmin':
-      return 'admin'            
+      return 'admin'
     case 'admin':
-      return 'mentor'          
+      return 'admin'
     case 'community_member':
     default:
-      return 'community_member' 
+      return 'community_member'
   }
 }
 
@@ -54,19 +54,18 @@ export function useUserRole(): UserRoleInfo {
         if (alive) setInfo(getUnauthenticatedRoleInfo())
         return
       }
-
-      const { data, error } = await supabase
+      const { data: rolesData, error: rolesError } = await supabase
         .from('users_with_roles')
         .select('roles')
         .eq('id', userId)
         .maybeSingle()
 
-      if (error) {
+      if (rolesError || !rolesData) {
         if (alive) setInfo(getDefaultRoleInfo())
         return
       }
 
-      const highest = pickHighestRole(data?.roles as string[] | undefined)
+      const highest = pickHighestRole(rolesData?.roles as string[] | undefined)
       const appRole = mapSupabaseToAppRole(highest)
       if (alive) setInfo(getRoleInfo(appRole as unknown as UserRole))
     }

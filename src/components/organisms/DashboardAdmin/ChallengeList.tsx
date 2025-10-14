@@ -5,6 +5,7 @@ import { Edit, Trash2, Eye, RefreshCw, Plus, Archive } from "lucide-react"
 import { AdminChallenge as Challenge, DIFFICULTY_OPTIONS, STATUS_OPTIONS } from "@/types/admin/admin-dashboard"
 import { SortButton } from "@/components/atoms/SortButton/SortButton"
 import { ChallengeSorter, SortType } from "@/lib/challenge-sorter"
+import { TrendingToggle } from "@/components/molecules/TrendingToggle/TrendingToggle"
 
 interface ChallengeListProps {
   challenges: Challenge[]
@@ -111,6 +112,11 @@ export function ChallengeList({
               <Badge className={getStatusColor(challenge.status)}>
                 {getStatusLabel(challenge.status)}
               </Badge>
+              {challenge.trending && (
+                <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-200">
+                  🔥 Trending
+                </Badge>
+              )}
             </div>
             <p className="text-muted-foreground text-sm mb-2 group-hover:text-foreground transition-colors duration-200">
               {challenge.description}
@@ -118,6 +124,7 @@ export function ChallengeList({
             <div className="flex items-center gap-4 text-xs text-muted-foreground/70 group-hover:text-muted-foreground transition-colors duration-200">
               <span>📁 {Array.isArray(challenge.category) ? challenge.category.join(', ') : challenge.category}</span>
               <span>⚡ {challenge.functionName}</span>
+              <span>👤 Criado por: {challenge.mentor || 'Usuário'}</span>
               <span>📅 Criado: {challenge.createdAt}</span>
               {challenge.createdAt !== challenge.updatedAt && (
                 <span>🔄 Atualizado: {challenge.updatedAt}</span>
@@ -125,7 +132,7 @@ export function ChallengeList({
             </div>
           </div>
           
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             <Button
               variant="outline"
               size="sm"

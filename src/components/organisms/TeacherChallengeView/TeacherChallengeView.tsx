@@ -142,7 +142,7 @@ export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps)
               </div>
             </div>
           </div>
-          <Button onClick={() => router.push(`/teacher/edit/${challenge.id}`)}>
+          <Button onClick={() => router.push(`/edit/${challenge.id}`)}>
             <Edit className="w-4 h-4 mr-2" />
             Editar
           </Button>

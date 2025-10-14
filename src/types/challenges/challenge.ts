@@ -4,13 +4,14 @@ export interface Challenge {
   title: string
   description: string
   skills: string[]
-  difficulty: number
+  difficulty: string // Mudado para string para usar labels
 
   problems: number
   participants: number
   rating: number
   category: string
   trending: boolean
+  trending_priority?: number | null
   image?: string
 }
 

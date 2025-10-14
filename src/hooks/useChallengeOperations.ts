@@ -1,307 +1,303 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
-import { toast } from 'sonner'
-import { useChallengesGlobal } from './useChallengesGlobal'
+import { mapDifficultyToNumber } from '@/lib/utils/difficulty-mapper'
+import { generateUniqueSlug } from '@/lib/utils/slug-generator'
+import { useCrudOperations } from './useCrudOperations'
+import { useUserValidation } from './useUserValidation'
+import { useBroadcastOperations } from './useBroadcastOperations'
+
+export interface ChallengeOperationData {
+  title: string
+  description: string
+  difficulty: string
+  category: string | string[]
+  function_name: string
+  initial_code?: string
+  status?: string
+  is_public?: boolean
+  trending?: boolean
+  trending_priority?: number | null
+  [key: string]: any
+}
 
 export function useChallengeOperations() {
-  const { 
-    broadcastChallengeCreated, 
-    broadcastChallengeUpdated, 
-    broadcastChallengeDeleted,
-    loadAllChallenges 
-  } = useChallengesGlobal()
-
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { user, validateUser } = useUserValidation()
+  const { executeWithBroadcastAndToast } = useBroadcastOperations()
+  
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
   const [isApproving, setIsApproving] = useState<string | null>(null)
   const [isArchiving, setIsArchiving] = useState<string | null>(null)
 
-  const difficultyMap: Record<string, number> = {
-    beginner: 1,
-    easy: 1,
-    medium: 2,
-    hard: 3,
-    expert: 4,
-  }
+  const createChallenge = useCallback(async (challengeData: ChallengeOperationData) => {
+    const { user } = validateUser()
 
-  const handleCreate = async (challengeData: any) => {
-    setIsSubmitting(true)
-    try {
-      const { data: challenge, error: createError } = await supabase
-        .schema('skill_evals')
-        .from('challenges')
-        .insert({
-          title: challengeData.title,
-          description: challengeData.description,
-          difficulty: difficultyMap[challengeData.difficulty] || 2,
-          category: challengeData.category,
-          function_name: challengeData.function_name,
-          initial_code: challengeData.initial_code || "",
-          status: 'to_approve',
-          is_public: false,
-          slug: challengeData.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
-        })
-        .select()
-        .single()
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', user.id)
+      .maybeSingle()
 
-      if (createError) {
-        throw new Error(createError.message || 'Erro ao criar challenge')
-      }
+    const mentorName = profile?.full_name || user.email?.split('@')[0] || 'Usuário'
 
-      toast.success("Challenge criado com sucesso!")
-      
-      try {
-        broadcastChallengeCreated(challenge)
-      } catch (broadcastError) {
-        loadAllChallenges()
-      }
-      
-      return challenge
-    } catch (err) {
-      toast.error("Erro ao criar challenge")
-      return null
-    } finally {
-      setIsSubmitting(false)
+    const challengePayload = {
+      title: challengeData.title,
+      slug: generateUniqueSlug(challengeData.title),
+      description: challengeData.description,
+      difficulty: mapDifficultyToNumber(challengeData.difficulty),
+      category: Array.isArray(challengeData.category) ? challengeData.category[0] : challengeData.category,
+      function_name: challengeData.function_name,
+      initial_code: challengeData.initial_code || '',
+      status: challengeData.status || 'to_approve',
+      is_public: challengeData.is_public || false,
+      created_by: user.id,
+      mentor: mentorName,
+      max_score: 100,
+      order_index: 0
     }
-  }
 
-  const handleUpdate = async (id: string, updateData: any) => {
-    setIsSubmitting(true)
-    try {
-      const { data: currentChallenge, error: fetchError } = await supabase
-        .schema('skill_evals')
-        .from('challenges')
-        .select('status')
-        .eq('id', id)
-        .single()
+    return executeWithBroadcastAndToast(
+      async () => {
+        const { data: challenge, error } = await supabase
+          .schema('skill_evals')
+          .from('challenges')
+          .insert([challengePayload])
+          .select()
+          .single()
 
-      if (fetchError) {
-        throw new Error('Erro ao buscar challenge atual')
-      }
+        if (error) {
+          throw new Error(error.message || 'Erro ao criar challenge')
+        }
 
-      let newStatus = updateData.status
-      // Se o challenge já está aprovado, mantém o status aprovado após edição
-      if (currentChallenge.status === 'approved') {
-        newStatus = 'approved'
-      }
+        return challenge
+      },
+      'create',
+      'Challenge criado com sucesso!',
+      'Erro ao criar challenge'
+    )
+  }, [validateUser, executeWithBroadcastAndToast])
 
-      const { error: updateError } = await supabase
-        .schema('skill_evals')
-        .from('challenges')
-        .update({
-          title: updateData.title,
-          description: updateData.description,
-          difficulty: difficultyMap[updateData.difficulty] || 2,
-          category: updateData.category,
-          function_name: updateData.function_name,
-          initial_code: updateData.initial_code,
-          status: newStatus,
-          slug: updateData.slug
-        })
-        .eq('id', id)
+  const updateChallenge = useCallback(async (id: string, updateData: Partial<ChallengeOperationData>) => {
+    const { user, isAdmin } = validateUser()
 
-      if (updateError) {
-        throw new Error(updateError.message || 'Erro ao atualizar challenge')
-      }
-
-      toast.success("Challenge atualizado com sucesso!")
-      loadAllChallenges()
-      return true
-    } catch (err) {
-      toast.error("Erro ao atualizar challenge")
-      return null
-    } finally {
-      setIsSubmitting(false)
+    // Criar payload com campos que existem na tabela real
+    const mappedUpdates: any = {
+      updated_at: new Date().toISOString()
     }
-  }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Tem certeza que deseja excluir este challenge?")) {
+    // Campos básicos que existem na tabela
+    if (updateData.title) mappedUpdates.title = updateData.title
+    if (updateData.description) mappedUpdates.description = updateData.description
+    if (updateData.difficulty) mappedUpdates.difficulty = mapDifficultyToNumber(updateData.difficulty)
+    if (updateData.category) {
+      mappedUpdates.category = Array.isArray(updateData.category) ? updateData.category[0] : updateData.category
+    }
+    if (updateData.function_name) mappedUpdates.function_name = updateData.function_name
+    if (updateData.initial_code) mappedUpdates.initial_code = updateData.initial_code
+    if (updateData.skills) mappedUpdates.skills = updateData.skills
+    if (updateData.mentor) mappedUpdates.mentor = updateData.mentor
+    
+    // Campos de status e trending (apenas para admins)
+    if (isAdmin) {
+      if (updateData.status) mappedUpdates.status = updateData.status
+      if (updateData.is_public !== undefined) mappedUpdates.is_public = updateData.is_public
+      if (updateData.trending !== undefined) mappedUpdates.trending = updateData.trending
+      if (updateData.trending_priority !== undefined) mappedUpdates.trending_priority = updateData.trending_priority
+    }
+
+    Object.keys(mappedUpdates).forEach(key => {
+      if ((mappedUpdates as any)[key] === undefined) {
+        delete (mappedUpdates as any)[key]
+      }
+    })
+
+    return executeWithBroadcastAndToast(
+      async () => {
+        const { data: challenge, error } = await supabase
+          .schema('skill_evals')
+          .from('challenges')
+          .update(mappedUpdates)
+          .eq('id', id)
+          .select()
+
+        if (error) {
+          throw new Error(error.message || 'Erro ao atualizar challenge')
+        }
+
+        if (!challenge || challenge.length === 0) {
+          throw new Error('Nenhuma linha foi atualizada. Verifique se você tem permissão para atualizar este challenge.')
+        }
+
+        return challenge[0]
+      },
+      'update',
+      'Challenge atualizado com sucesso!',
+      'Erro ao atualizar challenge'
+    )
+  }, [validateUser, executeWithBroadcastAndToast])
+
+  const deleteChallenge = useCallback(async (id: string) => {
+    if (!confirm('Tem certeza que deseja excluir este challenge?')) {
       return null
     }
 
     setIsDeleting(id)
     try {
-      const { error: deleteError } = await supabase
-        .schema('skill_evals')
-        .from('challenges')
-        .delete()
-        .eq('id', id)
+      return executeWithBroadcastAndToast(
+        async () => {
+          const { error } = await supabase
+            .schema('skill_evals')
+            .from('challenges')
+            .delete()
+            .eq('id', id)
 
-      if (deleteError) {
-        throw new Error(deleteError.message || 'Erro ao deletar challenge')
-      }
+          if (error) {
+            throw new Error(error.message || 'Erro ao excluir challenge')
+          }
 
-      toast.success("Challenge excluído com sucesso!")
-      
-      try {
-        broadcastChallengeDeleted(id)
-      } catch (broadcastError) {
-        loadAllChallenges()
-      }
-      
-      return true
-    } catch (err) {
-      toast.error("Erro ao excluir challenge")
-      return null
+          return { id }
+        },
+        'delete',
+        'Challenge excluído com sucesso!',
+        'Erro ao excluir challenge'
+      )
     } finally {
       setIsDeleting(null)
     }
-  }
+  }, [executeWithBroadcastAndToast])
 
-  const handleApprove = async (id: string) => {
-    console.log('🔍 useChallengeOperations: Aprovando challenge:', id)
+  const approveChallenge = useCallback(async (id: string) => {
     setIsApproving(id)
     try {
-      const { error: approveError } = await supabase
-        .schema('skill_evals')
-        .from('challenges')
-        .update({ 
-          status: 'approved',
-          is_public: true
-        })
-        .eq('id', id)
+      return executeWithBroadcastAndToast(
+        async () => {
+          const { data: challenge, error } = await supabase
+            .schema('skill_evals')
+            .from('challenges')
+            .update({ 
+              status: 'approved',
+              is_public: true,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', id)
+            .select()
+            .single()
 
-      if (approveError) {
-        console.error('❌ useChallengeOperations: Erro ao aprovar:', approveError)
-        throw new Error(approveError.message || 'Erro ao aprovar challenge')
-      }
+          if (error) {
+            throw new Error(error.message || 'Erro ao aprovar challenge')
+          }
 
-      console.log('✅ useChallengeOperations: Challenge aprovada com sucesso!')
-      toast.success("Challenge aprovado com sucesso!")
-      
-      try {
-        console.log('🔄 useChallengeOperations: Recarregando challenges...')
-        loadAllChallenges()
-      } catch (broadcastError) {
-        console.error('❌ useChallengeOperations: Erro ao recarregar challenges:', broadcastError)
-      }
-      
-      return true
-    } catch (err) {
-      console.error('❌ useChallengeOperations: Erro ao aprovar challenge:', err)
-      toast.error("Erro ao aprovar challenge")
-      return null
+          return challenge
+        },
+        'approve',
+        'Challenge aprovado com sucesso!',
+        'Erro ao aprovar challenge'
+      )
     } finally {
       setIsApproving(null)
     }
-  }
+  }, [executeWithBroadcastAndToast])
 
-  const handleReject = async (id: string, reason: string) => {
-    setIsSubmitting(true)
-    try {
-      const { error: rejectError } = await supabase
-        .schema('skill_evals')
-        .from('challenges')
-        .update({ 
-          status: 'rejected',
-          rejection_reason: reason,
-          is_public: false
-        })
-        .eq('id', id)
+  const rejectChallenge = useCallback(async (id: string) => {
+    return executeWithBroadcastAndToast(
+      async () => {
+        const { data: challenge, error } = await supabase
+          .schema('skill_evals')
+          .from('challenges')
+          .update({ 
+            status: 'rejected',
+            is_public: false,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', id)
+          .select()
+          .single()
 
-      if (rejectError) {
-        throw new Error(rejectError.message || 'Erro ao rejeitar challenge')
-      }
+        if (error) {
+          throw new Error(error.message || 'Erro ao rejeitar challenge')
+        }
 
-      toast.success("Challenge rejeitado e retornado ao mentor")
-      
-      try {
-        loadAllChallenges()
-      } catch (broadcastError) {
-        console.error('Erro ao recarregar challenges:', broadcastError)
-      }
-      
-      return true
-    } catch (err) {
-      toast.error("Erro ao rejeitar challenge")
-      return null
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
+        return challenge
+      },
+      'reject',
+      'Challenge rejeitado!',
+      'Erro ao rejeitar challenge'
+    )
+  }, [executeWithBroadcastAndToast])
 
-  const handleArchive = async (id: string) => {
+  const archiveChallenge = useCallback(async (id: string) => {
     setIsArchiving(id)
     try {
-      const { error: archiveError } = await supabase
-        .schema('skill_evals')
-        .from('challenges')
-        .update({ 
-          status: 'archived',
-          is_public: false
-        })
-        .eq('id', id)
+      return executeWithBroadcastAndToast(
+        async () => {
+          const { data: challenge, error } = await supabase
+            .schema('skill_evals')
+            .from('challenges')
+            .update({ 
+              status: 'archived',
+              is_public: false,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', id)
+            .select()
+            .single()
 
-      if (archiveError) {
-        throw new Error(archiveError.message || 'Erro ao arquivar challenge')
-      }
+          if (error) {
+            throw new Error(error.message || 'Erro ao arquivar challenge')
+          }
 
-      toast.success("Challenge arquivado com sucesso!")
-      
-      try {
-        loadAllChallenges()
-      } catch (broadcastError) {
-        console.error('Erro ao recarregar challenges:', broadcastError)
-      }
-      
-      return true
-    } catch (err) {
-      toast.error("Erro ao arquivar challenge")
-      return null
+          return challenge
+        },
+        'archive',
+        'Challenge arquivado com sucesso!',
+        'Erro ao arquivar challenge'
+      )
     } finally {
       setIsArchiving(null)
     }
-  }
+  }, [executeWithBroadcastAndToast])
 
-  const handleSendBackForReview = async (id: string) => {
-    if (!confirm("Tem certeza que deseja enviar este challenge de volta para análise?")) {
+  const sendBackForReview = useCallback(async (id: string) => {
+    if (!confirm('Tem certeza que deseja enviar este challenge de volta para análise?')) {
       return null
     }
 
-    setIsSubmitting(true)
-    try {
-      const { error: sendBackError } = await supabase
-        .schema('skill_evals')
-        .from('challenges')
-        .update({ 
-          status: 'to_approve',
-          is_public: false
-        })
-        .eq('id', id)
+    return executeWithBroadcastAndToast(
+      async () => {
+        const { data: challenge, error } = await supabase
+          .schema('skill_evals')
+          .from('challenges')
+          .update({ 
+            status: 'to_approve',
+            is_public: false,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', id)
+          .select()
+          .single()
 
-      if (sendBackError) {
-        throw new Error(sendBackError.message || 'Erro ao enviar challenge de volta')
-      }
+        if (error) {
+          throw new Error(error.message || 'Erro ao enviar challenge de volta')
+        }
 
-      toast.success("Challenge enviado de volta para análise!")
-      
-      try {
-        loadAllChallenges()
-      } catch (broadcastError) {
-        console.error('Erro ao recarregar challenges:', broadcastError)
-      }
-      
-      return true
-    } catch (err) {
-      toast.error("Erro ao enviar challenge de volta")
-      return null
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
+        return challenge
+      },
+      'update',
+      'Challenge enviado de volta para análise!',
+      'Erro ao enviar challenge de volta'
+    )
+  }, [executeWithBroadcastAndToast])
 
   return {
-    isSubmitting,
     isDeleting,
     isApproving,
     isArchiving,
-    handleCreate,
-    handleUpdate,
-    handleDelete,
-    handleApprove,
-    handleReject,
-    handleArchive,
-    handleSendBackForReview
+    
+    createChallenge,
+    updateChallenge,
+    deleteChallenge,
+    approveChallenge,
+    rejectChallenge,
+    archiveChallenge,
+    sendBackForReview
   }
 }

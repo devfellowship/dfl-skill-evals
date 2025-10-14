@@ -68,9 +68,6 @@ export function AdminNavigation({
     setDisplayName(name)
     setUserInitials(initials)
     
-    console.log('🔍 AdminNavigation: Profile data:', profile)
-    console.log('🔍 AdminNavigation: User metadata:', user?.user_metadata)
-    console.log('🔍 AdminNavigation: Avatar URL:', profile?.avatar_url || user?.user_metadata?.avatar_url)
   }, [user, profile, userName])
 
   const getUserRoleDisplay = () => {

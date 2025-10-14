@@ -120,89 +120,80 @@ export interface Database {
         Row: {
           id: string
           title: string
-          slug: string
+          slug?: string
           description: string
-          difficulty: DifficultyLevel
-          category?: string
+          difficulty: number
+          category: string
           skills: string[]
-          function_name: string
-          initial_code: string
-          examples: any
-          constraints: string[]
-          hints: string[]
-          created_by?: string
-          approved_by?: string
-          course_id?: string
-          module_id?: string
-          status: ChallengeStatus
-          rejection_reason?: string
-          estimated_time_minutes: number
-          max_score: number
-          tags: string[]
-          is_public: boolean
-          order_index: number
+          problem_statement?: string
+          function_name?: string
+          initial_code?: string
+          tags?: string[]
+          is_active?: boolean
           created_at: string
           updated_at: string
-          approved_at?: string
-          published_at?: string
+          order_index?: number
+          status: string
+          constraints?: string[]
+          is_public: boolean
+          mentor: string
+          max_score?: number
+          created_by?: string
+          image_url?: string
+          trending?: boolean
+          trending_priority?: number
         }
         Insert: {
           id?: string
           title: string
-          slug: string
+          slug?: string
           description: string
-          difficulty?: DifficultyLevel
+          difficulty?: number
           category?: string
           skills?: string[]
+          problem_statement?: string
           function_name?: string
-          initial_code: string
-          examples?: any
-          constraints?: string[]
-          hints?: string[]
-          created_by?: string
-          approved_by?: string
-          course_id?: string
-          module_id?: string
-          status?: ChallengeStatus
-          rejection_reason?: string
-          estimated_time_minutes?: number
-          max_score?: number
+          initial_code?: string
           tags?: string[]
-          is_public?: boolean
-          order_index?: number
+          is_active?: boolean
           created_at?: string
           updated_at?: string
-          approved_at?: string
-          published_at?: string
+          order_index?: number
+          status?: string
+          constraints?: string[]
+          is_public?: boolean
+          mentor?: string
+          max_score?: number
+          created_by?: string
+          image_url?: string
+          trending?: boolean
+          trending_priority?: number
         }
         Update: {
           id?: string
           title?: string
           slug?: string
           description?: string
-          difficulty?: DifficultyLevel
+          difficulty?: number
           category?: string
           skills?: string[]
+          problem_statement?: string
           function_name?: string
           initial_code?: string
-          examples?: any
-          constraints?: string[]
-          hints?: string[]
-          created_by?: string
-          approved_by?: string
-          course_id?: string
-          module_id?: string
-          status?: ChallengeStatus
-          rejection_reason?: string
-          estimated_time_minutes?: number
-          max_score?: number
           tags?: string[]
-          is_public?: boolean
-          order_index?: number
+          is_active?: boolean
           created_at?: string
           updated_at?: string
-          approved_at?: string
-          published_at?: string
+          order_index?: number
+          status?: string
+          constraints?: string[]
+          is_public?: boolean
+          mentor?: string
+          max_score?: number
+          created_by?: string
+          image_url?: string
+          trending?: boolean
+          trending_priority?: number
         }
       }
       challenge_templates: {

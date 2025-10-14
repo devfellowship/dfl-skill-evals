@@ -7,7 +7,6 @@ interface DashboardHeaderProps {
   lastUpdate: Date
   searchQuery: string
   onSearch: (query: string) => void
-  onCreateClick: () => void
   isSubmitting: boolean
 }
 
@@ -16,7 +15,6 @@ export function DashboardHeader({
   lastUpdate,
   searchQuery,
   onSearch,
-  onCreateClick,
   isSubmitting
 }: DashboardHeaderProps) {
   return (
@@ -33,7 +31,7 @@ export function DashboardHeader({
           currentQuery={searchQuery}
         />
         <DashboardHeaderButtons
-          onCreateClick={onCreateClick}
+          createButtonHref="/create"
           createButtonText="Novo Desafio"
           isSubmitting={isSubmitting}
           showHomeButton={true}

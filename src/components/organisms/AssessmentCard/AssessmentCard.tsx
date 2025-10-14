@@ -6,33 +6,45 @@ import { Badge } from "@/components/atoms/Badge/Badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { DifficultyIndicator } from "@/components/molecules/DifficultyIndicator/DifficultyIndicator"
 import { ChallengeImage } from "@/components/atoms/ChallengeImage/ChallengeImage"
+import { ChallengeMenu } from "@/components/molecules/ChallengeMenu/ChallengeMenu"
 import type { Challenge } from "@/types/challenges/challenge"
 import { formatParticipants, generateSlug } from "@/lib/utils"
 
 interface AssessmentCardProps {
   assessment: Challenge
   className?: string
+  isTrending?: boolean
 }
 
 export const AssessmentCard = React.forwardRef<
   HTMLDivElement,
   AssessmentCardProps
->(({ assessment, className, ...props }, ref) => {
+>(({ assessment, className, isTrending = false, ...props }, ref) => {
   return (
-    <Card className="group overflow-hidden border border-border/50 bg-background transition-all duration-200 hover:border-border hover:shadow-md">
+    <Card className="group overflow-hidden border border-border/50 bg-background transition-all duration-200 hover:shadow-md hover:border-border">
       <CardContent className="p-0">
         <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-primary/5 to-primary/10">
           <ChallengeImage
             imageUrl={assessment.image}
             category={[assessment.category]}
-            difficulty={assessment.difficulty.toString()}
+            difficulty={assessment.difficulty}
             title={assessment.title}
             className="w-full h-full object-cover"
           />
-          {assessment.trending && (
-            <div className="absolute top-3 right-3 z-30">
-              <Badge variant="secondary" className="bg-orange-100 text-orange-700 text-xs">
-                Trending
+          {/* Menu de 3 pontos no canto superior direito */}
+          <ChallengeMenu
+            challengeId={assessment.supabaseId || assessment.id.toString()}
+            isTrending={assessment.trending || false}
+            onUpdate={() => {
+              // Força uma atualização da página para refletir as mudanças
+              window.location.reload()
+            }}
+          />
+          
+          {isTrending && (
+            <div className="absolute top-3 right-12 z-30">
+              <Badge variant="secondary" className="bg-gradient-to-r from-orange-500 to-yellow-500 text-white text-xs font-semibold shadow-lg">
+                🔥 Trending
               </Badge>
             </div>
           )}

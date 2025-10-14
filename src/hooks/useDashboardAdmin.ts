@@ -17,17 +17,16 @@ export function useDashboardAdmin() {
   } = useChallengesGlobal()
 
   const {
-    isSubmitting,
     isDeleting,
     isApproving,
     isArchiving,
-    handleCreate,
-    handleUpdate,
-    handleDelete,
-    handleApprove,
-    handleReject,
-    handleArchive,
-    handleSendBackForReview
+    createChallenge,
+    updateChallenge,
+    deleteChallenge,
+    approveChallenge,
+    rejectChallenge,
+    archiveChallenge,
+    sendBackForReview
   } = useChallengeOperations()
 
   const [comparisonModalOpen, setComparisonModalOpen] = useState(false)
@@ -59,7 +58,7 @@ export function useDashboardAdmin() {
         status: formData.status
       })
       
-      const result = await handleUpdate(editingChallenge.id, updateData)
+      const result = await updateChallenge(editingChallenge.id, updateData)
       
       if (!result) {
         loadAllChallenges()
@@ -74,7 +73,7 @@ export function useDashboardAdmin() {
         initial_code: formData.initialCode || "// Seu código aqui",
         test_cases: formData.testCases || []
       }
-      await handleCreate(createData)
+      await createChallenge(createData)
     }
     
     setIsCreating(false)
@@ -82,9 +81,7 @@ export function useDashboardAdmin() {
   }
 
   const handleEdit = (challenge: Challenge) => {
-    console.log('🔧 useDashboardAdmin: handleEdit chamado com challenge:', challenge)
-    setEditingChallenge(challenge)
-    setIsCreating(true)
+    window.location.href = `/edit/${challenge.id}`
   }
 
   const handleCancel = () => {
@@ -94,7 +91,7 @@ export function useDashboardAdmin() {
 
   const handleDeleteWithOptimistic = async (id: string) => {
     removeChallengeFromList(id)
-    const result = await handleDelete(id)
+    const result = await deleteChallenge(id)
     if (!result) {
       loadAllChallenges()
     }
@@ -102,7 +99,7 @@ export function useDashboardAdmin() {
 
   const handleApproveWithOptimistic = async (id: string) => {
     updateChallengeInList(id, { status: 'published' as any })
-    const result = await handleApprove(id)
+    const result = await approveChallenge(id)
     if (!result) {
       loadAllChallenges()
     }
@@ -111,7 +108,7 @@ export function useDashboardAdmin() {
   const handleRejectWithOptimistic = async (id: string) => {
     updateChallengeInList(id, { status: 'draft' as any })
     const reason = prompt("Motivo da rejeição (opcional):")
-    const result = await handleReject(id, reason || "")
+    const result = await rejectChallenge(id)
     if (!result) {
       loadAllChallenges()
     }
@@ -119,7 +116,7 @@ export function useDashboardAdmin() {
 
   const handleArchiveWithOptimistic = async (id: string) => {
     updateChallengeInList(id, { status: 'archived' as any })
-    const result = await handleArchive(id)
+    const result = await archiveChallenge(id)
     if (!result) {
       loadAllChallenges()
     }
@@ -127,7 +124,7 @@ export function useDashboardAdmin() {
 
   const handleSendBackWithOptimistic = async (id: string) => {
     updateChallengeInList(id, { status: 'draft' as any })
-    const result = await handleSendBackForReview(id)
+    const result = await sendBackForReview(id)
     if (!result) {
       loadAllChallenges()
     }
@@ -146,7 +143,7 @@ export function useDashboardAdmin() {
   const handleApproveFromComparison = async () => {
     if (challengeToCompare) {
       try {
-        await handleApprove(challengeToCompare)
+        await approveChallenge(challengeToCompare)
         handleCloseComparison()
       } catch (error) {
         }
@@ -156,7 +153,7 @@ export function useDashboardAdmin() {
   const handleRejectFromComparison = async () => {
     if (challengeToCompare) {
       try {
-        await handleReject(challengeToCompare, "Rejeitado após análise de alterações")
+        await rejectChallenge(challengeToCompare)
         handleCloseComparison()
       } catch (error) {
         }
@@ -180,7 +177,6 @@ export function useDashboardAdmin() {
     isCreating,
     editingChallenge,
     activeTab,
-    isSubmitting,
     isDeleting,
     isApproving,
     isArchiving,

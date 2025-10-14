@@ -96,7 +96,6 @@ export function useChallengeExecution({ problemId, functionName }: UseChallengeE
           }))
         }
       } catch (dbError) {
-        console.log('Erro ao buscar test cases:', dbError)
         // Fallback para test cases gerados
       }
 

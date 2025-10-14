@@ -94,6 +94,7 @@ export function PendingApprovalsList({
               {challenge.description}
             </p>
             <div className="flex items-center gap-4 text-xs text-muted-foreground/70 group-hover:text-muted-foreground transition-colors duration-200">
+              <span>👤 Criado por: {challenge.mentor || 'Usuário'}</span>
               <span>📅 Criado: {challenge.createdAt}</span>
               <span>⚡ {challenge.functionName}</span>
             </div>
