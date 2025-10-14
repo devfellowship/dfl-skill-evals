@@ -66,15 +66,14 @@ export function UserOutputChallengePage({
     )
   }
 
-  const mapDifficulty = (difficulty: string): "Easy" | "Medium" | "Hard" => {
+  const mapDifficulty = (difficulty: number): "Easy" | "Medium" | "Hard" => {
     switch (difficulty) {
-      case 'beginner':
-      case 'easy':
+      case 1:
         return 'Easy'
-      case 'medium':
+      case 2:
         return 'Medium'
-      case 'hard':
-      case 'expert':
+      case 3:
+      case 4:
         return 'Hard'
       default:
         return 'Easy'
@@ -92,8 +91,8 @@ export function UserOutputChallengePage({
       explanation: example.explanation || ''
     })) || [],
     constraints: challenge.constraints || [],
-    hints: challenge.hints || [],
-    functionName: challenge.function_name,
+    hints: [],
+    functionName: challenge.function_name || '',
     testCases: challenge.challenge_test_cases?.map((testCase: any, index: number) => ({
       input: testCase.input,
       expectedOutput: testCase.expected_output,
@@ -130,7 +129,7 @@ export function UserOutputChallengePage({
           passedTests={passedTests}
           totalTests={totalTests}
           userCode={code}
-          functionName={challenge.function_name}
+          functionName={challenge.function_name || ''}
           testCases={adaptedProblem.testCases.map((tc, index) => ({
             id: `test_${index}`,
             input: tc.input,

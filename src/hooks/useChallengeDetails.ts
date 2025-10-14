@@ -3,8 +3,26 @@ import { supabase } from '@/lib/supabase'
 import type { Tables } from '@/lib/supabase'
 
 interface ChallengeDetails extends Tables<'challenges'> {
-  challenge_examples?: Array<Tables<'challenge_examples'>>
-  challenge_test_cases?: Array<Tables<'challenge_test_cases'>>
+  challenge_examples?: Array<{
+    id: string
+    challenge_id: string
+    input: string
+    output: string
+    explanation?: string
+    order_index: number
+    created_at: string
+    created_by?: string
+  }>
+  challenge_test_cases?: Array<{
+    id: string
+    challenge_id: string
+    input: string
+    expected_output: string
+    is_hidden: boolean
+    order_index: number
+    created_at: string
+    created_by?: string
+  }>
 }
 
 export function useChallengeDetails(challengeId: string) {

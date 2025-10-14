@@ -24,14 +24,14 @@ interface User {
 }
 
 const roleLabels: Record<UserRole, string> = {
-  superadmin: 'Super Administrador',
   admin: 'Administrador',
+  mentor: 'Mentor',
   community_member: 'Membro da Comunidade',
 }
 
 const roleColors: Record<UserRole, string> = {
-  superadmin: 'bg-purple-100 text-purple-800',
   admin: 'bg-red-100 text-red-800',
+  mentor: 'bg-green-100 text-green-800',
   community_member: 'bg-blue-100 text-blue-800',
 }
 
@@ -73,7 +73,7 @@ export function UserManagement() {
   }
 
   const counts = useMemo(() => {
-    const acc: Record<UserRole, number> = { superadmin: 0, admin: 0, community_member: 0 }
+    const acc: Record<UserRole, number> = { admin: 0, mentor: 0, community_member: 0 }
     users.forEach(u => { acc[u.role]++ })
     return acc
   }, [users])

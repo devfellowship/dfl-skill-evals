@@ -49,15 +49,14 @@ export function ChallengePage({ challengeId }: ChallengePageProps) {
     )
   }
 
-  const mapDifficulty = (difficulty: string): "Easy" | "Medium" | "Hard" => {
+  const mapDifficulty = (difficulty: number): "Easy" | "Medium" | "Hard" => {
     switch (difficulty) {
-      case 'beginner':
-      case 'easy':
+      case 1:
         return 'Easy'
-      case 'medium':
+      case 2:
         return 'Medium'
-      case 'hard':
-      case 'expert':
+      case 3:
+      case 4:
         return 'Hard'
       default:
         return 'Easy'
@@ -69,18 +68,20 @@ export function ChallengePage({ challengeId }: ChallengePageProps) {
     title: challenge.title,
     description: challenge.description,
     difficulty: mapDifficulty(challenge.difficulty),
-    examples: challenge.challenge_examples?.map(example => ({
+    examples: challenge.challenge_examples?.map((example: any) => ({
       input: example.input,
       output: example.output,
       explanation: example.explanation || ''
     })) || [],
     constraints: challenge.constraints || [],
-    hints: challenge.hints || [],
-    functionName: challenge.function_name,
-    testCases: challenge.challenge_test_cases?.map(testCase => ({
+    hints: [],
+    functionName: challenge.function_name || '',
+    testCases: challenge.challenge_test_cases?.map((testCase: any, index: number) => ({
+      id: `test_${index}`,
       input: testCase.input,
       expectedOutput: testCase.expected_output,
-      hidden: testCase.is_hidden
+      hidden: testCase.is_hidden,
+      description: `Test case ${index + 1}`
     })) || []
   }
 
