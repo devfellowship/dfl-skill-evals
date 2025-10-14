@@ -4,8 +4,10 @@ import { useDashboardAdmin } from "@/hooks/useDashboardAdmin"
 import { DashboardHeader } from "./DashboardHeader"
 import { DashboardTabs } from "./DashboardTabs"
 import { DashboardModals } from "./DashboardModals"
+import { DeleteChallengeWrapper, useDeleteChallenge } from "@/components/organisms/DeleteChallengeWrapper/DeleteChallengeWrapper"
 
-export function DashboardAdmin() {
+// Componente interno que usa o hook de exclusão
+const DashboardAdminContent = () => {
   const {
     published,
     pending,
@@ -19,7 +21,6 @@ export function DashboardAdmin() {
     isCreating,
     editingChallenge,
     activeTab,
-    isSubmitting,
     isDeleting,
     isApproving,
     isArchiving,
@@ -40,6 +41,22 @@ export function DashboardAdmin() {
     setActiveTab
   } = useDashboardAdmin()
 
+  const { openDeleteModal } = useDeleteChallenge()
+
+  // Wrapper para o handleDelete que abre o modal
+  const handleDeleteClick = (id: string, title: string) => {
+    openDeleteModal(id, title)
+  }
+
+  // Wrapper que converte a assinatura para o DashboardTabs
+  const handleDeleteForTabs = async (id: string) => {
+    // Buscar o título da challenge para mostrar no modal
+    const challenge = [...published, ...pending, ...archived].find(c => c.id === id)
+    if (challenge) {
+      openDeleteModal(id, challenge.title)
+    }
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       <DashboardHeader
@@ -47,7 +64,6 @@ export function DashboardAdmin() {
         lastUpdate={lastUpdate as Date}
         searchQuery={searchQuery}
         onSearch={handleTitleSearch}
-        isSubmitting={isSubmitting}
       />
 
       <DashboardTabs
@@ -58,7 +74,7 @@ export function DashboardAdmin() {
         archived={archived}
         isInitialLoading={isInitialLoading}
         onEdit={handleEdit}
-        onDelete={handleDeleteWithOptimistic}
+        onDelete={handleDeleteForTabs}
         onApprove={handleApproveWithOptimistic}
         onReject={handleRejectWithOptimistic}
         onArchive={handleArchiveWithOptimistic}
@@ -79,5 +95,14 @@ export function DashboardAdmin() {
         onRejectFromComparison={handleRejectFromComparison}
       />
     </div>
+  )
+}
+
+// Componente principal com wrapper
+export function DashboardAdmin() {
+  return (
+    <DeleteChallengeWrapper>
+      <DashboardAdminContent />
+    </DeleteChallengeWrapper>
   )
 }

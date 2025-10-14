@@ -7,7 +7,7 @@ interface DashboardHeaderProps {
   lastUpdate: Date
   searchQuery: string
   onSearch: (query: string) => void
-  isSubmitting: boolean
+  isSubmitting?: boolean
 }
 
 export function DashboardHeader({

@@ -89,9 +89,9 @@ export function useDashboardAdmin() {
     setEditingChallenge(null)
   }
 
-  const handleDeleteWithOptimistic = async (id: string) => {
+  const handleDeleteWithOptimistic = async (id: string, reason: string) => {
     removeChallengeFromList(id)
-    const result = await deleteChallenge(id)
+    const result = await deleteChallenge(id, reason)
     if (!result) {
       loadAllChallenges()
     }
