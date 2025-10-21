@@ -3,13 +3,12 @@ import type { Metadata } from "next";
 import "../styles/globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider"
 import { AuthProvider } from "@/components/providers/AuthProvider"
+import { GlobalAuthGuard } from "@/components/atoms/GlobalAuthGuard/GlobalAuthGuard"
 import { ConditionalFooter } from "@/components/organisms/Footer/ConditionalFooter"
-
 export const metadata: Metadata = {
   title: "DevShaper - Technical Assessments",
   description: "Advanced technical assessment platform for developers",
 }
-
 export default function RootLayout({
   children,
 }: {
@@ -25,12 +24,14 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            <div className="flex flex-col min-h-screen">
-              <main className="flex-1">
-                {children}
-              </main>
-              <ConditionalFooter />
-            </div>
+            <GlobalAuthGuard>
+              <div className="flex flex-col min-h-screen">
+                <main className="flex-1">
+                  {children}
+                </main>
+                <ConditionalFooter />
+              </div>
+            </GlobalAuthGuard>
           </AuthProvider>
         </ThemeProvider>
       </body>

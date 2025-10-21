@@ -1,5 +1,4 @@
 'use client'
-
 import { useState } from 'react'
 import { Button } from '@/components/atoms/Button/Button'
 import { Input } from '@/components/atoms/Input/Input'
@@ -7,7 +6,6 @@ import { Label } from '@/components/atoms/Label/Label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Mail } from 'lucide-react'
 import { EmailFormData } from '@/types/profile/profile'
-
 interface ProfileEmailSectionProps {
   isChangingEmail: boolean
   emailSaving: boolean
@@ -17,7 +15,6 @@ interface ProfileEmailSectionProps {
   onSave: () => void
   onEmailDataChange: (data: EmailFormData) => void
 }
-
 export function ProfileEmailSection({
   isChangingEmail,
   emailSaving,
@@ -61,7 +58,6 @@ export function ProfileEmailSection({
                 placeholder="Digite seu novo email"
               />
             </div>
-
             <div className="flex gap-2">
               <Button
                 onClick={onSave}
@@ -83,4 +79,4 @@ export function ProfileEmailSection({
       </CardContent>
     </Card>
   )
-}
+}

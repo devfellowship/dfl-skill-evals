@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/atoms/Button/Button"
@@ -9,7 +8,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, Edit, CheckCircle, XCircle, Clock, Code, TestTube, BookOpen, FileText } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { AdminRouteWrapper } from "@/components/atoms/AdminRouteWrapper/AdminRouteWrapper"
-
 interface TeacherChallenge {
   id: string
   title: string
@@ -24,23 +22,19 @@ interface TeacherChallenge {
   initialCode?: string
   testCases?: any[]
 }
-
 interface TeacherChallengeViewProps {
   challengeId: string
 }
-
 export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps) {
   const router = useRouter()
   const [challenge, setChallenge] = useState<TeacherChallenge | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-
   useEffect(() => {
     if (challengeId) {
       loadChallenge(challengeId)
     }
   }, [challengeId])
-
   const loadChallenge = async (id: string) => {
     try {
       setLoading(true)
@@ -50,12 +44,10 @@ export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps)
         .select('*')
         .eq('id', id)
         .single()
-
       if (error) {
         setError('Erro ao carregar challenge')
         return
       }
-
       if (data) {
         const adaptedChallenge: TeacherChallenge = {
           id: data.id,
@@ -79,7 +71,6 @@ export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps)
       setLoading(false)
     }
   }
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Aprovado': return 'bg-green-100 text-green-800'
@@ -89,7 +80,6 @@ export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps)
       default: return 'bg-gray-100 text-gray-800'
     }
   }
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background p-6">
@@ -101,7 +91,6 @@ export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps)
       </div>
     )
   }
-
   if (error || !challenge) {
     return (
       <div className="min-h-screen bg-background p-6">
@@ -118,12 +107,11 @@ export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps)
       </div>
     )
   }
-
   return (
     <AdminRouteWrapper allowedRoles={['superadmin', 'admin', 'mentor']}>
       <div className="min-h-screen bg-background p-6">
       <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header */}
+        {}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="outline" onClick={() => router.back()}>
@@ -147,8 +135,7 @@ export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps)
             Editar
           </Button>
         </div>
-
-        {/* Challenge Details */}
+        {}
         <Tabs defaultValue="description" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="description" className="flex items-center gap-2">
@@ -168,7 +155,6 @@ export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps)
               Informações
             </TabsTrigger>
           </TabsList>
-
           <TabsContent value="description" className="space-y-4">
             <Card>
               <CardHeader>
@@ -182,7 +168,6 @@ export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps)
                 </div>
               </CardContent>
             </Card>
-
             <Card>
               <CardHeader>
                 <CardTitle>Detalhes</CardTitle>
@@ -203,7 +188,6 @@ export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps)
               </CardContent>
             </Card>
           </TabsContent>
-
           <TabsContent value="code" className="space-y-4">
             <Card>
               <CardHeader>
@@ -219,7 +203,6 @@ export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps)
               </CardContent>
             </Card>
           </TabsContent>
-
           <TabsContent value="tests" className="space-y-4">
             <Card>
               <CardHeader>
@@ -259,7 +242,6 @@ export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps)
               </CardContent>
             </Card>
           </TabsContent>
-
           <TabsContent value="info" className="space-y-4">
             <Card>
               <CardHeader>

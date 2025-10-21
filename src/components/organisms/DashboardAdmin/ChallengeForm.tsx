@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DifficultyIndicator } from "@/components/molecules/DifficultyIndicator/DifficultyIndicator"
 import { useUserRole } from "@/hooks/useUserRole"
 import { AdminChallenge as Challenge, ChallengeFormData, DIFFICULTY_OPTIONS, CATEGORY_OPTIONS, STATUS_OPTIONS } from "@/types/admin/admin-dashboard"
-
 interface ChallengeFormProps {
   isCreating: boolean
   editingChallenge: Challenge | null
@@ -16,7 +15,6 @@ interface ChallengeFormProps {
   onCancel: () => void
   isSubmitting: boolean
 }
-
 export function ChallengeForm({
   isCreating,
   editingChallenge,
@@ -44,13 +42,9 @@ export function ChallengeForm({
     initialCode: "",
     testCases: []
   })
-
-
   useEffect(() => {
     if (editingChallenge) {
-      // Para não-admins, sempre define status como 'draft' (aguardando aprovação)
       const statusForUser = isAdmin ? (editingChallenge.status || "draft") : "draft"
-      
       const editFormData = {
         title: editingChallenge.title || "",
         description: editingChallenge.description || "",
@@ -75,11 +69,9 @@ export function ChallengeForm({
       })
     }
   }, [editingChallenge, isAdmin])
-
   const handleInputChange = (field: string, value: string | string[]) => {
     setFormData((prev: ChallengeFormData) => ({ ...prev, [field]: value }))
   }
-
   const handleCategoryChange = (category: string, checked: boolean) => {
     setFormData((prev: ChallengeFormData) => ({
       ...prev,
@@ -88,16 +80,13 @@ export function ChallengeForm({
         : prev.category.filter((c: string) => c !== category)
     }))
   }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     await onSubmit(formData)
   }
-
   if (!isCreating) {
     return null
   }
-
   return (
     <Card>
       <CardHeader>
@@ -135,7 +124,6 @@ export function ChallengeForm({
               />
             </div>
           </div>
-
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="difficulty">Dificuldade</Label>
@@ -186,8 +174,6 @@ export function ChallengeForm({
               )}
             </div>
           </div>
-
-
           <div className="space-y-2">
             <Label htmlFor="description">Descrição *</Label>
             <Textarea
@@ -199,7 +185,6 @@ export function ChallengeForm({
               required
             />
           </div>
-
           {isAdmin && (
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
@@ -220,7 +205,6 @@ export function ChallengeForm({
               </Select>
             </div>
           )}
-          
           {!isAdmin && (
             <div className="space-y-2">
               <Label>Status</Label>
@@ -231,9 +215,7 @@ export function ChallengeForm({
               </div>
             </div>
           )}
-
         </form>
-        
         {}
         <div className="flex gap-2 pt-6 border-t mt-6">
           <Button 
@@ -256,4 +238,4 @@ export function ChallengeForm({
       </CardContent>
     </Card>
   )
-}
+}

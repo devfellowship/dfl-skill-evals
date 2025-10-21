@@ -1,10 +1,8 @@
 "use client"
-
 interface NotFoundStateProps {
   title: string
   message: string
 }
-
 export function NotFoundState({ title, message }: NotFoundStateProps) {
   return (
     <div className="flex h-screen flex-col bg-background items-center justify-center">
@@ -12,4 +10,4 @@ export function NotFoundState({ title, message }: NotFoundStateProps) {
       <p className="text-lg text-muted-foreground">{message}</p>
     </div>
   )
-}
+}

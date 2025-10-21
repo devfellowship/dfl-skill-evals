@@ -1,5 +1,4 @@
 'use client'
-
 import { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { useProfile } from '@/hooks/useProfile'
@@ -11,7 +10,6 @@ import { validateEmail } from '@/lib/utils/profile-utils'
 import { ProfilePersonalInfo } from './ProfilePersonalInfo'
 import { ProfileEmailSection } from './ProfileEmailSection'
 import { ProfilePasswordSection } from './ProfilePasswordSection'
-
 export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
   const { profile, loading, canChangeName, daysUntilNameChange, updateProfile, changePassword, changeEmail } = useProfile()
   const [isEditing, setIsEditing] = useState(false)
@@ -20,21 +18,17 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
   const [saving, setSaving] = useState(false)
   const [passwordSaving, setPasswordSaving] = useState(false)
   const [emailSaving, setEmailSaving] = useState(false)
-
   const [formData, setFormData] = useState<ProfileFormData>({
     full_name: ''
   })
-
   const [passwordData, setPasswordData] = useState<PasswordFormData>({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   })
-
   const [emailData, setEmailData] = useState<EmailFormData>({
     newEmail: ''
   })
-
   useEffect(() => {
     if (profile) {
       setFormData({
@@ -42,12 +36,10 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
       })
     }
   }, [profile])
-
   const handleSave = async () => {
     if (!profile) {
       return
     }
-
     setSaving(true)
     try {
       const result = await updateProfile(formData)
@@ -60,18 +52,15 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
       setSaving(false)
     }
   }
-
   const handlePasswordChange = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       toast.error(PROFILE_MESSAGES.PASSWORD_MISMATCH)
       return
     }
-
     if (passwordData.newPassword.length < PROFILE_CONSTANTS.MIN_PASSWORD_LENGTH) {
       toast.error(PROFILE_MESSAGES.PASSWORD_TOO_SHORT)
       return
     }
-
     setPasswordSaving(true)
     try {
       await changePassword(passwordData.currentPassword, passwordData.newPassword)
@@ -88,23 +77,19 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
       setPasswordSaving(false)
     }
   }
-
   const handleEmailChange = async () => {
     if (!emailData.newEmail) {
       toast.error('Digite o novo email')
       return
     }
-
     if (emailData.newEmail === profile?.email) {
       toast.error(PROFILE_MESSAGES.EMAIL_SAME)
       return
     }
-
     if (!validateEmail(emailData.newEmail)) {
       toast.error(PROFILE_MESSAGES.EMAIL_INVALID)
       return
     }
-
     setEmailSaving(true)
     try {
       await changeEmail(emailData.newEmail)
@@ -119,7 +104,6 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
       setEmailSaving(false)
     }
   }
-
   if (loading) {
     return (
       <Card>
@@ -132,7 +116,6 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
       </Card>
     )
   }
-
   if (!profile) {
     return (
       <Card>
@@ -145,7 +128,6 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
       </Card>
     )
   }
-
   return (
     <div className="space-y-6">
       <ProfilePersonalInfo
@@ -165,7 +147,6 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
         }}
         onFormDataChange={setFormData}
       />
-
       <ProfileEmailSection
         isChangingEmail={isChangingEmail}
         emailSaving={emailSaving}
@@ -178,7 +159,6 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
         onSave={handleEmailChange}
         onEmailDataChange={setEmailData}
       />
-
       <ProfilePasswordSection
         isChangingPassword={isChangingPassword}
         passwordSaving={passwordSaving}
@@ -197,4 +177,4 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
       />
     </div>
   )
-}
+}

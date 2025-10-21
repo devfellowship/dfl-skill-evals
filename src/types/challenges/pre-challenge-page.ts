@@ -1,12 +1,10 @@
 export interface PreChallengePageProps {
   challengeId: string
 }
-
 export interface SystemChecks {
   browser: boolean
   internet: boolean
 }
-
 export interface PreChallengeAssessment {
   id: string
   title: string
@@ -20,8 +18,7 @@ export interface PreChallengeAssessment {
   examples: any
   constraints: string[]
   hints: string[]
-
   max_score: number
   tags: string[]
   order_index: number
-}
+}

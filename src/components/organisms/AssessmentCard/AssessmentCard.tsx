@@ -9,13 +9,11 @@ import { ChallengeImage } from "@/components/atoms/ChallengeImage/ChallengeImage
 import { ChallengeMenu } from "@/components/molecules/ChallengeMenu/ChallengeMenu"
 import type { AdminChallenge } from "@/types/admin/admin-dashboard"
 import { formatParticipants, generateSlug } from "@/lib/utils"
-
 interface AssessmentCardProps {
   assessment: AdminChallenge
   className?: string
   isTrending?: boolean
 }
-
 export const AssessmentCard = React.forwardRef<
   HTMLDivElement,
   AssessmentCardProps
@@ -42,7 +40,6 @@ export const AssessmentCard = React.forwardRef<
               window.location.reload()
             }}
           />
-          
           {isTrending && (
             <div className="absolute top-3 right-12 z-30">
               <Badge variant="secondary" className="bg-gradient-to-r from-orange-500 to-yellow-500 text-white text-xs font-semibold shadow-lg">
@@ -51,7 +48,6 @@ export const AssessmentCard = React.forwardRef<
             </div>
           )}
         </div>
-
         <div className="p-4 space-y-3">
           <div>
             <h3 className="font-semibold text-lg leading-tight group-hover:text-primary transition-colors">
@@ -61,7 +57,6 @@ export const AssessmentCard = React.forwardRef<
               {assessment.description}
             </p>
           </div>
-
           <div className="flex flex-wrap gap-1">
             {assessment.skills && assessment.skills.slice(0, 3).map((skill: string) => (
               <Badge key={skill} variant="outline" className="text-xs">
@@ -74,7 +69,6 @@ export const AssessmentCard = React.forwardRef<
               </Badge>
             )}
           </div>
-
           <div className="space-y-2">
             <DifficultyIndicator difficulty={assessment.difficulty} />
             <div className="flex items-center justify-between text-xs text-muted-foreground">
@@ -90,7 +84,6 @@ export const AssessmentCard = React.forwardRef<
               </div>
             </div>
           </div>
-
           <div className="pt-2">
             <Button
               asChild

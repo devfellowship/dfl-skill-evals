@@ -3,7 +3,6 @@ import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { Edit, Trash2, Eye, CheckCircle, RefreshCw, Archive } from "lucide-react"
 import { AdminChallenge as Challenge, DIFFICULTY_OPTIONS, STATUS_OPTIONS } from "@/types/admin/admin-dashboard"
-
 interface ArchivedChallengesListProps {
   challenges: Challenge[]
   isInitialLoading: boolean
@@ -14,7 +13,6 @@ interface ArchivedChallengesListProps {
   isDeleting?: string | null
   isApproving?: string | null
 }
-
 export function ArchivedChallengesList({
   challenges,
   isInitialLoading,
@@ -28,15 +26,12 @@ export function ArchivedChallengesList({
   const getDifficultyColor = useMemo(() => (difficulty: string) => {
     return DIFFICULTY_OPTIONS.find(opt => opt.value === difficulty)?.color || ""
   }, [])
-
   const getStatusColor = useMemo(() => (status: string) => {
     return STATUS_OPTIONS.find(opt => opt.value === status)?.color || ""
   }, [])
-
   const getStatusLabel = useMemo(() => (status: string) => {
     return STATUS_OPTIONS.find(opt => opt.value === status)?.label || status
   }, [])
-
   if (isInitialLoading) {
     return (
       <div className="text-center py-8">
@@ -45,7 +40,6 @@ export function ArchivedChallengesList({
       </div>
     )
   }
-
   if (challenges.length === 0) {
     return (
       <div className="text-center py-12 text-gray-500">
@@ -55,7 +49,6 @@ export function ArchivedChallengesList({
       </div>
     )
   }
-
   return (
     <div className="space-y-4">
       {challenges.map(challenge => (
@@ -83,7 +76,6 @@ export function ArchivedChallengesList({
               <span>⚡ {challenge.functionName}</span>
             </div>
           </div>
-          
           <div className="flex gap-2">
             <Button
               variant="outline"
@@ -94,7 +86,6 @@ export function ArchivedChallengesList({
             >
               <Eye className="w-4 h-4" />
             </Button>
-            
             <Button
               variant="outline"
               size="sm"
@@ -105,7 +96,6 @@ export function ArchivedChallengesList({
             >
               <CheckCircle className="w-4 h-4" />
             </Button>
-            
             <Button
               variant="outline"
               size="sm"
@@ -115,7 +105,6 @@ export function ArchivedChallengesList({
             >
               <RefreshCw className="w-4 h-4" />
             </Button>
-            
             <Button
               variant="outline"
               size="sm"

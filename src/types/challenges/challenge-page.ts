@@ -1,7 +1,6 @@
 export interface ChallengePageProps {
   challengeId: string
 }
-
 export interface ChallengeLayoutProps {
   title: string
   problem: ChallengeProblem
@@ -17,7 +16,6 @@ export interface ChallengeLayoutProps {
   onCancel: () => void
   onReset: () => void
 }
-
 export interface ChallengeProblem {
   id: string
   title: string
@@ -29,20 +27,17 @@ export interface ChallengeProblem {
   functionName: string
   testCases: ChallengeTestCase[]
 }
-
 export interface ChallengeExample {
   input: string
   output: string
   explanation?: string
 }
-
 export interface ChallengeTestCase {
   input: string
   expectedOutput: any
   description?: string
   hidden?: boolean
 }
-
 export interface ChallengeResults {
   passCount: number
   failCount: number
@@ -50,7 +45,6 @@ export interface ChallengeResults {
   details: TestResultDetail[]
   totalExecutionTime: number
 }
-
 export interface TestResultDetail {
   testCaseId: string
   input: string
@@ -60,7 +54,6 @@ export interface TestResultDetail {
   executionTime: number
   errorMessage?: string
 }
-
 export interface ChallengeEditorProps {
   code: string
   language: string
@@ -73,9 +66,8 @@ export interface ChallengeEditorProps {
   onCancel: () => void
   onReset: () => void
 }
-
 export interface ChallengeResultsProps {
   results: ChallengeResults | null
   passedTests: number
   totalTests: number
-}
+}

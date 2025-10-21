@@ -1,5 +1,4 @@
 'use client'
-
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent } from '@/components/ui/card'
@@ -7,7 +6,6 @@ import { toast } from 'sonner'
 import { ResetPasswordHeader } from '@/components/molecules/ResetPasswordHeader/ResetPasswordHeader'
 import { ResetPasswordFields } from '@/components/molecules/ResetPasswordFields/ResetPasswordFields'
 import { useAuth } from '@/hooks/useAuth'
-
 export function ResetPasswordForm() {
   const [email, setEmail] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -15,15 +13,12 @@ export function ResetPasswordForm() {
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const { resetPassword } = useAuth()
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError(null)
-
     try {
       const { error: resetError } = await resetPassword(email)
-      
       if (resetError) {
         setError('Erro ao enviar email de recuperação. Tente novamente.')
         toast.error('Erro ao enviar email de recuperação. Tente novamente.')
@@ -38,21 +33,17 @@ export function ResetPasswordForm() {
       setIsLoading(false)
     }
   }
-
   const handleBackToLogin = () => {
     router.push('/login')
   }
-
   const handleResendEmail = () => {
     setIsEmailSent(false)
     setEmail('')
     setError(null)
   }
-
   return (
     <div className="space-y-8">
       <ResetPasswordHeader />
-      
       <Card className="border-0 shadow-2xl bg-gray-800/90 backdrop-blur-md rounded-3xl overflow-hidden">
         <CardContent className="p-8">
           {isEmailSent ? (
@@ -62,19 +53,16 @@ export function ResetPasswordForm() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              
               <div className="space-y-2">
                 <h2 className="text-2xl font-semibold text-white">Email Enviado!</h2>
                 <p className="text-gray-300">
                   Enviamos um link de recuperação para <strong className="text-white">{email}</strong>
                 </p>
               </div>
-              
               <div className="space-y-4">
                 <p className="text-sm text-gray-400">
                   Verifique sua caixa de entrada e siga as instruções para redefinir sua senha.
                 </p>
-                
                 <div className="flex flex-col space-y-3">
                   <button
                     onClick={handleResendEmail}
@@ -82,7 +70,6 @@ export function ResetPasswordForm() {
                   >
                     Enviar Novamente
                   </button>
-                  
                   <button
                     onClick={handleBackToLogin}
                     className="w-full py-3 px-4 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-xl transition-colors"
@@ -104,7 +91,6 @@ export function ResetPasswordForm() {
           )}
         </CardContent>
       </Card>
-      
       <div className="text-center">
         <p className="text-sm text-gray-300">
           Lembrou da senha?{' '}
@@ -118,4 +104,4 @@ export function ResetPasswordForm() {
       </div>
     </div>
   )
-}
+}

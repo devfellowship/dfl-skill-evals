@@ -5,7 +5,6 @@ import { Star, StarOff, Settings } from 'lucide-react'
 import { useTrendingChallenges } from '@/hooks/useTrendingChallenges'
 import { invalidateChallengesCache } from '@/hooks/useChallenges'
 import { toast } from 'sonner'
-
 interface TrendingManagerProps {
   challenges: Array<{
     id: string
@@ -15,17 +14,13 @@ interface TrendingManagerProps {
   }>
   onUpdate?: () => void
 }
-
 export function TrendingManager({ challenges, onUpdate }: TrendingManagerProps) {
   const [isUpdating, setIsUpdating] = useState<string | null>(null)
   const { setTrending, removeTrending, updateTrendingPriority } = useTrendingChallenges()
-
   const trendingChallenges = challenges.filter(c => c.trending)
   const regularChallenges = challenges.filter(c => !c.trending)
-
   const handleToggleTrending = async (challengeId: string, isCurrentlyTrending: boolean) => {
     if (isUpdating) return
-
     setIsUpdating(challengeId)
     try {
       if (isCurrentlyTrending) {
@@ -33,31 +28,24 @@ export function TrendingManager({ challenges, onUpdate }: TrendingManagerProps) 
       } else {
         await setTrending(challengeId, 1)
       }
-      
-      // Invalida o cache para garantir que as mudanças sejam refletidas
       invalidateChallengesCache()
       onUpdate?.()
     } catch (error) {
-      console.error('Erro ao atualizar trending:', error)
     } finally {
       setIsUpdating(null)
     }
   }
-
   const handleUpdatePriority = async (challengeId: string, newPriority: number) => {
     if (isUpdating) return
-
     setIsUpdating(challengeId)
     try {
       await updateTrendingPriority(challengeId, newPriority)
       onUpdate?.()
     } catch (error) {
-      console.error('Erro ao atualizar prioridade:', error)
-    } finally {
+    } finally{
       setIsUpdating(null)
     }
   }
-
   return (
     <div className="space-y-6">
       {trendingChallenges.length > 0 && (
@@ -68,7 +56,6 @@ export function TrendingManager({ challenges, onUpdate }: TrendingManagerProps) 
               {trendingChallenges.length}
             </Badge>
           </div>
-          
           <div className="grid gap-3">
             {trendingChallenges
               .sort((a, b) => (a.trending_priority || 0) - (b.trending_priority || 0))
@@ -83,7 +70,6 @@ export function TrendingManager({ challenges, onUpdate }: TrendingManagerProps) 
                     </span>
                     <span className="font-medium">{challenge.title}</span>
                   </div>
-                  
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-1">
                       <Button
@@ -105,7 +91,6 @@ export function TrendingManager({ challenges, onUpdate }: TrendingManagerProps) 
                         ↓
                       </Button>
                     </div>
-                    
                     <Button
                       variant="outline"
                       size="sm"
@@ -122,8 +107,7 @@ export function TrendingManager({ challenges, onUpdate }: TrendingManagerProps) 
           </div>
         </div>
       )}
-
-      {/* Seção Regular */}
+      {}
       {regularChallenges.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2">
@@ -132,7 +116,6 @@ export function TrendingManager({ challenges, onUpdate }: TrendingManagerProps) 
               {regularChallenges.length}
             </Badge>
           </div>
-          
           <div className="grid gap-2">
             {regularChallenges.map((challenge) => (
               <div
@@ -140,7 +123,6 @@ export function TrendingManager({ challenges, onUpdate }: TrendingManagerProps) 
                 className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50"
               >
                 <span className="font-medium">{challenge.title}</span>
-                
                 <Button
                   variant="outline"
                   size="sm"
@@ -156,7 +138,6 @@ export function TrendingManager({ challenges, onUpdate }: TrendingManagerProps) 
           </div>
         </div>
       )}
-
       {challenges.length === 0 && (
         <div className="text-center py-8 text-muted-foreground">
           <Settings className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -166,4 +147,3 @@ export function TrendingManager({ challenges, onUpdate }: TrendingManagerProps) 
     </div>
   )
 }
-

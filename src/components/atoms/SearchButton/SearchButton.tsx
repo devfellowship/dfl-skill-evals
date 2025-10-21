@@ -1,16 +1,13 @@
 "use client"
-
 import { useState } from "react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Input } from "@/components/atoms/Input/Input"
 import { Search, X } from "lucide-react"
-
 interface SearchButtonProps {
   onSearch: (query: string) => void
   placeholder?: string
   currentQuery?: string
 }
-
 export function SearchButton({ 
   onSearch, 
   placeholder = "Pesquisar por título...",
@@ -18,17 +15,14 @@ export function SearchButton({
 }: SearchButtonProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [searchQuery, setSearchQuery] = useState(currentQuery)
-
   const handleSearch = () => {
     onSearch(searchQuery.trim())
   }
-
   const handleClear = () => {
     setSearchQuery("")
     onSearch("")
     setIsExpanded(false)
   }
-
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSearch()
@@ -36,7 +30,6 @@ export function SearchButton({
       handleClear()
     }
   }
-
   const handleToggle = () => {
     if (isExpanded) {
       handleClear()
@@ -44,7 +37,6 @@ export function SearchButton({
       setIsExpanded(true)
     }
   }
-
   if (isExpanded) {
     return (
       <div className="relative w-full">
@@ -72,7 +64,6 @@ export function SearchButton({
       </div>
     )
   }
-
   return (
     <div 
       onClick={handleToggle}
@@ -84,4 +75,4 @@ export function SearchButton({
       </span>
     </div>
   )
-}
+}

@@ -1,12 +1,10 @@
 import React from 'react'
-
 interface NotificationBadgeProps {
   count: number
   variant?: 'default' | 'success' | 'warning' | 'error'
   showZero?: boolean
   className?: string
 }
-
 export const NotificationBadge: React.FC<NotificationBadgeProps> = ({
   count,
   variant = 'default',
@@ -14,7 +12,6 @@ export const NotificationBadge: React.FC<NotificationBadgeProps> = ({
   className = ''
 }) => {
   if (count === 0 && !showZero) return null
-
   const getVariantStyles = () => {
     switch (variant) {
       case 'success':
@@ -27,14 +24,12 @@ export const NotificationBadge: React.FC<NotificationBadgeProps> = ({
         return 'bg-blue-500 text-white'
     }
   }
-
   const getAnimation = () => {
     if (count > 0 && variant === 'error') {
       return 'animate-pulse'
     }
     return ''
   }
-
   return (
     <span
       className={`
@@ -53,4 +48,4 @@ export const NotificationBadge: React.FC<NotificationBadgeProps> = ({
       {count === 0 && variant === 'success' ? '✓' : (count > 99 ? '99+' : count)}
     </span>
   )
-}
+}

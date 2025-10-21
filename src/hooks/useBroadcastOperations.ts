@@ -1,9 +1,7 @@
 import { useCallback } from 'react'
 import { useChallengesGlobal } from './useChallengesGlobal'
 import { toast } from 'sonner'
-
 export type BroadcastType = 'create' | 'update' | 'delete' | 'approve' | 'reject' | 'archive'
-
 export interface BroadcastConfig {
   showToast?: boolean
   toastMessages?: {
@@ -18,7 +16,6 @@ export function useBroadcastOperations() {
     broadcastChallengeDeleted,
     loadAllChallenges
   } = useChallengesGlobal()
-
   const executeWithBroadcast = useCallback(async <T>(
     operation: () => Promise<T>,
     broadcastType: BroadcastType,
@@ -28,7 +25,6 @@ export function useBroadcastOperations() {
       showToast = true,
       toastMessages = {}
     } = config
-
     try {
       const result = await operation()
       try {
@@ -54,7 +50,6 @@ export function useBroadcastOperations() {
       if (showToast && toastMessages.success) {
         toast.success(toastMessages.success)
       }
-
       return result
     } catch (error) {
       if (showToast && toastMessages.error) {
@@ -82,10 +77,8 @@ export function useBroadcastOperations() {
       }
     })
   }, [executeWithBroadcast])
-
   return {
     executeWithBroadcast,
     executeWithBroadcastAndToast
   }
-}
-
+}

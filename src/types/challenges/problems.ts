@@ -4,13 +4,11 @@ export interface ProblemTestCase {
   description: string
   hidden: boolean
 }
-
 export interface Example {
   input: string
   output: string
   explanation: string
 }
-
 export interface Problem {
   id: string
   title: string
@@ -22,5 +20,4 @@ export interface Problem {
   functionName: string
   testCases: ProblemTestCase[]
 }
-
 export type ProblemDifficulty = "Easy" | "Medium" | "Hard" 

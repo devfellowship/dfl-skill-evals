@@ -1,5 +1,4 @@
 'use client'
-
 import { useState } from 'react'
 import { Button } from '@/components/atoms/Button/Button'
 import { Input } from '@/components/atoms/Input/Input'
@@ -9,7 +8,6 @@ import { Badge } from '@/components/atoms/Badge/Badge'
 import { User, Calendar, AlertCircle } from 'lucide-react'
 import { ProfileFormData } from '@/types/profile/profile'
 import { PROFILE_MESSAGES } from '@/consts/profile/profile-constants'
-
 interface ProfilePersonalInfoProps {
   profile: any
   canChangeName: boolean
@@ -22,7 +20,6 @@ interface ProfilePersonalInfoProps {
   onCancel: () => void
   onFormDataChange: (data: ProfileFormData) => void
 }
-
 export function ProfilePersonalInfo({
   profile,
   canChangeName,
@@ -68,8 +65,6 @@ export function ProfilePersonalInfo({
                 </Button>
               </div>
             </div>
-
-
             {!canChangeName && (
               <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                 <div className="flex items-center gap-2 text-yellow-800 dark:text-yellow-200">
@@ -98,8 +93,6 @@ export function ProfilePersonalInfo({
                 </p>
               )}
             </div>
-
-
             <div className="flex gap-2">
               <Button
                 onClick={onSave}
@@ -121,4 +114,4 @@ export function ProfilePersonalInfo({
       </CardContent>
     </Card>
   )
-}
+}

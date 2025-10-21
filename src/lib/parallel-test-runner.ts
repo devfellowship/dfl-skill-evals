@@ -1,20 +1,16 @@
 import type { TestCase, TestResult, TestSummary } from '@/types/challenges/test-cases'
 import { executeCodeWithJudge0 } from './execution/judge0-executor'
 import { JUDGE0_LANGUAGES, type LanguageId } from '@/types/editor/execution'
-
 export interface ParallelTestRunnerOptions {
   maxConcurrentJobs: number
   timeoutMs: number
   languageId: LanguageId
 }
-
 export class ParallelTestRunner {
   private runningJobs = new Map<string, Promise<TestResult>>()
   private completedResults: TestResult[] = []
   private startTime: number = 0
-
   constructor(private options: ParallelTestRunnerOptions) {}
-
   async runTests(
     code: string,
     testCases: TestCase[],
@@ -23,17 +19,13 @@ export class ParallelTestRunner {
     this.startTime = Date.now()
     this.completedResults = []
     this.runningJobs.clear()
-
     const testPromises = testCases.map(testCase => 
       this.executeSingleTest(code, testCase, functionName)
     )
-
     const results = await Promise.all(testPromises)
-    
     const totalExecutionTime = Date.now() - this.startTime
     const passCount = results.filter((r: TestResult) => r.status === 'passed').length
     const failCount = results.filter((r: TestResult) => r.status === 'failed').length
-
     return {
       passCount,
       failCount,
@@ -42,17 +34,14 @@ export class ParallelTestRunner {
       totalExecutionTime
     }
   }
-
   private async executeSingleTest(
     code: string,
     testCase: TestCase,
     functionName: string
   ): Promise<TestResult> {
     const testStartTime = Date.now()
-    
     try {
       const executionCode = this.prepareExecutionCode(code, testCase, functionName)
-      
       const result = await executeCodeWithJudge0(
         executionCode,
         [{
@@ -65,9 +54,7 @@ export class ParallelTestRunner {
         this.options.timeoutMs,
         functionName
       )
-
       const executionTime = Date.now() - testStartTime
-      
       if (result.length === 0) {
         return {
           testCaseId: testCase.id,
@@ -79,9 +66,7 @@ export class ParallelTestRunner {
           errorMessage: 'No test results returned'
         }
       }
-
       const testResult = result[0]
-      
       return {
         testCaseId: testCase.id,
         input: testCase.input,
@@ -91,10 +76,8 @@ export class ParallelTestRunner {
         executionTime,
         errorMessage: testResult.status === 'failed' ? 'Output mismatch' : undefined
       }
-
     } catch (error) {
       const executionTime = Date.now() - testStartTime
-      
       return {
         testCaseId: testCase.id,
         input: testCase.input,
@@ -106,7 +89,6 @@ export class ParallelTestRunner {
       }
     }
   }
-
   private prepareExecutionCode(
     userCode: string,
     testCase: TestCase,
@@ -114,41 +96,31 @@ export class ParallelTestRunner {
   ): string {
     if (this.options.languageId === JUDGE0_LANGUAGES.JAVASCRIPT || 
         this.options.languageId === JUDGE0_LANGUAGES.TYPESCRIPT) {
-      
       return `${userCode}
-
 const input = ${testCase.input};
 const result = ${functionName}(...input);
 );`
     }
-
     return userCode
   }
-
   cancelAll(): void {
-
     this.runningJobs.clear()
   }
-
   getProgress(): { completed: number; total: number; percentage: number } {
     const total = this.completedResults.length + this.runningJobs.size
     const completed = this.completedResults.length
     const percentage = total > 0 ? (completed / total) * 100 : 0
-    
     return { completed, total, percentage }
   }
 }
-
 export class TestRunnerFactory {
   static createRunner(challengeId: string, language: string): ParallelTestRunner {
     const languageId = language === 'typescript' ? JUDGE0_LANGUAGES.TYPESCRIPT : JUDGE0_LANGUAGES.JAVASCRIPT
-    
     const options: ParallelTestRunnerOptions = {
       maxConcurrentJobs: 5, 
       timeoutMs: 10000,    
       languageId
     }
-
     return new ParallelTestRunner(options)
   }
-}
+}

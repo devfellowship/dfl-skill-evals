@@ -1,14 +1,11 @@
 "use client"
-
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { Separator } from "@/components/ui/separator"
 import { ProblemExamples } from "@/components/molecules/ProblemExamples/ProblemExamples"
 import type { Problem } from "@/types/challenges/problems"
-
 interface ProblemPanelProps {
   problem: Problem
 }
-
 export function ProblemPanel({ problem }: ProblemPanelProps) {
   return (
     <div className="w-[35%] min-w-[250px] border-r border-border/40 overflow-auto bg-background">
@@ -22,11 +19,9 @@ export function ProblemPanel({ problem }: ProblemPanelProps) {
             {problem.description}
           </p>
         </div>
-
         <Separator />
-
         <ProblemExamples examples={problem.examples} />
       </div>
     </div>
   )
-}
+}

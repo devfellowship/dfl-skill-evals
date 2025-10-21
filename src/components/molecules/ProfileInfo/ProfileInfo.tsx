@@ -2,14 +2,12 @@ import * as React from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "../../atoms/Avatar/Avatar"
 import type { User } from "@/types"
 import { cn } from "@/lib/utils"
-
 interface ProfileInfoProps {
   user: User
   size?: "sm" | "md" | "lg"
   className?: string
   showEmail?: boolean
 }
-
 const sizeClasses = {
   sm: {
     avatar: "h-6 w-6",
@@ -30,13 +28,11 @@ const sizeClasses = {
     container: "gap-3"
   }
 }
-
 export const ProfileInfo = React.forwardRef<
   HTMLDivElement,
   ProfileInfoProps
 >(({ user, size = "md", className, showEmail = true, ...props }, ref) => {
   const classes = sizeClasses[size]
-  
   return (
     <div
       ref={ref}

@@ -1,5 +1,4 @@
 import Link from "next/link"
-
 export function FooterBottom() {
   return (
     <div className="border-t border-border/40 mt-6 pt-8">
@@ -28,4 +27,4 @@ export function FooterBottom() {
       </div>
     </div>
   )
-}
+}

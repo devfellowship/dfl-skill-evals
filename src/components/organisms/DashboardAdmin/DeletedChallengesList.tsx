@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
@@ -8,7 +7,7 @@ import { AdminChallenge } from "@/types/admin/admin-dashboard"
 import { convertToBrazilianTime } from "@/lib/utils/timezone"
 import { DIFFICULTY_OPTIONS, STATUS_OPTIONS } from "@/types/admin/admin-dashboard"
 import { supabase } from "@/lib/supabase"
-
+import { ViewChallengeOverlay } from "@/components/molecules/ViewChallengeOverlay/ViewChallengeOverlay"
 interface DeletedChallengesListProps {
   challenges: AdminChallenge[]
   isInitialLoading: boolean
@@ -19,7 +18,6 @@ interface DeletedChallengesListProps {
   isDeleting: string | null
   searchQuery: string
 }
-
 export function DeletedChallengesList({
   challenges,
   isInitialLoading,
@@ -31,22 +29,19 @@ export function DeletedChallengesList({
   searchQuery
 }: DeletedChallengesListProps) {
   const [userNames, setUserNames] = useState<Record<string, string>>({})
-
+  const [viewingChallenge, setViewingChallenge] = useState<AdminChallenge | null>(null)
+  const [isViewOverlayOpen, setIsViewOverlayOpen] = useState(false)
   const filteredChallenges = challenges
   useEffect(() => {
     const fetchUserNames = async () => {
       const uniqueUserIds = [...new Set(challenges.map(c => c.deleted_by).filter(Boolean))]
-      
       if (uniqueUserIds.length === 0) return
-
       try {
         const nameMap: Record<string, string> = {}
-        
         const { data: profiles, error: profilesError } = await supabase
           .from('profiles')
           .select('id, full_name')
           .in('id', uniqueUserIds)
-
         if (!profilesError && profiles) {
           profiles.forEach(profile => {
             if (profile.full_name) {
@@ -54,12 +49,10 @@ export function DeletedChallengesList({
             }
           })
         }
-
         const { data: usersWithRoles, error: rolesError } = await supabase
           .from('users_with_roles')
           .select('id, name')
           .in('id', uniqueUserIds)
-
         if (!rolesError && usersWithRoles) {
           usersWithRoles.forEach(user => {
             if (user.name && !nameMap[user.id]) {
@@ -67,13 +60,11 @@ export function DeletedChallengesList({
             }
           })
         }
-
         uniqueUserIds.forEach(id => {
           if (!nameMap[id]) {
             nameMap[id] = 'Usuário'
           }
         })
-
         setUserNames(nameMap)
       } catch (error) {
         const fallbackMap: Record<string, string> = {}
@@ -83,26 +74,20 @@ export function DeletedChallengesList({
         setUserNames(fallbackMap)
       }
     }
-
     fetchUserNames()
   }, [challenges])
-
   const getDifficultyColor = (difficulty: string) => {
     return DIFFICULTY_OPTIONS.find(opt => opt.value === difficulty)?.color || "bg-gray-100 text-gray-800"
   }
-
   const getDifficultyLabel = (difficulty: string) => {
     return DIFFICULTY_OPTIONS.find(opt => opt.value === difficulty)?.label || "Desconhecido"
   }
-
   const getStatusColor = (status: string) => {
     return STATUS_OPTIONS.find(opt => opt.value === status)?.color || "bg-gray-100 text-gray-800"
   }
-
   const getStatusLabel = (status: string) => {
     return STATUS_OPTIONS.find(opt => opt.value === status)?.label || "Desconhecido"
   }
-
   if (isInitialLoading) {
     return (
       <div className="space-y-4">
@@ -128,7 +113,6 @@ export function DeletedChallengesList({
       </div>
     )
   }
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -139,8 +123,6 @@ export function DeletedChallengesList({
           </p>
         </div>
       </div>
-
-
       {filteredChallenges.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 border rounded-lg">
           <Trash2 className="h-12 w-12 text-muted-foreground mb-4" />
@@ -185,26 +167,26 @@ export function DeletedChallengesList({
                     <span>👤 Deletada por: {userNames[challenge.deleted_by] || challenge.deleted_by}</span>
                   )}
                 </div>
-                
-                {/* Motivo da exclusão */}
+                {}
                 {challenge.deletion_reason && (
                   <div className="mt-2 text-xs text-muted-foreground">
                     <span className="font-medium">Motivo:</span> {challenge.deletion_reason}
                   </div>
                 )}
               </div>
-              
               <div className="flex gap-2 items-center">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => window.open(`/admin/challenge/${challenge.id}`, '_blank')}
+                  onClick={() => {
+                    setViewingChallenge(challenge)
+                    setIsViewOverlayOpen(true)
+                  }}
                   className="opacity-70 group-hover:opacity-100 transition-opacity duration-200"
                   title="Visualizar challenge"
                 >
                   <Eye className="w-4 h-4" />
                 </Button>
-
                 <Button
                   variant="outline"
                   size="sm"
@@ -215,7 +197,6 @@ export function DeletedChallengesList({
                 >
                   <RotateCcw className="w-4 h-4" />
                 </Button>
-                
                 <Button
                   variant="outline"
                   size="sm"
@@ -231,6 +212,34 @@ export function DeletedChallengesList({
           ))}
         </div>
       )}
+
+      {viewingChallenge && (() => {
+        const challengeData = {
+          id: viewingChallenge.id,
+          title: viewingChallenge.title,
+          description: viewingChallenge.description,
+          difficulty: viewingChallenge.difficulty,
+          category: Array.isArray(viewingChallenge.category) ? viewingChallenge.category[0] : viewingChallenge.category,
+          function_name: viewingChallenge.functionName || '',
+          initial_code: viewingChallenge.initialCode || '',
+          testCases: viewingChallenge.testCases || [],
+          examples: [],
+          status: viewingChallenge.status,
+          mentor: viewingChallenge.mentor,
+          createdAt: viewingChallenge.createdAt,
+          updatedAt: viewingChallenge.updatedAt
+        }
+        return (
+          <ViewChallengeOverlay
+            challenge={challengeData}
+            isOpen={isViewOverlayOpen}
+            onClose={() => {
+              setIsViewOverlayOpen(false)
+              setViewingChallenge(null)
+            }}
+          />
+        )
+      })()}
     </div>
   )
 }

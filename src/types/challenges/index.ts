@@ -2,5 +2,4 @@ export * from './challenge'
 export * from './challenge-page'
 export * from './pre-challenge-page'
 export * from './test-cases'
-export * from './problems'
-
+export * from './problems'

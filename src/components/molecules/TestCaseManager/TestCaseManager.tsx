@@ -1,5 +1,4 @@
 "use client"
-
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/atoms/Button/Button"
@@ -7,24 +6,20 @@ import { Input } from "@/components/atoms/Input/Input"
 import { Textarea } from "@/components/atoms/Textarea/Textarea"
 import { Label } from "@/components/atoms/Label/Label"
 import { Plus, Trash2 } from "lucide-react"
-
 interface TestCase {
   input: string
   expectedOutput: string
 }
-
 interface TestCaseManagerProps {
   testCases: TestCase[]
   onAdd: (testCase: TestCase) => void
   onRemove: (index: number) => void
 }
-
 export function TestCaseManager({ testCases, onAdd, onRemove }: TestCaseManagerProps) {
   const [testCase, setTestCase] = useState<TestCase>({
     input: "",
     expectedOutput: ""
   })
-
   const addTestCase = () => {
     if (testCase.input.trim() && testCase.expectedOutput.trim()) {
       const newTestCase = {
@@ -35,7 +30,6 @@ export function TestCaseManager({ testCases, onAdd, onRemove }: TestCaseManagerP
       setTestCase({ input: "", expectedOutput: "" })
     }
   }
-
   return (
     <Card>
       <CardHeader>
@@ -64,12 +58,10 @@ export function TestCaseManager({ testCases, onAdd, onRemove }: TestCaseManagerP
             />
           </div>
         </div>
-        
         <Button type="button" onClick={addTestCase} variant="outline">
           <Plus className="w-4 h-4 mr-2" />
           Adicionar Caso de Teste
         </Button>
-
         {testCases.length > 0 && (
           <div className="space-y-2">
             <Label>Casos de Teste Adicionados ({testCases.length})</Label>
@@ -98,4 +90,4 @@ export function TestCaseManager({ testCases, onAdd, onRemove }: TestCaseManagerP
       </CardContent>
     </Card>
   )
-}
+}

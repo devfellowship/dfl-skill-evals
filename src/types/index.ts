@@ -1,5 +1,4 @@
 export * from './editor'
-
 export type { 
   Challenge, 
   SearchFilters,
@@ -10,9 +9,7 @@ export type {
   ProblemDifficulty,
   TestCase as ChallengeTestCase
 } from './challenges'
-
 export type { ExecutionTestCase, TestResult } from './editor'
-
 export interface User {
   name: string
   email: string

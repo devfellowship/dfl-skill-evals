@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect } from 'react'
 import { useChallengeManagement } from '@/hooks/useChallengeManagement'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -9,17 +8,14 @@ import { ArrowLeft, XCircle } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 import { ChallengeData, ChallengeViewBySlugProps } from '@/interface'
-
 export function ChallengeViewBySlug({ slug }: ChallengeViewBySlugProps) {
   const { getChallengeBySlug, loading, error } = useChallengeManagement()
   const [challenge, setChallenge] = useState<ChallengeData | null>(null)
-
   useEffect(() => {
     if (slug) {
       loadChallenge()
     }
   }, [slug])
-
   const loadChallenge = async () => {
     try {
       const challengeData = await getChallengeBySlug(slug)
@@ -32,7 +28,6 @@ export function ChallengeViewBySlug({ slug }: ChallengeViewBySlugProps) {
       toast.error("Erro ao carregar challenge")
     }
   }
-
   const getDifficultyColor = (difficulty: string) => {
     const colors = {
       easy: "bg-green-100 text-green-800",
@@ -42,7 +37,6 @@ export function ChallengeViewBySlug({ slug }: ChallengeViewBySlugProps) {
     }
     return colors[difficulty as keyof typeof colors] || "bg-gray-100 text-gray-800"
   }
-
   const getStatusColor = (status: string) => {
     const colors = {
       to_approve: "bg-yellow-100 text-yellow-800",
@@ -52,7 +46,6 @@ export function ChallengeViewBySlug({ slug }: ChallengeViewBySlugProps) {
     }
     return colors[status as keyof typeof colors] || "bg-gray-100 text-gray-800"
   }
-
   const getStatusLabel = (status: string) => {
     const labels = {
       to_approve: "A ser aprovado",
@@ -62,7 +55,6 @@ export function ChallengeViewBySlug({ slug }: ChallengeViewBySlugProps) {
     }
     return labels[status as keyof typeof labels] || status
   }
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -73,7 +65,6 @@ export function ChallengeViewBySlug({ slug }: ChallengeViewBySlugProps) {
       </div>
     )
   }
-
   if (error || !challenge) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -91,7 +82,6 @@ export function ChallengeViewBySlug({ slug }: ChallengeViewBySlugProps) {
       </div>
     )
   }
-
   return (
     <div className="min-h-screen bg-background">
       <header className="bg-background/95 backdrop-blur border-b">
@@ -119,7 +109,6 @@ export function ChallengeViewBySlug({ slug }: ChallengeViewBySlugProps) {
           </div>
         </div>
       </header>
-
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Card>
           <CardHeader>
@@ -131,7 +120,6 @@ export function ChallengeViewBySlug({ slug }: ChallengeViewBySlugProps) {
                 {challenge.description}
               </p>
             </div>
-            
             {challenge.skills && challenge.skills.length > 0 && (
               <div className="mt-6">
                 <h4 className="font-semibold text-gray-900 mb-3">Habilidades:</h4>
@@ -146,7 +134,6 @@ export function ChallengeViewBySlug({ slug }: ChallengeViewBySlugProps) {
             )}
           </CardContent>
         </Card>
-
         <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <div className="bg-gray-50 p-4 rounded-lg">
             <span className="font-medium text-gray-700">Função:</span>
@@ -168,4 +155,4 @@ export function ChallengeViewBySlug({ slug }: ChallengeViewBySlugProps) {
       </div>
     </div>
   )
-}
+}

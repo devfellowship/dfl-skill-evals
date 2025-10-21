@@ -1,5 +1,4 @@
 import { ChallengeComparisonModal } from "@/components/molecules/ChallengeComparisonModal/ChallengeComparisonModal"
-
 interface DashboardModalsProps {
   comparisonModalOpen: boolean
   challengeToCompare: string | null
@@ -7,7 +6,6 @@ interface DashboardModalsProps {
   onApproveFromComparison: () => Promise<void>
   onRejectFromComparison: () => Promise<void>
 }
-
 export function DashboardModals({
   comparisonModalOpen,
   challengeToCompare,
@@ -16,7 +14,6 @@ export function DashboardModals({
   onRejectFromComparison
 }: DashboardModalsProps) {
   if (!challengeToCompare) return null
-
   return (
     <ChallengeComparisonModal
       isOpen={comparisonModalOpen}
@@ -26,5 +23,4 @@ export function DashboardModals({
       onReject={onRejectFromComparison}
     />
   )
-}
-
+}

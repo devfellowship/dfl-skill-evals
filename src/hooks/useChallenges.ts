@@ -3,9 +3,6 @@ import { supabase } from '@/lib/supabase'
 import type { Tables } from '@/lib/supabase'
 import type { Challenge } from '@/types/challenges/challenge'
 import { mapDifficultyToString } from '@/lib/utils/difficulty-mapper'
-
-
-
 let challengesCache: Challenge[] | null = null
 let cacheTimestamp: number = 0
 const CACHE_DURATION = 5 * 60 * 1000
@@ -13,24 +10,20 @@ export const invalidateChallengesCache = () => {
   challengesCache = null
   cacheTimestamp = 0
 }
-
 export function useChallenges() {
   const [challenges, setChallenges] = useState<Challenge[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-
   const fetchChallenges = useCallback(async (forceRefresh = false) => {
     try {
       setLoading(true)
       setError(null)
-
       const now = Date.now()
       if (!forceRefresh && challengesCache && (now - cacheTimestamp) < CACHE_DURATION) {
         setChallenges(challengesCache)
         setLoading(false)
         return
       }
-
       const { data, error: fetchError } = await supabase
         .schema('skill_evals')
         .from('challenges')
@@ -40,18 +33,15 @@ export function useChallenges() {
         .order('trending', { ascending: false })
         .order('trending_priority', { ascending: true })
         .order('difficulty', { ascending: true })
-
       if (fetchError) {
         setError(`Erro ao conectar com o banco: ${fetchError.message}`)
         setChallenges([])
         return
       }
-      
       if (!data || data.length === 0) {
         setChallenges([])
         return
       }
-
       const adaptedChallenges = data.map((challenge, index) => ({
         id: index + 1,
         supabaseId: challenge.id,
@@ -67,7 +57,6 @@ export function useChallenges() {
         trending_priority: challenge.trending_priority || null,
         image: '/images/challenges/defaults/Default.jpg' 
       }))
-
       challengesCache = adaptedChallenges
       cacheTimestamp = Date.now()
       setChallenges(adaptedChallenges)
@@ -78,23 +67,19 @@ export function useChallenges() {
       setLoading(false)
     }
   }, [])
-
   const fetchChallengeById = async (id: string) => {
     try {
       setLoading(true)
       setError(null)
-
       const { data, error: fetchError } = await supabase
         .schema('skill_evals')
         .from('challenges')
         .select('*')
         .eq('id', id)
         .single()
-
       if (fetchError) {
         throw fetchError
       }
-
       return data
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao buscar desafio')
@@ -103,7 +88,6 @@ export function useChallenges() {
       setLoading(false)
     }
   }
-
   const createChallenge = async (challengeData: Omit<Tables<'challenges'>, 'id' | 'created_at' | 'updated_at'>) => {
     try {
       const { data, error: createError } = await supabase
@@ -112,7 +96,6 @@ export function useChallenges() {
         .insert([challengeData])
         .select()
         .single()
-
       if (createError) {
         throw createError
       }
@@ -124,7 +107,6 @@ export function useChallenges() {
       return { data: null, error: errorMessage }
     }
   }
-
   const updateChallenge = async (id: string, updates: Partial<Tables<'challenges'>>) => {
     try {
       const { data, error: updateError } = await supabase
@@ -134,7 +116,6 @@ export function useChallenges() {
         .eq('id', id)
         .select()
         .single()
-
       if (updateError) {
         throw updateError
       }
@@ -162,7 +143,6 @@ export function useChallenges() {
       return { data: null, error: errorMessage }
     }
   }
-
   const deleteChallenge = async (id: string) => {
     try {
       const { error: deleteError } = await supabase
@@ -170,7 +150,6 @@ export function useChallenges() {
         .from('challenges')
         .delete()
         .eq('id', id)
-
       if (deleteError) {
         throw deleteError
       }
@@ -186,7 +165,6 @@ export function useChallenges() {
     challengesCache = null
     cacheTimestamp = 0
   }, [])
-
   useEffect(() => {
     fetchChallenges()
     const channel = supabase
@@ -212,17 +190,14 @@ export function useChallenges() {
           payload => {
             challengesCache = null
             cacheTimestamp = 0
-
             fetchChallenges(true)
           }
       )
       .subscribe()
-
     return () => {
       supabase.removeChannel(channel)
     }
   }, [])
-
   const forceRefresh = useCallback(() => {
     challengesCache = null
     cacheTimestamp = 0
@@ -234,9 +209,6 @@ export function useChallenges() {
     setChallenges([])
     fetchChallenges(true)
   }, [fetchChallenges])
-
-
-
   return {
     challenges,
     loading,
@@ -250,4 +222,4 @@ export function useChallenges() {
     forceRefresh,
     clearCacheAndRefresh,
   }
-}
+}

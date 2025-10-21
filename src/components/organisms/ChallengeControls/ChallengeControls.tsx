@@ -2,7 +2,6 @@ import { useState } from "react"
 import { Play, Square, RefreshCw } from "lucide-react"
 import { Button } from "@/components/atoms/Button/Button"
 
-
 interface ChallengeControlsProps {
   language: string
   setLanguage: (language: string) => void
@@ -49,7 +48,7 @@ export function ChallengeControls({
           <Play className="w-4 h-4" />
           Executar Teste Único
         </Button>
-        
+
         <Button
           onClick={onRunTests}
           disabled={isRunning}
@@ -58,7 +57,7 @@ export function ChallengeControls({
           <Play className="w-4 h-4" />
           Executar Múltiplos Testes
         </Button>
-        
+
         <Button
           onClick={onGenerateTestCases}
           disabled={isRunning}
@@ -68,7 +67,7 @@ export function ChallengeControls({
           <RefreshCw className="w-4 h-4" />
           Gerar Novos Casos
         </Button>
-        
+
         {isRunning && (
           <Button
             onClick={onCancelTests}

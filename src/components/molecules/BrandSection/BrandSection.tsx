@@ -1,6 +1,5 @@
 import { BrandLogo } from "@/components/atoms/Logo/Logo"
 import { SocialLinks } from "@/components/molecules/SocialLinks/SocialLinks"
-
 export function BrandSection() {
   return (
     <div className="lg:col-span-1">
@@ -19,4 +18,4 @@ export function BrandSection() {
       <SocialLinks />
     </div>
   )
-}
+}

@@ -1,10 +1,8 @@
 import { LucideIcon } from "lucide-react"
-
 interface ContactItemProps {
   icon: LucideIcon
   children: React.ReactNode
 }
-
 export function ContactItem({ icon: Icon, children }: ContactItemProps) {
   return (
     <li className="flex items-center space-x-4">
@@ -14,4 +12,4 @@ export function ContactItem({ icon: Icon, children }: ContactItemProps) {
       </div>
     </li>
   )
-}
+}

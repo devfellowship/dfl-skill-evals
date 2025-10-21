@@ -4,7 +4,6 @@ export const PROFILE_CONSTANTS = {
   EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   ALLOWED_PROFILE_FIELDS: ['full_name', 'phone', 'updated_at', 'last_name_change'] as const
 } as const
-
 export const PROFILE_MESSAGES = {
   LOADING: 'Carregando perfil...',
   ERROR_LOADING: 'Erro ao carregar perfil',
@@ -19,4 +18,4 @@ export const PROFILE_MESSAGES = {
   CURRENT_PASSWORD_INCORRECT: 'Senha atual incorreta',
   USER_NOT_FOUND: 'Usuário não encontrado',
   UNEXPECTED_ERROR: 'Erro inesperado'
-} as const
+} as const

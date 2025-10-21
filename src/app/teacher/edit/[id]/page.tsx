@@ -1,20 +1,15 @@
 "use client"
-
 import { useParams } from "next/navigation"
 import { EditChallenge } from "@/components/organisms/EditChallenge/EditChallenge"
 import { useUserRole } from "@/hooks/useUserRole"
 import { LoadingState } from "@/components/molecules/LoadingState/LoadingState"
 import { NotFoundState } from "@/components/molecules/NotFoundState/NotFoundState"
-
 export default function EditChallengePage() {
   const params = useParams()
   const { isLoading, isAdmin, isMentor } = useUserRole()
-  
   if (isLoading) {
     return <LoadingState message="Verificando permissões..." />
   }
-
-  // Verifica se o usuário tem permissão para editar (admin ou mentor)
   if (!isAdmin && !isMentor) {
     return (
       <NotFoundState 
@@ -23,6 +18,5 @@ export default function EditChallengePage() {
       />
     )
   }
-  
   return <EditChallenge challengeId={params.id as string} />
 }

@@ -6,7 +6,6 @@ interface DashboardHeaderProps {
   lastUpdate: Date
   isSubmitting?: boolean
 }
-
 export function DashboardHeader({
   broadcastWorking,
   lastUpdate,

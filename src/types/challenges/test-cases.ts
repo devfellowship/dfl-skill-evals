@@ -8,7 +8,6 @@ export interface TestCase {
   is_hidden: boolean
   created_at: string
 }
-
 export interface TestCaseExecution {
   id: string
   submission_id: string
@@ -23,7 +22,6 @@ export interface TestCaseExecution {
   created_at: string
   updated_at: string
 }
-
 export interface TestResult {
   testCaseId: string
   input: string
@@ -33,7 +31,6 @@ export interface TestResult {
   executionTime: number | null
   errorMessage?: string
 }
-
 export interface TestSummary {
   passCount: number
   failCount: number
@@ -41,8 +38,7 @@ export interface TestSummary {
   details: TestResult[]
   totalExecutionTime: number
 }
-
 export interface TestCaseGenerator {
   generateTestCases(seed: number, count: number): TestCase[]
   validateOutput(input: string, output: string): boolean
-}
+}

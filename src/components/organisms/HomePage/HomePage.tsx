@@ -1,15 +1,12 @@
 "use client"
-
 import { useState, useMemo } from "react"
 import { AssessmentGrid } from "@/components/organisms/AssessmentGrid/AssessmentGrid"
 import { MainHeader } from "@/components/organisms/MainHeader/MainHeader"
 import { useChallenges } from "@/hooks/useChallenges"
 import { MainChallengeSorter, MainSortType } from "@/lib/main-challenge-sorter"
 import type { SearchFilters } from "@/types/challenges/challenge"
-
 export function HomePage() {
   const { challenges, loading: challengesLoading, error: challengesError } = useChallenges()
-  
   const [searchQuery, setSearchQuery] = useState("")
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     skills: [],
@@ -19,21 +16,16 @@ export function HomePage() {
     trending: false,
   })
   const [sortBy, setSortBy] = useState<MainSortType>("difficulty_asc")
-
   const handleSearch = (query: string, filters: SearchFilters) => {
     setSearchQuery(query)
     setSearchFilters(filters)
   }
-
   const handleTitleSearch = (query: string) => {
     setSearchQuery(query)
   }
-
   const filteredAssessments = useMemo(() => {
     if (!challenges.length) return []
-    
     let filtered = challenges
-    
     if (searchQuery) {
       filtered = challenges.filter(
         (assessment) =>
@@ -41,26 +33,20 @@ export function HomePage() {
           assessment.description.toLowerCase().includes(searchQuery.toLowerCase())
       )
     }
-
-    // Aplicar filtro de trending se ativo
     if (searchFilters.trending) {
       filtered = filtered.filter(assessment => assessment.trending)
     }
-
     return filtered
   }, [challenges, searchQuery, searchFilters.trending])
-
   const sortedAssessments = useMemo(() => {
     return MainChallengeSorter.sortChallenges(filteredAssessments, sortBy)
   }, [filteredAssessments, sortBy])
-
   const activeFiltersCount = 
     searchFilters.skills.length +
     searchFilters.difficulties.length +
     searchFilters.categories.length +
     (searchFilters.minRating > 0 ? 1 : 0) +
     (searchFilters.trending ? 1 : 0)
-
   return (
     <div className="min-h-screen bg-background">
       <MainHeader 
@@ -70,7 +56,6 @@ export function HomePage() {
         onSortChange={setSortBy}
         showNavigation={true}
       />
-      
       <main className="p-6">
         {challengesError ? (
           <div className="flex h-96 items-center justify-center">
@@ -88,4 +73,4 @@ export function HomePage() {
       </main>
     </div>
   )
-}
+}

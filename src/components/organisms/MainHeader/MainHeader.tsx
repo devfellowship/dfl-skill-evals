@@ -1,5 +1,4 @@
 "use client"
-
 import { BrandLogo } from "@/components/atoms/Logo/Logo"
 import { Button } from "@/components/atoms/Button/Button"
 import { SearchButton } from "@/components/atoms/SearchButton/SearchButton"
@@ -14,7 +13,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { MAIN_SORT_OPTIONS } from "@/consts/main-header"
-
 const getIcon = (iconName: string) => {
   const icons = {
     Hash: <Hash className="w-4 h-4" />,
@@ -27,7 +25,6 @@ const getIcon = (iconName: string) => {
   }
   return icons[iconName as keyof typeof icons] || <Hash className="w-4 h-4" />
 }
-
 interface MainHeaderProps {
   searchQuery: string
   onSearch: (query: string) => void
@@ -35,8 +32,6 @@ interface MainHeaderProps {
   onSortChange: (sort: MainSortType) => void
   showNavigation?: boolean
 }
-
-
 export function MainHeader({ 
   searchQuery, 
   onSearch, 
@@ -47,9 +42,7 @@ export function MainHeader({
   const { user, signOut } = useAuth()
   const { isAdmin, isMentor, canCreateChallenges, isLoading: roleLoading } = useUserRole()
   const { profile } = useProfile()
-  
   const currentOption = MAIN_SORT_OPTIONS.find(option => option.value === sortBy) || MAIN_SORT_OPTIONS[0]
-
   const handleSignOut = async () => {
     try {
       await signOut()
@@ -58,11 +51,9 @@ export function MainHeader({
   }
   const getUserDisplayName = () => {
     if (!user) return 'Usuário'
-
     if (profile?.full_name) {
       return profile.full_name
     }
-
     if (user.user_metadata?.full_name) {
       return user.user_metadata.full_name
     }
@@ -71,16 +62,12 @@ export function MainHeader({
     }
     return 'Usuário'
   }
-
   const getUserInitials = () => {
     const name = getUserDisplayName()
     return name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
   }
-
-  // Forçar re-renderização quando o perfil mudar
   const displayName = getUserDisplayName()
   const userInitials = getUserInitials()
-
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center gap-4 px-6">
@@ -90,7 +77,6 @@ export function MainHeader({
             <span className="text-foreground font-bold text-xl">Devfellowship</span>
           </Link>
         </div>
-
         {showNavigation && (
           <div className="flex-1 flex items-center justify-center gap-4">
             <div className="w-full max-w-md">
@@ -131,7 +117,6 @@ export function MainHeader({
             </DropdownMenu>
           </div>
         )}
-
         <div className="flex items-center gap-4">
           {showNavigation && !roleLoading && (
             <div className="flex items-center gap-2">
@@ -146,7 +131,6 @@ export function MainHeader({
                   </Link>
                 </Button>
               )}
-
               {isMentor && (
                 <Button 
                   asChild 
@@ -158,7 +142,6 @@ export function MainHeader({
                   </Link>
                 </Button>
               )}
-
               {canCreateChallenges && (
                 <Button 
                   asChild 
@@ -172,7 +155,6 @@ export function MainHeader({
               )}
             </div>
           )}
-
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -215,4 +197,4 @@ export function MainHeader({
       </div>
     </header>
   )
-}
+}

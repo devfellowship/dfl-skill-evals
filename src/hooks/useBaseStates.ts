@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react'
-
 export interface BaseStates {
   loading: boolean
   error: string | null
@@ -10,13 +9,11 @@ export interface BaseStates {
 export function useBaseStates(): BaseStates {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
   const executeWithLoading = useCallback(async <T>(
     operation: () => Promise<T>
   ): Promise<T> => {
     setLoading(true)
     setError(null)
-    
     try {
       const result = await operation()
       return result
@@ -28,7 +25,6 @@ export function useBaseStates(): BaseStates {
       setLoading(false)
     }
   }, [])
-
   return {
     loading,
     error,
@@ -36,4 +32,4 @@ export function useBaseStates(): BaseStates {
     setError,
     setLoading
   }
-}
+}

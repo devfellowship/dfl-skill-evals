@@ -1,11 +1,9 @@
 "use client"
-
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { ArrowUpDown, Hash, Calendar, Zap, Star, Users, ArrowUp, ArrowDown } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import type { MainSortType } from "@/lib/main-challenge-sorter"
-
 const MAIN_SORT_OPTIONS = [
   {
     value: 'difficulty_asc' as MainSortType,
@@ -48,15 +46,12 @@ const MAIN_SORT_OPTIONS = [
     icon: <Users className="w-4 h-4" />
   }
 ]
-
 interface SortDropdownProps {
   sortBy: MainSortType
   onSortChange: (sort: MainSortType) => void
 }
-
 export function SortDropdown({ sortBy, onSortChange }: SortDropdownProps) {
   const currentOption = MAIN_SORT_OPTIONS.find(option => option.value === sortBy) || MAIN_SORT_OPTIONS[0]
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -88,4 +83,4 @@ export function SortDropdown({ sortBy, onSortChange }: SortDropdownProps) {
       </DropdownMenuContent>
     </DropdownMenu>
   )
-}
+}

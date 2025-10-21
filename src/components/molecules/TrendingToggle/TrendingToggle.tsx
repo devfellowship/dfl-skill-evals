@@ -5,7 +5,6 @@ import { Star, StarOff, ArrowUp, ArrowDown } from 'lucide-react'
 import { useTrendingChallenges } from '@/hooks/useTrendingChallenges'
 import { invalidateChallengesCache } from '@/hooks/useChallenges'
 import { toast } from 'sonner'
-
 interface TrendingToggleProps {
   challengeId: string
   isTrending: boolean
@@ -13,7 +12,6 @@ interface TrendingToggleProps {
   onUpdate?: () => void
   showPriority?: boolean
 }
-
 export function TrendingToggle({ 
   challengeId, 
   isTrending, 
@@ -23,29 +21,22 @@ export function TrendingToggle({
 }: TrendingToggleProps) {
   const [isUpdating, setIsUpdating] = useState(false)
   const { toggleTrending, updateTrendingPriority } = useTrendingChallenges()
-
   const handleToggleTrending = async () => {
     if (isUpdating) return
-
     setIsUpdating(true)
     try {
       await toggleTrending(challengeId, isTrending, 1)
       toast.success(isTrending ? 'Removido das novidades' : 'Adicionado às novidades')
-      
-      // Invalida o cache para garantir que as mudanças sejam refletidas
       invalidateChallengesCache()
       onUpdate?.()
     } catch (error) {
-      console.error('Erro ao atualizar novidade:', error)
       toast.error('Erro ao atualizar novidade')
     } finally {
       setIsUpdating(false)
     }
   }
-
   const handleUpdatePriority = async (newPriority: number) => {
     if (isUpdating || !isTrending) return
-
     setIsUpdating(true)
     try {
       await updateTrendingPriority(challengeId, newPriority)
@@ -57,7 +48,6 @@ export function TrendingToggle({
       setIsUpdating(false)
     }
   }
-
   return (
     <div className="flex items-center gap-2">
       <Button
@@ -79,13 +69,11 @@ export function TrendingToggle({
           </>
         )}
       </Button>
-
       {isTrending && showPriority && (
         <div className="flex items-center gap-1">
           <Badge variant="secondary" className="text-xs">
             Prioridade: {trendingPriority || 1}
           </Badge>
-          
           <div className="flex flex-col gap-0.5">
             <Button
               variant="ghost"

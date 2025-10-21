@@ -1,5 +1,4 @@
 import { KeyRound } from 'lucide-react'
-
 export function ResetPasswordHeader() {
   return (
     <div className="text-center space-y-6">
@@ -10,7 +9,6 @@ export function ResetPasswordHeader() {
           </div>
           <div className="absolute -inset-1 bg-gradient-to-r from-orange-600 via-red-600 to-pink-600 rounded-2xl blur opacity-30 -z-10"></div>
         </div>
-        
         <div className="space-y-2">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-400 via-red-400 to-pink-400 bg-clip-text text-transparent">
             Recuperar Senha
@@ -18,7 +16,6 @@ export function ResetPasswordHeader() {
           <p className="text-lg text-gray-300 font-medium">DevShapper</p>
         </div>
       </div>
-
       <div className="space-y-2">
         <h2 className="text-2xl font-semibold text-white">
           Esqueceu sua senha?
@@ -29,4 +26,4 @@ export function ResetPasswordHeader() {
       </div>
     </div>
   )
-}
+}

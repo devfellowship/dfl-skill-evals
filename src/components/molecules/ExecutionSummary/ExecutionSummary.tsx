@@ -1,8 +1,6 @@
 "use client"
-
 import { RefreshCw } from "lucide-react"
 import { Button } from "@/components/atoms/Button/Button"
-
 interface ExecutionSummaryProps {
   results: {
     passCount: number
@@ -11,7 +9,6 @@ interface ExecutionSummaryProps {
   }
   onReset: () => void
 }
-
 export function ExecutionSummary({ results, onReset }: ExecutionSummaryProps) {
   return (
     <div className="border-t border-border/40 p-4 bg-muted/20">
@@ -43,4 +40,4 @@ export function ExecutionSummary({ results, onReset }: ExecutionSummaryProps) {
       </div>
     </div>
   )
-}
+}

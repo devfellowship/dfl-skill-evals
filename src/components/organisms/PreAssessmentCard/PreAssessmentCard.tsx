@@ -1,24 +1,19 @@
 "use client"
-
 import { Star } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { Separator } from "@/components/ui/separator"
 import { DifficultyIndicator } from "@/components/molecules/DifficultyIndicator/DifficultyIndicator"
-
 interface Challenge {
   title: string
   description: string
   rating: number
   skills: string[]
-
   difficulty: number
 }
-
 interface PreAssessmentCardProps {
   assessment: Challenge
 }
-
 export function PreAssessmentCard({ assessment }: PreAssessmentCardProps) {
   return (
     <Card className="border-border/40">
@@ -34,7 +29,6 @@ export function PreAssessmentCard({ assessment }: PreAssessmentCardProps) {
           </div>
         </div>
       </CardHeader>
-
       <CardContent className="space-y-6">
         <div>
           <h4 className="mb-2 font-medium">Skills Tested</h4>
@@ -46,15 +40,10 @@ export function PreAssessmentCard({ assessment }: PreAssessmentCardProps) {
             ))}
           </div>
         </div>
-
         <Separator />
-
         <div className="space-y-3">
-
         </div>
-
         <Separator />
-
         <div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Difficulty</span>
@@ -64,4 +53,4 @@ export function PreAssessmentCard({ assessment }: PreAssessmentCardProps) {
       </CardContent>
     </Card>
   )
-}
+}

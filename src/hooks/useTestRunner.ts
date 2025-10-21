@@ -84,12 +84,12 @@ export function useTestRunner() {
     currentTest,
     results,
     error,
-    
+
     runTests,
     cancelTests,
     generateTestCases,
     validateOutput,
-    
+
     reset: () => {
       setResults(null)
       setError(null)
