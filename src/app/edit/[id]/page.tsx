@@ -19,4 +19,4 @@ export default function EditChallengePage({ params }: { params: Promise<{ id: st
     )
   }
   return <EditChallenge challengeId={id} />
-}
+}

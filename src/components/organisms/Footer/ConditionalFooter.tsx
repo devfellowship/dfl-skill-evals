@@ -18,4 +18,4 @@ export function ConditionalFooter() {
     return null
   }
   return <Footer />
-}
+}

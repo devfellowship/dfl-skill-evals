@@ -19,4 +19,4 @@ export default function EditChallengePage() {
     )
   }
   return <EditChallenge challengeId={params.id as string} />
-}
+}

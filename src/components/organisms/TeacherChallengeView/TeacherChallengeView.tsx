@@ -274,4 +274,4 @@ export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps)
     </div>
     </AdminRouteWrapper>
   )
-}
+}

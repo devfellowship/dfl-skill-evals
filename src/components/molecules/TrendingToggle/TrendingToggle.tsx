@@ -30,7 +30,6 @@ export function TrendingToggle({
       invalidateChallengesCache()
       onUpdate?.()
     } catch (error) {
-      console.error('Erro ao atualizar novidade:', error)
       toast.error('Erro ao atualizar novidade')
     } finally {
       setIsUpdating(false)
@@ -99,4 +98,4 @@ export function TrendingToggle({
       )}
     </div>
   )
-}
+}

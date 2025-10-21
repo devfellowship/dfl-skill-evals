@@ -12,6 +12,7 @@ interface DashboardTabsProps {
   onTabChange: (tab: string) => void
   published: Challenge[]
   pending: Challenge[]
+  pendingChallenges: Challenge[] // Challenges pendentes do localStorage
   archived: Challenge[]
   deleted: Challenge[]
   isInitialLoading: boolean
@@ -31,12 +32,16 @@ interface DashboardTabsProps {
   isApproving: string | null
   isArchiving: string | null
   isRestoring: string | null
+  onUpdatePendingChallenge?: (challenge: Challenge) => void
+  onApprovePendingChallenge?: (id: string) => void
+  onRejectPendingChallenge?: (id: string) => void
 }
 export function DashboardTabs({
   activeTab,
   onTabChange,
   published,
   pending,
+  pendingChallenges, // Challenges pendentes do localStorage
   archived,
   deleted,
   isInitialLoading,
@@ -55,7 +60,10 @@ export function DashboardTabs({
   isDeleting,
   isApproving,
   isArchiving,
-  isRestoring
+  isRestoring,
+  onUpdatePendingChallenge,
+  onApprovePendingChallenge,
+  onRejectPendingChallenge
 }: DashboardTabsProps) {
   return (
     <Tabs defaultValue="challenges" value={activeTab} onValueChange={onTabChange} className="space-y-4">
@@ -67,12 +75,20 @@ export function DashboardTabs({
         <TabsTrigger value="approvals" className="flex items-center gap-2 relative">
           <CheckCircle className="w-4 h-4" />
           Aprovações
-          {pending.length > 0 && (
-            <NotificationBadge 
-              count={pending.length} 
-              variant="error"
-            />
-          )}
+          {(() => {
+            const allChallenges = [...pending]
+            pendingChallenges.forEach(pc => {
+              if (!allChallenges.some(p => p.id === pc.id)) {
+                allChallenges.push(pc)
+              }
+            })
+            return allChallenges.length > 0 ? (
+              <NotificationBadge 
+                count={allChallenges.length} 
+                variant="error"
+              />
+            ) : null
+          })()}
         </TabsTrigger>
         <TabsTrigger value="archived" className="flex items-center gap-2">
           <Archive className="w-4 h-4" />
@@ -104,12 +120,21 @@ export function DashboardTabs({
           isDeleting={isDeleting}
           isArchiving={isArchiving}
           onCreateNew={onCreateNew}
+          onUpdateChallenge={onUpdatePendingChallenge}
           searchQuery={searchQuery}
         />
       </TabsContent>
       <TabsContent value="approvals" className="space-y-6">
         <PendingApprovalsList
-          challenges={pending}
+          challenges={(() => {
+            const allChallenges = [...pending]
+            pendingChallenges.forEach(pc => {
+              if (!allChallenges.some(p => p.id === pc.id)) {
+                allChallenges.push(pc)
+              }
+            })
+            return allChallenges
+          })()}
           isInitialLoading={isInitialLoading}
           onEdit={onEdit}
           onDelete={onDelete}
@@ -117,6 +142,7 @@ export function DashboardTabs({
           onReject={onReject}
           onArchive={onArchive}
           onCompare={onCompare}
+          onUpdateChallenge={onUpdatePendingChallenge} // Nova função para edição
           isDeleting={isDeleting}
           isApproving={isApproving}
           isArchiving={isArchiving}
@@ -149,4 +175,4 @@ export function DashboardTabs({
       </TabsContent>
     </Tabs>
   )
-}
+}

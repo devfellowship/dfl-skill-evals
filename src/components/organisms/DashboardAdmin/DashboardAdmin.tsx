@@ -10,6 +10,7 @@ const DashboardAdminContent = () => {
     pending,
     archived,
     deleted,
+    pendingChallenges, 
     isInitialLoading,
     lastUpdate,
     broadcastWorking,
@@ -38,6 +39,9 @@ const DashboardAdminContent = () => {
     handleApproveFromComparison,
     handleRejectFromComparison,
     handleTitleSearch,
+    handleUpdatePendingChallenge, 
+    handleApprovePendingChallenge,
+    handleRejectPendingChallenge,
     setIsCreating,
     setActiveTab
   } = useDashboardAdmin()
@@ -62,6 +66,7 @@ const DashboardAdminContent = () => {
         onTabChange={setActiveTab}
         published={published}
         pending={pending}
+        pendingChallenges={pendingChallenges || []} 
         archived={archived}
         deleted={deleted}
         isInitialLoading={isInitialLoading}
@@ -81,6 +86,9 @@ const DashboardAdminContent = () => {
         isApproving={isApproving as string | null}
         isArchiving={isArchiving as string | null}
         isRestoring={isRestoring as string | null}
+        onUpdatePendingChallenge={handleUpdatePendingChallenge}
+        onApprovePendingChallenge={handleApprovePendingChallenge} 
+        onRejectPendingChallenge={handleRejectPendingChallenge} 
       />
       <DashboardModals
         comparisonModalOpen={comparisonModalOpen}

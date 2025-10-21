@@ -7,6 +7,7 @@ import { AdminChallenge } from "@/types/admin/admin-dashboard"
 import { convertToBrazilianTime } from "@/lib/utils/timezone"
 import { DIFFICULTY_OPTIONS, STATUS_OPTIONS } from "@/types/admin/admin-dashboard"
 import { supabase } from "@/lib/supabase"
+import { ViewChallengeOverlay } from "@/components/molecules/ViewChallengeOverlay/ViewChallengeOverlay"
 interface DeletedChallengesListProps {
   challenges: AdminChallenge[]
   isInitialLoading: boolean
@@ -28,6 +29,8 @@ export function DeletedChallengesList({
   searchQuery
 }: DeletedChallengesListProps) {
   const [userNames, setUserNames] = useState<Record<string, string>>({})
+  const [viewingChallenge, setViewingChallenge] = useState<AdminChallenge | null>(null)
+  const [isViewOverlayOpen, setIsViewOverlayOpen] = useState(false)
   const filteredChallenges = challenges
   useEffect(() => {
     const fetchUserNames = async () => {
@@ -175,7 +178,10 @@ export function DeletedChallengesList({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => window.open(`/admin/challenge/${challenge.id}`, '_blank')}
+                  onClick={() => {
+                    setViewingChallenge(challenge)
+                    setIsViewOverlayOpen(true)
+                  }}
                   className="opacity-70 group-hover:opacity-100 transition-opacity duration-200"
                   title="Visualizar challenge"
                 >
@@ -206,6 +212,34 @@ export function DeletedChallengesList({
           ))}
         </div>
       )}
+
+      {viewingChallenge && (() => {
+        const challengeData = {
+          id: viewingChallenge.id,
+          title: viewingChallenge.title,
+          description: viewingChallenge.description,
+          difficulty: viewingChallenge.difficulty,
+          category: Array.isArray(viewingChallenge.category) ? viewingChallenge.category[0] : viewingChallenge.category,
+          function_name: viewingChallenge.functionName || '',
+          initial_code: viewingChallenge.initialCode || '',
+          testCases: viewingChallenge.testCases || [],
+          examples: [],
+          status: viewingChallenge.status,
+          mentor: viewingChallenge.mentor,
+          createdAt: viewingChallenge.createdAt,
+          updatedAt: viewingChallenge.updatedAt
+        }
+        return (
+          <ViewChallengeOverlay
+            challenge={challengeData}
+            isOpen={isViewOverlayOpen}
+            onClose={() => {
+              setIsViewOverlayOpen(false)
+              setViewingChallenge(null)
+            }}
+          />
+        )
+      })()}
     </div>
   )
-}
+}

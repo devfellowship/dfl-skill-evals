@@ -38,4 +38,4 @@ export const getLoadingRoleInfo = (): UserRoleInfo => {
 }
 export const getUnauthenticatedRoleInfo = (): UserRoleInfo => {
   return { ...DEFAULT_ROLE_INFO, isLoading: false }
-}
+}

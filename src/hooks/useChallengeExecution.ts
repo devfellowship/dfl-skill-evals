@@ -82,7 +82,6 @@ export function useChallengeExecution({ problemId, functionName }: UseChallengeE
           }))
         }
       } catch (dbError) {
-        // Fallback para test cases gerados
       }
       if (!traditionalTestCases.length) {
         const seed = Date.now()

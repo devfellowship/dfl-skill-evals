@@ -4,10 +4,6 @@ import { useAuth } from './useAuth'
 import { useUserValidation } from './useUserValidation'
 import { useBroadcastOperations } from './useBroadcastOperations'
 
-// =====================================================
-// INTERFACES E TIPOS
-// =====================================================
-
 export interface DeletedChallenge {
   id: string
   title: string
@@ -37,10 +33,6 @@ export interface DeletionReasonStats {
   frequency: number
 }
 
-// =====================================================
-// HOOK PRINCIPAL
-// =====================================================
-
 export const useSoftDeleteAudit = () => {
   const { user } = useAuth()
   const { validateUser } = useUserValidation()
@@ -49,10 +41,6 @@ export const useSoftDeleteAudit = () => {
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
   const [isRestoring, setIsRestoring] = useState<string | null>(null)
   const [deletedChallenges, setDeletedChallenges] = useState<DeletedChallenge[]>([])
-
-  // =====================================================
-  // SOFT DELETE COM MOTIVO
-  // =====================================================
 
   const deleteChallenge = useCallback(async (id: string, reason?: string) => {
     const { user: validatedUser, isAdmin } = validateUser()
@@ -100,10 +88,6 @@ export const useSoftDeleteAudit = () => {
     }
   }, [validateUser, executeWithBroadcastAndToast])
 
-  // =====================================================
-  // RESTAURAR CHALLENGE
-  // =====================================================
-
   const restoreChallenge = useCallback(async (id: string) => {
     const { isAdmin } = validateUser()
 
@@ -145,10 +129,6 @@ export const useSoftDeleteAudit = () => {
     }
   }, [validateUser, executeWithBroadcastAndToast])
 
-  // =====================================================
-  // BUSCAR CHALLENGES DELETADAS
-  // =====================================================
-
   const fetchDeletedChallenges = useCallback(async () => {
     const { isAdmin } = validateUser()
 
@@ -184,10 +164,6 @@ export const useSoftDeleteAudit = () => {
     }
   }, [validateUser])
 
-  // =====================================================
-  // ESTATÍSTICAS DE AUDITORIA
-  // =====================================================
-
   const getDeletionStats = useCallback(async (): Promise<DeletionStats[]> => {
     const { isAdmin } = validateUser()
 
@@ -201,7 +177,6 @@ export const useSoftDeleteAudit = () => {
         .rpc('get_deletion_stats')
 
       if (error) {
-        // Se a função não existir, fazer query manual
         const { data: manualData, error: manualError } = await supabase
           .schema('skill_evals')
           .from('challenges')
@@ -215,7 +190,6 @@ export const useSoftDeleteAudit = () => {
           throw new Error(manualError.message || 'Erro ao buscar estatísticas')
         }
 
-        // Processar dados manualmente
         const stats = new Map<string, DeletionStats>()
         
         manualData?.forEach(challenge => {
@@ -267,7 +241,6 @@ export const useSoftDeleteAudit = () => {
         throw new Error(error.message || 'Erro ao buscar estatísticas de motivos')
       }
 
-      // Processar dados manualmente
       const reasonStats = new Map<string, number>()
       
       data?.forEach(challenge => {
@@ -283,10 +256,6 @@ export const useSoftDeleteAudit = () => {
       return []
     }
   }, [validateUser])
-
-  // =====================================================
-  // DELETAR PERMANENTEMENTE (APENAS SUPERADMIN)
-  // =====================================================
 
   const permanentDeleteChallenge = useCallback(async (id: string) => {
     const { isAdmin } = validateUser()
@@ -326,21 +295,14 @@ export const useSoftDeleteAudit = () => {
   }, [validateUser, executeWithBroadcastAndToast])
 
   return {
-    // Estados
     isDeleting,
     isRestoring,
     deletedChallenges,
-    
-    // Funções principais
     deleteChallenge,
     restoreChallenge,
     fetchDeletedChallenges,
-    
-    // Estatísticas
     getDeletionStats,
     getDeletionReasonStats,
-    
-    // Deletar permanentemente
     permanentDeleteChallenge
   }
 }

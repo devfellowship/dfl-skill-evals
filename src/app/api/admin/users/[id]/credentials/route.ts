@@ -69,7 +69,6 @@ export async function PATCH(
         }
       })
     } catch (logError) {
-      console.error('Erro ao logar mudança de credenciais:', logError)
     }
     return NextResponse.json({ 
       message: 'Credenciais atualizadas com sucesso',
@@ -80,4 +79,4 @@ export async function PATCH(
       error: `Erro interno do servidor: ${error instanceof Error ? error.message : 'Erro desconhecido'}` 
     }, { status: 500 })
   }
-}
+}

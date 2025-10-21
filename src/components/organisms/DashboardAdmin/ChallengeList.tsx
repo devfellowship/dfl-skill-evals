@@ -6,10 +6,13 @@ import { AdminChallenge as Challenge, DIFFICULTY_OPTIONS, STATUS_OPTIONS } from 
 import { SortButton } from "@/components/atoms/SortButton/SortButton"
 import { ChallengeSorter, SortType } from "@/lib/challenge-sorter"
 import { TrendingToggle } from "@/components/molecules/TrendingToggle/TrendingToggle"
+import { ViewChallengeOverlay } from "@/components/molecules/ViewChallengeOverlay/ViewChallengeOverlay"
+import { EditChallengeOverlay } from "@/components/molecules/EditChallengeOverlay/EditChallengeOverlay"
 interface ChallengeListProps {
   challenges: Challenge[]
   isInitialLoading: boolean
   onEdit: (challenge: Challenge) => void
+  onUpdateChallenge?: (challenge: Challenge) => void
   onDelete: (id: string) => void
   onSendBackForReview: (id: string) => void
   onArchive: (id: string) => void
@@ -28,9 +31,14 @@ export function ChallengeList({
   isDeleting,
   isArchiving,
   onCreateNew,
+  onUpdateChallenge,
   searchQuery = ""
 }: ChallengeListProps) {
   const [sortType, setSortType] = useState<SortType>('created_desc')
+  const [viewingChallenge, setViewingChallenge] = useState<Challenge | null>(null)
+  const [editingChallenge, setEditingChallenge] = useState<Challenge | null>(null)
+  const [isViewOverlayOpen, setIsViewOverlayOpen] = useState(false)
+  const [isEditOverlayOpen, setIsEditOverlayOpen] = useState(false)
   const filteredAndSortedChallenges = useMemo(() => {
     let filtered = challenges
     if (searchQuery.trim()) {
@@ -123,16 +131,24 @@ export function ChallengeList({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => onEdit(challenge)}
+              onClick={() => {
+                setEditingChallenge(challenge)
+                setIsEditOverlayOpen(true)
+              }}
               className="opacity-70 group-hover:opacity-100 transition-opacity duration-200"
+              title="Editar Challenge"
             >
               <Edit className="w-4 h-4" />
             </Button>
                                     <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => window.open(`/admin/challenge/${challenge.id}`, '_blank')}
+                          onClick={() => {
+                            setViewingChallenge(challenge)
+                            setIsViewOverlayOpen(true)
+                          }}
                           className="opacity-70 group-hover:opacity-100 transition-opacity duration-200"
+                          title="Visualizar Challenge"
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
@@ -173,6 +189,85 @@ export function ChallengeList({
           </div>
         </div>
       ))}
+
+      {viewingChallenge && (() => {
+        const challengeData = {
+          id: viewingChallenge.id,
+          title: viewingChallenge.title,
+          description: viewingChallenge.description,
+          difficulty: viewingChallenge.difficulty,
+          category: Array.isArray(viewingChallenge.category) ? viewingChallenge.category[0] : viewingChallenge.category,
+          function_name: viewingChallenge.functionName || '',
+          initial_code: viewingChallenge.initialCode || '',
+          testCases: viewingChallenge.testCases || [],
+          examples: [],
+          status: viewingChallenge.status,
+          mentor: viewingChallenge.mentor,
+          createdAt: viewingChallenge.createdAt,
+          updatedAt: viewingChallenge.updatedAt
+        }
+        return (
+          <ViewChallengeOverlay
+            challenge={challengeData}
+            isOpen={isViewOverlayOpen}
+            onClose={() => {
+              setIsViewOverlayOpen(false)
+              setViewingChallenge(null)
+            }}
+          />
+        )
+      })()}
+
+      {editingChallenge && (() => {
+        const challengeData = {
+          id: editingChallenge.id,
+          title: editingChallenge.title,
+          description: editingChallenge.description,
+          difficulty: editingChallenge.difficulty,
+          category: Array.isArray(editingChallenge.category) ? editingChallenge.category[0] : editingChallenge.category,
+          function_name: editingChallenge.functionName || '',
+          initial_code: editingChallenge.initialCode || '',
+          testCases: editingChallenge.testCases || [],
+          examples: [],
+          status: editingChallenge.status,
+          mentor: editingChallenge.mentor,
+          createdAt: editingChallenge.createdAt,
+          updatedAt: editingChallenge.updatedAt
+        }
+        
+        const handleSave = (updatedChallenge: any) => {
+          if (onUpdateChallenge) {
+            const adminChallenge: Challenge = {
+              id: updatedChallenge.id,
+              title: updatedChallenge.title,
+              description: updatedChallenge.description,
+              difficulty: updatedChallenge.difficulty,
+              category: updatedChallenge.category,
+              functionName: updatedChallenge.function_name,
+              initialCode: updatedChallenge.initial_code,
+              testCases: updatedChallenge.testCases,
+              slug: updatedChallenge.title?.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || '',
+              status: updatedChallenge.status,
+              mentor: updatedChallenge.mentor || 'Usuário',
+              createdAt: updatedChallenge.createdAt || editingChallenge.createdAt,
+              updatedAt: new Date().toISOString()
+            }
+            onUpdateChallenge(adminChallenge)
+          }
+        }
+        
+        return (
+          <EditChallengeOverlay
+            challenge={challengeData}
+            isOpen={isEditOverlayOpen}
+            onClose={() => {
+              setIsEditOverlayOpen(false)
+              setEditingChallenge(null)
+            }}
+            onSave={handleSave}
+          />
+        )
+      })()}
     </div>
   )
-}
+}

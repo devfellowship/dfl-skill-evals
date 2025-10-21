@@ -54,7 +54,9 @@ export function useChallengeOperations() {
       skills: challengeData.skills || [],
       function_name: challengeData.function_name,
       initial_code: challengeData.initial_code || '',
-      status: challengeData.status || 'to_approve',
+      status: challengeData.status ? 
+        (challengeData.status === 'pending' ? 'to_approve' : challengeData.status) : 
+        'to_approve',
       is_public: challengeData.is_public || false,
       created_by: user.id,
       mentor: mentorName,
@@ -95,7 +97,16 @@ export function useChallengeOperations() {
     if (updateData.skills) mappedUpdates.skills = updateData.skills
     if (updateData.mentor) mappedUpdates.mentor = updateData.mentor
     if (isAdmin) {
-      if (updateData.status) mappedUpdates.status = updateData.status
+      if (updateData.status) {
+        const statusMapping: Record<string, string> = {
+          'draft': 'draft',
+          'pending': 'to_approve',
+          'published': 'approved',
+          'archived': 'archived',
+          'deleted': 'deleted'
+        }
+        mappedUpdates.status = statusMapping[updateData.status] || updateData.status
+      }
       if (updateData.is_public !== undefined) mappedUpdates.is_public = updateData.is_public
       if (updateData.trending !== undefined) mappedUpdates.trending = updateData.trending
       if (updateData.trending_priority !== undefined) mappedUpdates.trending_priority = updateData.trending_priority

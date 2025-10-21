@@ -66,7 +66,6 @@ export function useUserOutputExecution({
       setUserOutputResults(userResults)
       setCombinedResults(combined)
     } catch (err) {
-      console.error('Erro ao gerar outputs do usuário:', err)
       setError('Erro ao gerar outputs reais do usuário')
     }
   }, [functionName, userOutputRatio])
@@ -99,4 +98,4 @@ export function useUserOutputExecution({
     showUserOutputs,
     userOutputRatio
   }
-}
+}

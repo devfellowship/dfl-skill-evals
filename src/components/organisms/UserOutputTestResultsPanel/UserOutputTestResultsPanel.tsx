@@ -57,7 +57,6 @@ export function UserOutputTestResultsPanel({
       setUserOutputResults(userResults)
       setCombinedResults(combined)
     } catch (error) {
-      console.error('Erro ao gerar outputs do usuário:', error)
       setCombinedResults(results?.details || [])
     } finally {
       setLoading(false)
@@ -128,4 +127,4 @@ export function UserOutputTestResultsPanel({
       </div>
     </div>
   )
-}
+}

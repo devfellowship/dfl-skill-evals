@@ -5,7 +5,7 @@ import { useChallengeOperations } from "@/hooks/useChallengeOperations"
 import { useAuth } from "@/hooks/useAuth"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Code, CheckCircle, Clock, Archive } from "lucide-react"
+import { Code, CheckCircle, Clock, Archive, XCircle } from "lucide-react"
 import { AdminNavigation } from "@/components/atoms/AdminNavigation/AdminNavigation"
 import { DashboardHeaderButtons } from "@/components/atoms/DashboardHeaderButtons/DashboardHeaderButtons"
 import { TeacherStatsCards } from "@/components/molecules/TeacherStatsCards/TeacherStatsCards"
@@ -15,7 +15,7 @@ export function TeacherDashboard() {
   const { user } = useAuth()
   const { 
     published, 
-    pending, 
+    pending,
     archived, 
     isInitialLoading, 
     loadAllChallenges
@@ -23,9 +23,9 @@ export function TeacherDashboard() {
   const {
     isDeleting,
     isArchiving,
-    handleDelete,
-    handleArchive,
-    handleSendBackForReview
+    deleteChallenge,
+    archiveChallenge,
+    sendBackForReview
   } = useChallengeOperations()
   const myPublished = useMemo(
     () => (user?.id ? published.filter(c => c.created_by === user.id) : []),
@@ -35,31 +35,36 @@ export function TeacherDashboard() {
     () => (user?.id ? pending.filter(c => c.created_by === user.id) : []),
     [pending, user?.id]
   )
+  const myRejected = useMemo(
+    () => (user?.id ? pending.filter((c: any) => c.created_by === user.id && c.status === 'rejected') : []),
+    [pending, user?.id]
+  )
   const myArchived = useMemo(
     () => (user?.id ? archived.filter(c => c.created_by === user.id) : []),
     [archived, user?.id]
   )
   const [searchQuery, setSearchQuery] = useState("")
   const teacherStats = useMemo(() => {
-    const allMine = [...myPublished, ...myPending, ...myArchived]
+    const allMine = [...myPublished, ...myPending, ...myRejected, ...myArchived]
     return {
       totalChallenges: allMine.length,
       approvedChallenges: myPublished.length,
       toApproveChallenges: myPending.length,
-      totalSubmissions: allMine.reduce((sum, c) => sum + (c.submissions_count || 0), 0),
+      rejectedChallenges: myRejected.length,
+      totalSubmissions: allMine.reduce((sum, c) => sum + ((c as any).submissions_count || 0), 0),
       averageScore:
         allMine.length > 0
-          ? allMine.reduce((sum, c) => sum + (c.average_score || 0), 0) / allMine.length
+          ? allMine.reduce((sum, c) => sum + ((c as any).average_score || 0), 0) / allMine.length
           : 0
     }
-  }, [myPublished, myPending, myArchived])
+  }, [myPublished, myPending, myRejected, myArchived])
   useEffect(() => {
     loadAllChallenges()
   }, [loadAllChallenges])
   const handleDeleteChallenge = async (id: string) => {
     if (confirm("Tem certeza que deseja excluir este challenge?")) {
       try {
-        const result = await handleDelete(id)
+        const result = await deleteChallenge(id, "Excluído pelo teacher")
         if (result) {
           alert("Challenge excluído com sucesso!")
         } else {
@@ -74,7 +79,7 @@ export function TeacherDashboard() {
   const onSendBackForReviewClick = async (id: string) => {
     if (confirm("Tem certeza que deseja enviar este challenge de volta para análise? Isso permitirá que ele seja excluído posteriormente.")) {
       try {
-        const result = await handleSendBackForReview(id)
+        const result = await sendBackForReview(id)
         if (result) {
           alert("Challenge enviado de volta para análise com sucesso!")
         }
@@ -119,7 +124,7 @@ export function TeacherDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <TeacherStatsCards stats={teacherStats} />
         <Tabs defaultValue="published" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="published" className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4" />
               Publicados ({myPublished.length})
@@ -127,6 +132,10 @@ export function TeacherDashboard() {
             <TabsTrigger value="pending" className="flex items-center gap-2">
               <Clock className="w-4 h-4" />
               Pendentes ({myPending.length})
+            </TabsTrigger>
+            <TabsTrigger value="rejected" className="flex items-center gap-2">
+              <XCircle className="w-4 h-4" />
+              Rejeitados ({myRejected.length})
             </TabsTrigger>
             <TabsTrigger value="archived" className="flex items-center gap-2">
               <Archive className="w-4 h-4" />
@@ -179,6 +188,29 @@ export function TeacherDashboard() {
               </CardContent>
             </Card>
           </TabsContent>
+          <TabsContent value="rejected" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Challenges Rejeitados ({myRejected.length})</CardTitle>
+                <CardDescription>Challenges rejeitados que precisam ser corrigidos e reenviados</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isInitialLoading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">Carregando challenges rejeitados...</p>
+                  </div>
+                ) : (
+                  <TeacherChallengeList 
+                    challenges={myRejected} 
+                    onDelete={handleDeleteChallenge}
+                    onSendBackForReview={onSendBackForReviewClick}
+                    searchQuery={searchQuery}
+                  />
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
           <TabsContent value="archived" className="space-y-6">
             <Card>
               <CardHeader>
@@ -205,4 +237,4 @@ export function TeacherDashboard() {
       </div>
     </div>
   )
-}
+}

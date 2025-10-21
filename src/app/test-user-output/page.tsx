@@ -3,10 +3,7 @@
 import { UserOutputChallengePage } from "@/components/organisms/UserOutputChallengePage/UserOutputChallengePage"
 
 export default function TestUserOutputPage() {
-  // ID de um challenge existente para teste
-  // Você pode alterar este ID para testar com diferentes challenges
-  // Para testar, acesse /admin e copie o ID de um challenge existente
-  const testChallengeId = "test-challenge" // Substitua por um ID real de um challenge existente
+  const testChallengeId = "test-challenge"
   
   return (
     <div className="min-h-screen bg-background">

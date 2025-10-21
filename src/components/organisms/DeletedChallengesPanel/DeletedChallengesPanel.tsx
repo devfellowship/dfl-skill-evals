@@ -49,18 +49,15 @@ export const DeletedChallengesPanel: React.FC<DeletedChallengesPanelProps> = ({
   const handleRestore = async (challenge: DeletedChallenge) => {
     try {
       await restoreChallenge(challenge.id)
-      await fetchDeletedChallenges() // Recarregar lista
+      await fetchDeletedChallenges()
     } catch (error) {
-      console.error('Erro ao restaurar challenge:', error)
-    }
   }
 
   const handlePermanentDelete = async (challenge: DeletedChallenge) => {
     try {
       await permanentDeleteChallenge(challenge.id)
-      await fetchDeletedChallenges() // Recarregar lista
+      await fetchDeletedChallenges()
     } catch (error) {
-      console.error('Erro ao deletar permanentemente:', error)
     }
   }
 
@@ -78,7 +75,6 @@ export const DeletedChallengesPanel: React.FC<DeletedChallengesPanelProps> = ({
 
   return (
     <div className={`space-y-6 ${className}`}>
-      {/* Header */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-2xl font-bold">
@@ -107,11 +103,8 @@ export const DeletedChallengesPanel: React.FC<DeletedChallengesPanelProps> = ({
           </p>
         </CardContent>
       </Card>
-
-      {/* Estatísticas */}
       {showStats && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Estatísticas por usuário */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Exclusões por Usuário</CardTitle>
@@ -127,8 +120,6 @@ export const DeletedChallengesPanel: React.FC<DeletedChallengesPanelProps> = ({
               </div>
             </CardContent>
           </Card>
-
-          {/* Estatísticas por motivo */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Motivos Mais Comuns</CardTitle>
@@ -146,8 +137,6 @@ export const DeletedChallengesPanel: React.FC<DeletedChallengesPanelProps> = ({
           </Card>
         </div>
       )}
-
-      {/* Lista de Challenges Deletadas */}
       <div className="space-y-4">
         {deletedChallenges.length === 0 ? (
           <Card>

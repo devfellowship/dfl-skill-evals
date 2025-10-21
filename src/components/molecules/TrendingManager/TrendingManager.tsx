@@ -31,7 +31,6 @@ export function TrendingManager({ challenges, onUpdate }: TrendingManagerProps) 
       invalidateChallengesCache()
       onUpdate?.()
     } catch (error) {
-      console.error('Erro ao atualizar trending:', error)
     } finally {
       setIsUpdating(null)
     }
@@ -43,8 +42,7 @@ export function TrendingManager({ challenges, onUpdate }: TrendingManagerProps) 
       await updateTrendingPriority(challengeId, newPriority)
       onUpdate?.()
     } catch (error) {
-      console.error('Erro ao atualizar prioridade:', error)
-    } finally {
+    } finally{
       setIsUpdating(null)
     }
   }
@@ -148,4 +146,4 @@ export function TrendingManager({ challenges, onUpdate }: TrendingManagerProps) 
       )}
     </div>
   )
-}
+}
