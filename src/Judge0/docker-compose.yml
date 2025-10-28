@@ -23,8 +23,6 @@ services:
     image: judge0/judge0:1.13.1
     container_name: judge0-server
     restart: unless-stopped
-    ports:
-      - "2358:2358"
     environment:
       PORT: 2358
       ENABLE_ISOLATE: "true"
@@ -46,6 +44,7 @@ services:
       - redis
     networks:
       - judge0
+      - network_public
     user: "0:0"
     privileged: true
     cap_add:
@@ -54,6 +53,17 @@ services:
     security_opt:
       - apparmor:unconfined
       - seccomp:unconfined
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=network_swarm_public"
+        - "traefik.http.routers.judge0.rule=Host(`judge0.devfellowship.com`)"
+        - "traefik.http.routers.judge0.entrypoints=websecure"
+        - "traefik.http.routers.judge0.priority=1"
+        - "traefik.http.routers.judge0.service=judge0"
+        - "traefik.http.routers.judge0.tls.certresolver=letsencryptresolver"
+        - "traefik.http.services.judge0.loadbalancer.server.port=2358"
+        - "traefik.http.services.judge0.loadbalancer.passHostHeader=true"
 
   worker:
     image: judge0/judge0:1.13.1
@@ -96,3 +106,7 @@ volumes:
 
 networks:
   judge0:
+
+  network_public:
+    name: network_swarm_public
+    external: true
