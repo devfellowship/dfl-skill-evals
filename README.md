@@ -21,7 +21,7 @@ Entrega de tarefas com autoavaliação baseada em assessment items.
 
 Reavaliação através de “Refazer”, com:
 
-título automático (Título Original / reavaliação N),
+título automático (Título Original / reavaliação N);
 
 descrição vazia,
 
