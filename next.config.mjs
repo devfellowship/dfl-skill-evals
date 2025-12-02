@@ -19,10 +19,11 @@ const nextConfig = {
   },
 
   async rewrites() {
+    const judge0Url = process.env.JUDGE0_API_URL || 'https://judge0.devfellowship.com';
     return [
       {
         source: '/api/judge0/:path*',
-        destination: 'http://146.190.150.14:2358/:path*',
+        destination: `${judge0Url}/:path*`,
       },
     ]
   },
