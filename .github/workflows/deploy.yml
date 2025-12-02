@@ -21,6 +21,7 @@ jobs:
             set -e
             cd ${{ secrets.VPS_APP_DIR }}
 
+            ls -la
             echo "==> Atualizando código"
             git fetch --all --prune
             git reset --hard origin/main
