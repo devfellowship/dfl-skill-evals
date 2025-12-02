@@ -1,4 +1,4 @@
-name: Deploy to VPS
+name: Deploy Judge0 to VPS 
 
 on:
   push:
@@ -8,9 +8,26 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Copiar arquivos para VPS
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Tar Judge0 content
+        run: |
+          cd src/Judge0
+          tar -czf ../../judge0.tar.gz .
+          cd ../../
+          ls -lh judge0.tar.gz
+      - name: Upload Judge0 archive
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "judge0.tar.gz"
+          target: "/home/deploy/devsharper/judge0"
+          overwrite: true
+      - name: SSH & Deploy (Swarm)
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -18,22 +35,38 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            set -e
-            cd ${{ secrets.VPS_APP_DIR }}
+            set -euo pipefail
+            APPDIR="/home/deploy/devsharper/judge0"
+            cd "$APPDIR"
 
-            ls -la
-            echo "==> Atualizando código"
-            git fetch --all --prune
-            git reset --hard origin/main
+            # Extrai o pacote
+            [ -f judge0.tar.gz ] && tar -xzf judge0.tar.gz && rm -f judge0.tar.gz
 
-            echo "==> (Opcional) gravando .env"
-            if [ -n "${{ secrets.ENV_FILE }}" ]; then
-              echo "${{ secrets.ENV_FILE }}" > .env
+            # (Opcional) escrever .env a partir de secret
+            if [ -n "${{ secrets.ENV_FILE || '' }}" ]; then
+              printf "%b" "${{ secrets.ENV_FILE }}" > .env
+              echo "[deploy] .env escrito a partir do secret."
             fi
 
-            echo "==> Atualizando containers"
-            docker compose pull
-            docker compose up -d
+            # Limpa qualquer resto de compose e a rede local conflitante
+            docker compose down -v || true
+            docker network rm judge0_judge0 || true
 
-            echo "==> Status"
-            docker compose ps
+            # Exporta variáveis do .env (se existir) para o stack
+            if [ -f .env ]; then
+              set -a
+              . ./.env
+              set +a
+            fi
+
+            # Deploy em SWARM (Traefik usa network_swarm_public)
+            docker stack deploy -c docker-compose.yml judge0
+
+            echo "[deploy] Serviços do stack:"
+            docker stack services judge0 || true
+
+            echo "[deploy] Tarefas do serviço server:"
+            docker service ps judge0_server || true
+
+            # Validação rápida do endpoint (não falha o job se 404/401)
+            (curl -s -o /dev/null -w "HTTP:%{http_code}\n" https://judge0.devfellowship.com/languages || true)
