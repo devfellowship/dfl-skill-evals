@@ -15,9 +15,10 @@ export async function executeCodeWithJudge0(
   const results: TestResult[] = []
   let processedCode = code
   let targetLanguage = { id: languageId }
+
   if (languageId === 74) {
     try {
-      processedCode = transpileTsToJs(code)
+      processedCode = await transpileTsToJs(code)
       targetLanguage = { id: 63 }
     } catch (error) {
       return testCases.map(testCase => ({
@@ -30,6 +31,7 @@ export async function executeCodeWithJudge0(
       }))
     }
   }
+
   for (const testCase of testCases) {
     const startTime = Date.now()
     try {
@@ -49,6 +51,7 @@ export async function executeCodeWithJudge0(
       })
     }
   }
+
   return results
 }
 async function executeTestCase(
@@ -73,4 +76,4 @@ async function executeTestCase(
   }
   const result = await executeCode(payload)
   return parseJudge0Result(result, testCase)
-}
+}

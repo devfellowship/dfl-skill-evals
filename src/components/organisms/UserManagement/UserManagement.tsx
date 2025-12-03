@@ -52,7 +52,12 @@ export function UserManagement() {
       if (to) sp.set('to', to)
       const res = await fetch(`/api/admin/users?${sp.toString()}`, { headers })
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
+        let err = {}
+        try {
+          err = await res.json()
+        } catch {
+          err = { error: `HTTP ${res.status}` }
+        }
         throw new Error(err.error || 'Erro ao buscar usuários')
       }
       const data = await res.json()
@@ -92,7 +97,12 @@ export function UserManagement() {
         }),
       })
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
+        let err = {}
+        try {
+          err = await res.json()
+        } catch {
+          err = { error: `HTTP ${res.status}` }
+        }
         throw new Error(err.error || 'Erro ao salvar perfil')
       }
       const data = await res.json()
@@ -121,7 +131,12 @@ export function UserManagement() {
         }),
       })
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
+        let err = {}
+        try {
+          err = await res.json()
+        } catch {
+          err = { error: `HTTP ${res.status}` }
+        }
         throw new Error(err.error || 'Erro ao resetar senha')
       }
       const result = await res.json()

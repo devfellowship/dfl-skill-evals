@@ -28,7 +28,8 @@ export function ChallengePage({ challengeId }: ChallengePageProps) {
     clearResults
   } = useChallengeExecution({
     problemId: challengeId,
-    functionName: challenge?.function_name || 'solution'
+    functionName: challenge?.function_name || 'solution',
+    language
   })
   if (challengeLoading) {
     return <LoadingState message="Carregando challenge..." />

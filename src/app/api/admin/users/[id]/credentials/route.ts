@@ -20,12 +20,23 @@ export async function PATCH(
       return NextResponse.json({ error: 'Acesso negado. Apenas administradores podem atualizar credenciais.' }, { status: 403 })
     }
     const { id: userId } = params
-    const { email, password } = await request.json() as Partial<{ 
+    const { email, password } = await request.json() as Partial<{
       email: string
-      password: string 
+      password: string
     }>
     if (!email && !password) {
       return NextResponse.json({ error: 'Email ou senha deve ser fornecido' }, { status: 400 })
+    }
+    if (password) {
+      if (password.length < 8) {
+        return NextResponse.json({ error: 'Senha deve ter no mínimo 8 caracteres' }, { status: 400 })
+      }
+      if (!/[a-z]/.test(password) || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+        return NextResponse.json({ error: 'Senha deve conter letras maiúsculas, minúsculas e números' }, { status: 400 })
+      }
+    }
+    if (email && !email.includes('@')) {
+      return NextResponse.json({ error: 'Email inválido' }, { status: 400 })
     }
     const { data: before, error: beforeError } = await supabase
       .from('users_with_roles')

@@ -2,13 +2,26 @@
 import { useEffect } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { useAuth } from "@/components/providers/AuthProvider"
-const PUBLIC_ROUTES = ['/login', '/reset-password', '/auth/login', '/auth/reset-password']
+const PUBLIC_ROUTES = [
+  '/login',
+  '/reset-password',
+  '/auth/login',
+  '/auth/reset-password',
+  '/challenge',
+  '/challenge/pre'
+]
+
+const isPublicRoute = (pathname: string) => {
+  return PUBLIC_ROUTES.some(route =>
+    pathname === route || pathname.startsWith(`${route}/`)
+  )
+}
 export function GlobalAuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
   const { user, loading } = useAuth()
   useEffect(() => {
-    if (!loading && !user && !PUBLIC_ROUTES.includes(pathname)) {
+    if (!loading && !user && !isPublicRoute(pathname)) {
       router.replace(`/auth/login?from=${encodeURIComponent(pathname)}`)
     }
   }, [loading, user, router, pathname])
@@ -22,7 +35,7 @@ export function GlobalAuthGuard({ children }: { children: React.ReactNode }) {
       </div>
     )
   }
-  if (!user && !PUBLIC_ROUTES.includes(pathname)) {
+  if (!user && !isPublicRoute(pathname)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
         <div className="text-center">

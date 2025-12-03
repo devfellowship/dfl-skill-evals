@@ -23,17 +23,12 @@ export interface Judge0Result {
 }
 export const JUDGE0_CONFIG = {
   LANGUAGES: {
-    JAVASCRIPT: 54,
+    JAVASCRIPT: 63,
+    TYPESCRIPT: 74,
     PYTHON: 71,
-    JAVA: 62,
-    CPP: 54,
-    C: 50,
-    CSHARP: 51,
-    GO: 60,
-    RUST: 73,
   } as const,
   EXECUTION: {
-    CPU_TIME_LIMIT: 3,
+    CPU_TIME_LIMIT: 5,
     MEMORY_LIMIT: 128000,
     TIMEOUT_MS: 5000,
   } as const,
@@ -42,17 +37,12 @@ export const JUDGE0_CONFIG = {
   FALLBACK_URLS: [
     process.env.JUDGE0_API_URL || 'https://judge0.devfellowship.com',
     'http://judge0-ce:2358',
-    'https://judge0-ce.p.rapidapi.com'
   ] as const,
-  SUPPORTED_LANGUAGES: [54, 71, 62, 50, 51, 60, 73] as const,
+  SUPPORTED_LANGUAGES: [63, 74, 71] as const,
   LANGUAGE_MAP: {
-    54: 'JavaScript',
+    63: 'JavaScript',
+    74: 'TypeScript',
     71: 'Python',
-    62: 'Java',
-    50: 'C',
-    51: 'C#',
-    60: 'Go',
-    73: 'Rust',
   } as Record<number, string>,
 } as const;
 export async function discoverLanguageId(languageName: string): Promise<number | null> {
@@ -111,6 +101,9 @@ export async function listAvailableLanguages(): Promise<Judge0Language[]> {
   }
 }
 export async function executeCode(submission: Judge0Submission): Promise<Judge0Result> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
+
   try {
     const response = await fetch(`${JUDGE0_CONFIG.API_URL}/submissions?wait=true`, {
       method: 'POST',
@@ -118,13 +111,20 @@ export async function executeCode(submission: Judge0Submission): Promise<Judge0R
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(submission),
+      signal: controller.signal,
     });
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     return await response.json();
   } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('Judge0 execution timeout');
+    }
     throw error;
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 export async function getSubmissionResult(submissionId: string): Promise<Judge0Result> {

@@ -30,10 +30,16 @@ export function useAuth() {
     return () => subscription.unsubscribe()
   }, [])
   const signIn = async (email: string, password: string) => {
+    if (!email?.trim() || !password?.trim()) {
+      return { error: { message: 'Email e senha são obrigatórios' } }
+    }
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     return { error }
   }
   const signUp = async (email: string, password: string, fullName: string) => {
+    if (!email?.trim() || !password?.trim() || !fullName?.trim()) {
+      return { error: { message: 'Email, senha e nome são obrigatórios' } }
+    }
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -50,8 +56,8 @@ export function useAuth() {
     return { error }
   }
   const getUserRole = (): UserRole => {
-    if (!user?.email) return 'community_member'
-    if (user.email.includes('@admin.') || user.email.includes('@fellowship.')) return 'admin'
+    const profile = (user as any)?.profile
+    if (profile?.role) return profile.role as UserRole
     return 'community_member'
   }
   const hasRole = (role: UserRole): boolean => getUserRole() === role

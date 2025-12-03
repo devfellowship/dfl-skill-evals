@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase"
 interface UseChallengeExecutionProps {
   problemId: string
   functionName: string
+  language?: string
 }
 interface TestCase {
   input: any
@@ -28,7 +29,16 @@ interface TestResult {
   }>
   totalExecutionTime: number
 }
-export function useChallengeExecution({ problemId, functionName }: UseChallengeExecutionProps) {
+function getLanguageId(language: string = 'typescript'): number {
+  const languageMap: Record<string, number> = {
+    'javascript': 63,
+    'typescript': 74,
+    'python': 71,
+  }
+  return languageMap[language] || 74
+}
+
+export function useChallengeExecution({ problemId, functionName, language = 'typescript' }: UseChallengeExecutionProps) {
   const [compilationError, setCompilationError] = useState<string | null>(null)
   const [manualResults, setManualResults] = useState<TestResult | null>(null)
   const [manualLoading, setManualLoading] = useState(false)
@@ -82,6 +92,7 @@ export function useChallengeExecution({ problemId, functionName }: UseChallengeE
           }))
         }
       } catch (dbError) {
+        traditionalTestCases = []
       }
       if (!traditionalTestCases.length) {
         const seed = Date.now()
@@ -96,19 +107,32 @@ export function useChallengeExecution({ problemId, functionName }: UseChallengeE
       const request = {
         code,
         testCases: traditionalTestCases,
-        languageId: 74,
+        languageId: getLanguageId(language),
         timeoutMs: 5000,
         functionName
       }
+      const { data: { session } } = await supabase.auth.getSession()
+      const headers: HeadersInit = { 'Content-Type': 'application/json' }
+      if (session?.access_token) {
+        headers.Authorization = `Bearer ${session.access_token}`
+      }
       const response = await fetch('/api/execute-code', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(request)
       })
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
       const result = await response.json()
+      if (result.compilationError) {
+        setCompilationError(`Erro de Compilação: ${result.compilationError}`)
+        return
+      }
+      if (result.error) {
+        setCompilationError(`Erro: ${result.error}`)
+        return
+      }
       if (result.testResults && result.testResults.length > 0) {
         const testSummary: TestResult = {
           passCount: result.testResults.filter((r: any) => r.status === 'passed').length,
@@ -125,39 +149,13 @@ export function useChallengeExecution({ problemId, functionName }: UseChallengeE
           })),
           totalExecutionTime: result.totalExecutionTime
         }
-        setManualResults(testSummary)
-        if (testSummary.passCount === 0) {
-          setCompilationError(null)
-        }
+        setManualResults({ ...testSummary })
       } else {
-        if (result.compilationError) {
-          setCompilationError(`Erro de Compilação: ${result.compilationError}`)
-        } else if (result.error) {
-          setCompilationError(`Erro: ${result.error}`)
-        } else if (result.testResults && result.testResults.length > 0) {
-          const seed = Date.now()
-          const testSummary: TestResult = {
-            passCount: result.testResults.filter((r: any) => r.status === 'passed').length,
-            failCount: result.testResults.filter((r: any) => r.status === 'failed').length,
-            totalCount: result.testResults.length,
-            details: result.testResults.map((r: any, index: number) => ({
-              testCaseId: `test_${seed}_${index}`,
-              input: r.input,
-              expectedOutput: r.expectedOutput,
-              actualOutput: r.actualOutput,
-              status: r.status,
-              executionTime: r.executionTime,
-              errorMessage: r.error
-            })),
-            totalExecutionTime: result.totalExecutionTime || 0
-          }
-          setManualResults(testSummary)
-        } else {
-          setCompilationError('Erro durante execução. Verifique seu código e tente novamente.')
-        }
+        setCompilationError('Erro durante execução. Verifique seu código e tente novamente.')
       }
     } catch (error) {
-      setCompilationError('Erro ao executar testes. Tente novamente.')
+      const message = error instanceof Error ? error.message : 'Erro desconhecido'
+      setCompilationError(`Erro ao executar testes: ${message}`)
     } finally {
       setManualLoading(false)
     }

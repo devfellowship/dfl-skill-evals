@@ -72,13 +72,33 @@ export function useChallengesGlobal() {
   }, [adaptChallenge])
   const startPolling = useCallback(() => {
     if (pollingRef.current) return
-    pollingRef.current = setInterval(() => {
-      loadAllChallenges()
-    }, 5000)
+    let isActive = true
+    const poll = async () => {
+      if (!isActive) return
+      try {
+        await loadAllChallenges()
+      } catch (error) {
+        if (isActive) {
+          pollingRef.current = setTimeout(poll, 5000)
+        }
+        return
+      }
+      if (isActive) {
+        pollingRef.current = setTimeout(poll, 5000)
+      }
+    }
+    poll()
+    return () => {
+      isActive = false
+    }
   }, [loadAllChallenges])
   const stopPolling = useCallback(() => {
     if (pollingRef.current) {
-      clearInterval(pollingRef.current)
+      if (typeof pollingRef.current === 'number') {
+        clearTimeout(pollingRef.current)
+      } else {
+        clearInterval(pollingRef.current as any)
+      }
       pollingRef.current = null
     }
   }, [])

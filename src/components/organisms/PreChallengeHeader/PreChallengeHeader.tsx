@@ -44,11 +44,24 @@ export function PreChallengeHeader() {
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="w-48">
+              <div className="px-2 py-1.5 text-sm font-medium">
+                {profile?.full_name || user.email}
+              </div>
+              {profile?.role && (
+                <div className="px-2 py-1 text-xs text-muted-foreground">
+                  {profile.role === 'admin' && 'Administrador'}
+                  {profile.role === 'superadmin' && 'Super Admin'}
+                  {profile.role === 'mentor' && 'Mentor'}
+                  {profile.role === 'teacher' && 'Professor'}
+                  {profile.role === 'community_member' && 'Comunidade'}
+                </div>
+              )}
+              <div className="my-2 h-px bg-border" />
               <DropdownMenuItem asChild>
                 <Link href="/profile">
                   <User className="mr-2 h-4 w-4" />
-                  <span>Perfil</span>
+                  <span>Editar Perfil</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => signOut()}>

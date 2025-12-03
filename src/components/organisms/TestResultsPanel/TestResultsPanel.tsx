@@ -1,4 +1,5 @@
 "use client"
+import { useEffect, useState } from "react"
 import { Progress } from "@/components/atoms/Progress/Progress"
 import { TestResultCard } from "@/components/molecules/TestResultCard/TestResultCard"
 interface TestResultsPanelProps {
@@ -7,6 +8,12 @@ interface TestResultsPanelProps {
   totalTests: number
 }
 export function TestResultsPanel({ results, passedTests, totalTests }: TestResultsPanelProps) {
+  const [displayResults, setDisplayResults] = useState(results)
+
+  useEffect(() => {
+    setDisplayResults(results)
+  }, [results])
+
   return (
     <div className="w-[20%] border-l border-border/40 overflow-auto bg-background">
       <div className="p-4">
@@ -17,14 +24,14 @@ export function TestResultsPanel({ results, passedTests, totalTests }: TestResul
               {passedTests}/{totalTests} passed
             </div>
           </div>
-          <Progress value={(passedTests / totalTests) * 100} className="h-2" />
+          <Progress value={totalTests > 0 ? (passedTests / totalTests) * 100 : 0} className="h-2" />
         </div>
         <div className="space-y-2">
-          {results?.details && results.details.length > 0 ? (
+          {displayResults?.details && displayResults.details.length > 0 ? (
             <>
-              {results.details.map((result: any, index: number) => (
+              {displayResults.details.map((result: any, index: number) => (
                 <TestResultCard
-                  key={index}
+                  key={`${result.testCaseId}-${result.status}`}
                   result={result}
                   index={index}
                   isHidden={index >= 3}

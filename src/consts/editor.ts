@@ -2,9 +2,6 @@ export const LANGUAGES = [
   { value: "javascript", label: "JavaScript", extension: "js" },
   { value: "typescript", label: "TypeScript", extension: "ts" },
   { value: "python", label: "Python", extension: "py" },
-  { value: "java", label: "Java", extension: "java" },
-  { value: "cpp", label: "C++", extension: "cpp" },
-  { value: "go", label: "Go", extension: "go" },
 ] as const
 export const THEMES = [
   { value: "dark", label: "Dark" },

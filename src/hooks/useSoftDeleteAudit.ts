@@ -133,7 +133,6 @@ export const useSoftDeleteAudit = () => {
     const { isAdmin } = validateUser()
 
     if (!isAdmin) {
-      console.warn('Apenas administradores podem ver challenges deletadas')
       return []
     }
 
@@ -159,7 +158,6 @@ export const useSoftDeleteAudit = () => {
       setDeletedChallenges(data || [])
       return data || []
     } catch (error) {
-      console.error('Erro ao buscar challenges deletadas:', error)
       return []
     }
   }, [validateUser])
@@ -168,7 +166,6 @@ export const useSoftDeleteAudit = () => {
     const { isAdmin } = validateUser()
 
     if (!isAdmin) {
-      console.warn('Apenas administradores podem ver estatísticas de exclusão')
       return []
     }
 
@@ -216,7 +213,6 @@ export const useSoftDeleteAudit = () => {
 
       return data || []
     } catch (error) {
-      console.error('Erro ao buscar estatísticas de exclusão:', error)
       return []
     }
   }, [validateUser])
@@ -225,7 +221,6 @@ export const useSoftDeleteAudit = () => {
     const { isAdmin } = validateUser()
 
     if (!isAdmin) {
-      console.warn('Apenas administradores podem ver estatísticas de motivos')
       return []
     }
 
@@ -252,7 +247,6 @@ export const useSoftDeleteAudit = () => {
         .map(([deletion_reason, frequency]) => ({ deletion_reason, frequency }))
         .sort((a, b) => b.frequency - a.frequency)
     } catch (error) {
-      console.error('Erro ao buscar estatísticas de motivos:', error)
       return []
     }
   }, [validateUser])
@@ -289,7 +283,6 @@ export const useSoftDeleteAudit = () => {
         'Erro ao deletar permanentemente'
       )
     } catch (error) {
-      console.error('Erro ao deletar permanentemente:', error)
       throw error
     }
   }, [validateUser, executeWithBroadcastAndToast])

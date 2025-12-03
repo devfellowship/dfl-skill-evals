@@ -1,5 +1,5 @@
 
-import { parseTestCaseInput } from './code-processor'
+import { parseTestCaseInput, transpileTsToJs } from './code-processor'
 export interface UserOutputResult {
   input: string
   expectedOutput: string
@@ -24,7 +24,7 @@ export async function executeUserCode(
   try {
     const params = parseTestCaseInput(testInput)
     const paramsString = params.map(p => JSON.stringify(p)).join(', ')
-    const executableCode = createExecutableCode(userCode, functionName, paramsString, languageId)
+    const executableCode = await createExecutableCode(userCode, functionName, paramsString, languageId)
     const actualOutput = simulateExecution(functionName, params, userCode)
     const executionTime = Date.now() - startTime
     return {
@@ -46,49 +46,37 @@ export async function executeUserCode(
     }
   }
 }
-function createExecutableCode(
+async function createExecutableCode(
   userCode: string, 
   functionName: string, 
   paramsString: string, 
   languageId: number
-): string {
+): Promise<string> {
   const timestamp = Date.now()
-  if (languageId === 74) { // JavaScript
+  if (languageId === 74) { // TypeScript
     return `// Código do usuário - Execução ${timestamp}
 ${userCode}
 try {
   const result_${timestamp} = ${functionName}(${paramsString});
-  console.log(result_${timestamp});
+  return JSON.stringify(result_${timestamp});
 } catch (error_${timestamp}) {
-  console.error(error_${timestamp});
+  throw error_${timestamp};
 }`
   }
   if (languageId === 63) { // TypeScript
-    const cleanCode = userCode
-      .replace(/:\s*number\[\]/g, '')
-      .replace(/:\s*string\[\]/g, '')
-      .replace(/:\s*boolean\[\]/g, '')
-      .replace(/:\s*any\[\]/g, '')
-      .replace(/:\s*\w+\[\]/g, '')
-      .replace(/:\s*number\b/g, '')
-      .replace(/:\s*string\b/g, '')
-      .replace(/:\s*boolean\b/g, '')
-      .replace(/:\s*any\b/g, '')
-      .replace(/<[^>]*>/g, '')
-      .replace(/!\s*([,;\)\]])/g, '$1')
-      .replace(/!\s*$/gm, '')
-      .replace(/export\s+/g, '')
-      .replace(/import\s+.*?from\s+['"][^'"]*['"];?\s*/g, '')
-      .replace(/\s+/g, ' ')
-      .trim()
-    return `// Código do usuário - Execução ${timestamp}
+    try {
+      const cleanCode = await transpileTsToJs(userCode)
+      return `// Código do usuário - Execução ${timestamp}
 ${cleanCode}
 try {
   const result_${timestamp} = ${functionName}(${paramsString});
-  console.log(result_${timestamp});
+  return JSON.stringify(result_${timestamp});
 } catch (error_${timestamp}) {
-  console.error(error_${timestamp});
+  throw error_${timestamp};
 }`
+    } catch (error) {
+      throw new Error(`TypeScript transpilation error: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
   }
   return `// Código do usuário
 ${userCode}
@@ -122,20 +110,7 @@ function extractFunctionLogic(userCode: string, functionName: string): string | 
   return null
 }
 function executeDirectFunction(userCode: string, functionName: string, params: any[]): string {
-  try {
-    const context = {
-      [functionName]: null as any
-    }
-    const codeToEval = userCode.replace(/export\s+/g, '').replace(/import\s+.*?from\s+['"][^'"]*['"];?\s*/g, '')
-    const wrapper = new Function('params', `
-      ${codeToEval}
-      return ${functionName}(...params);
-    `)
-    const result = wrapper(params)
-    return JSON.stringify(result)
-  } catch (error) {
-    return analyzeSimplePatterns(userCode, functionName, params)
-  }
+  return analyzeSimplePatterns(userCode, functionName, params)
 }
 function analyzeSimplePatterns(userCode: string, functionName: string, params: any[]): string {
   if (userCode.includes('+') && params.length >= 2) {
@@ -267,4 +242,4 @@ export function combineUserAndSeedOutputs(
     })
   }
   return combined
-}
+}
