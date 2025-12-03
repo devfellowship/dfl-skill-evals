@@ -167,3 +167,5 @@ Apaixonado por criar plataformas educacionais e ferramentas dev-first.
 📜 Licença
 
 Este projeto utiliza uma licença permissiva (MIT) — pode ser adaptado, modificado ou estendido conforme necessário.
+
+Projeto publicado em 202512031525.
