@@ -1,5 +1,5 @@
 import React from "react"
-import Link from "next/link"
+import { Link } from 'react-router-dom'
 import { ArrowRight, Code, Star, Users } from "lucide-react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
@@ -90,7 +90,7 @@ export const AssessmentCard = React.forwardRef<
               className="w-full"
               variant="outline"
             >
-              <Link href={`/challenge/pre/${generateSlug(assessment.title)}`}>
+              <Link to={`/challenge/pre/${generateSlug(assessment.title)}`}>
                 Start Challenge
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>

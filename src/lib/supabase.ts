@@ -1,10 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables')
-}
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+import { ENV } from '@/config/env'
+
+export const supabase = createClient(ENV.SUPABASE_URL, ENV.SUPABASE_ANON_KEY)
 export type UserRole = 'admin' | 'mentor' | 'community_member'
 export type ChallengeStatus = 'to_approve' | 'approved' | 'rejected' | 'archived'
 export type DifficultyLevel = 'easy' | 'medium' | 'hard' | 'expert'

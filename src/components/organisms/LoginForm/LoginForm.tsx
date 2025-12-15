@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useNavigate } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { toast } from 'sonner'
 import { LoginHeader } from '@/components/molecules/LoginHeader/LoginHeader'
@@ -12,7 +12,7 @@ export function LoginForm() {
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const router = useRouter()
+  const navigate = useNavigate()
   const { signIn } = useAuth()
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -38,12 +38,12 @@ export function LoginForm() {
         if (user) {
           const isAdmin = false
           if (isAdmin) {
-            router.push('/admin')
+            navigate('/admin')
           } else {
-            router.push('/')
+            navigate('/')
           }
         } else {
-          router.push('/')
+          navigate('/')
         }
       }
     } catch (error) {
@@ -54,7 +54,7 @@ export function LoginForm() {
     }
   }
   const handleForgotPassword = () => {
-    router.push('/reset-password')
+    navigate('/reset-password')
   }
   return (
     <div className="space-y-8">

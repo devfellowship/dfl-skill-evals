@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/atoms/Button/Button'
 import { Badge } from '@/components/atoms/Badge/Badge'
 import { ArrowLeft, XCircle } from "lucide-react"
-import Link from "next/link"
+import { Link } from 'react-router-dom'
 import { toast } from "sonner"
 import { ChallengeData, ChallengeViewBySlugProps } from '@/interface'
 export function ChallengeViewBySlug({ slug }: ChallengeViewBySlugProps) {
@@ -73,7 +73,7 @@ export function ChallengeViewBySlug({ slug }: ChallengeViewBySlugProps) {
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Challenge não encontrada</h1>
           <p className="text-gray-600 mb-6">A challenge que você está procurando não existe ou foi removida.</p>
           <Button asChild>
-            <Link href="/">
+            <Link to="/">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Voltar ao Início
             </Link>
@@ -88,7 +88,7 @@ export function ChallengeViewBySlug({ slug }: ChallengeViewBySlugProps) {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 py-6">
             <Button variant="outline" size="sm" asChild>
-              <Link href="/">
+              <Link to="/">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Voltar
               </Link>

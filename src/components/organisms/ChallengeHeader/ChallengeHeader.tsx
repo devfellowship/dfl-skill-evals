@@ -1,5 +1,5 @@
 "use client"
-import Link from "next/link"
+import { Link } from 'react-router-dom'
 import { Separator } from "@/components/ui/separator"
 interface ChallengeHeaderProps {
   title: string
@@ -10,7 +10,7 @@ export function ChallengeHeader({ title, backHref = "/" }: ChallengeHeaderProps)
     <header className="shrink-0 border-b border-border/40 bg-background/95 p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href={backHref} className="text-sm text-muted-foreground hover:text-foreground">
+          <Link to={backHref} className="text-sm text-muted-foreground hover:text-foreground">
             ← Voltar ao Dashboard
           </Link>
           <Separator orientation="vertical" className="h-4" />

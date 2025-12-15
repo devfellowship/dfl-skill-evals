@@ -1,8 +1,8 @@
 "use client"
-import { usePathname } from "next/navigation"
+import { useLocation } from 'react-router-dom'
 import { Footer } from "./Footer"
 export function ConditionalFooter() {
-  const pathname = usePathname()
+  const location = useLocation(); const pathname = location.pathname
   const hideFooterPages = [
     "/admin",
     "/teacher",

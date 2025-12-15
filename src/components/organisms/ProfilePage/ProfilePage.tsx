@@ -10,21 +10,21 @@ import { Badge } from '@/components/atoms/Badge/Badge'
 import { ProfileEditForm } from '@/components/molecules/ProfileEditForm/ProfileEditForm'
 import { AdminNavigation } from '@/components/atoms/AdminNavigation/AdminNavigation'
 import { User, Mail, Calendar, Shield, LogOut, Settings, Plus, Edit3 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import Link from 'next/link'
+import { Link } from 'react-router-dom'
 import { getUserDisplayName, getUserInitials } from '@/lib/utils/profile-utils'
 export function ProfilePage() {
   const { user, signOut } = useAuth()
   const { role, label, color, isAdmin, isMentor, canCreateChallenges, isLoading: roleLoading } = useUserRole()
   const { profile } = useProfile()
-  const router = useRouter()
+  const navigate = useNavigate()
   const [showEditForm, setShowEditForm] = useState(false)
   const handleSignOut = async () => {
     try {
       await signOut()
       toast.success('Logout realizado com sucesso!')
-      router.push('/')
+      navigate('/')
     } catch {
       toast.error('Erro ao fazer logout')
     }
@@ -104,14 +104,14 @@ export function ProfilePage() {
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <Button asChild variant="outline" className="justify-start h-12 border-2 hover:border-primary/50 hover:bg-primary/5">
-                      <Link href="/teacher/create" className="flex items-center gap-3">
+                      <Link to="/teacher/create" className="flex items-center gap-3">
                         <Plus className="w-5 h-5" />
                         <span className="font-medium">Criar Challenge</span>
                       </Link>
                     </Button>
                     {isAdmin && (
                       <Button asChild variant="outline" className="justify-start h-12 border-2 hover:border-purple-500/50 hover:bg-purple-500/5">
-                        <Link href="/admin" className="flex items-center gap-3">
+                        <Link to="/admin" className="flex items-center gap-3">
                           <Settings className="w-5 h-5" />
                           <span className="font-medium">Painel Admin</span>
                         </Link>
@@ -119,7 +119,7 @@ export function ProfilePage() {
                     )}
                     {isMentor && (
                       <Button asChild variant="outline" className="justify-start h-12 border-2 hover:border-primary/50 hover:bg-primary/5">
-                        <Link href="/teacher" className="flex items-center gap-3">
+                        <Link to="/teacher" className="flex items-center gap-3">
                           <User className="w-5 h-5" />
                           <span className="font-medium">Painel Mentor</span>
                         </Link>

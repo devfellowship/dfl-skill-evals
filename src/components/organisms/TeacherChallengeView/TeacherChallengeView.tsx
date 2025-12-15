@@ -26,7 +26,7 @@ interface TeacherChallengeViewProps {
   challengeId: string
 }
 export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps) {
-  const router = useRouter()
+  const navigate = useNavigate()
   const [challenge, setChallenge] = useState<TeacherChallenge | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -130,7 +130,7 @@ export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps)
               </div>
             </div>
           </div>
-          <Button onClick={() => router.push(`/edit/${challenge.id}`)}>
+          <Button onClick={() => navigate(`/edit/${challenge.id}`)}>
             <Edit className="w-4 h-4 mr-2" />
             Editar
           </Button>

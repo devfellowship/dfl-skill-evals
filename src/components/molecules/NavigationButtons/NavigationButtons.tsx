@@ -1,6 +1,6 @@
 "use client"
 import { Button } from "@/components/atoms/Button/Button"
-import Link from "next/link"
+import { Link } from 'react-router-dom'
 interface NavigationButtonsProps {
   isAdmin: boolean
   isTeacher: boolean
@@ -22,7 +22,7 @@ export function NavigationButtons({
           variant="outline"
           className="px-4 py-2 text-sm"
         >
-          <Link href="/admin">
+          <Link to="/admin">
             Admin
           </Link>
         </Button>
@@ -33,7 +33,7 @@ export function NavigationButtons({
           variant="outline"
           className="px-4 py-2 text-sm"
         >
-          <Link href="/teacher">
+          <Link to="/teacher">
             Mentor
           </Link>
         </Button>
@@ -44,7 +44,7 @@ export function NavigationButtons({
           variant="outline"
           className="px-4 py-2 text-sm"
         >
-          <Link href="/teacher/create">
+          <Link to="/teacher/create">
             Criar
           </Link>
         </Button>

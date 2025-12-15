@@ -113,4 +113,4 @@ try {
   return `// Código do usuário
 ${userCode}
 console.log(${functionName}(${paramsString}));`
-}
+}

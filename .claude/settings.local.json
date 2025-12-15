@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(cat:*)",
+      "Bash(git checkout:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(node migrate-imports.js:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}

@@ -1,5 +1,5 @@
 "use client"
-import { useRouter } from "next/navigation"
+import { useNavigate } from 'react-router-dom'
 import { useChallengeOperations } from "@/hooks/useChallengeOperations"
 import { useUserRole } from "@/hooks/useUserRole"
 import { usePendingChallengeCreation } from "@/hooks/usePendingChallengeCreation"
@@ -7,11 +7,11 @@ import { useChallengeForm } from "@/hooks/challenge/useChallengeForm"
 import { ChallengeFormFields } from "@/components/molecules/ChallengeFormFields/ChallengeFormFields"
 import { Button } from "@/components/atoms/Button/Button"
 import { Save, ArrowLeft } from "lucide-react"
-import Link from "next/link"
+import { Link } from 'react-router-dom'
 import { toast } from "sonner"
 
 export function ChallengeCreateForm() {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { createChallenge, isDeleting } = useChallengeOperations()
   const { createPendingChallenge } = usePendingChallengeCreation()
   const { isAdmin } = useUserRole()
@@ -55,13 +55,13 @@ export function ChallengeCreateForm() {
         const result = await createChallenge(formData)
         if (result) {
           toast.success("Challenge criada com sucesso!")
-          router.push("/admin")
+          navigate("/admin")
         }
       } else {
         const success = createPendingChallenge(formData)
         if (success) {
           toast.success("Challenge enviada para aprovação!")
-          router.push("/teacher")
+          navigate("/teacher")
         } else {
           toast.error("Erro ao criar challenge pendente")
         }
@@ -83,7 +83,7 @@ export function ChallengeCreateForm() {
                 Preencha os dados para criar um novo challenge
               </p>
             </div>
-            <Link href={isAdmin ? "/admin" : "/teacher"}>
+            <Link to={isAdmin ? "/admin" : "/teacher"}>
               <Button variant="outline">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Voltar
@@ -118,7 +118,7 @@ export function ChallengeCreateForm() {
 
             {/* Botões de Ação */}
             <div className="flex items-center justify-end gap-4 mt-8 p-6 bg-muted/30 border rounded-lg">
-              <Link href={isAdmin ? "/admin" : "/teacher"}>
+              <Link to={isAdmin ? "/admin" : "/teacher"}>
                 <Button type="button" variant="outline" disabled={!!isDeleting}>
                   Cancelar
                 </Button>

@@ -1,6 +1,6 @@
 "use client"
 import { Button } from "@/components/atoms/Button/Button"
-import Link from "next/link"
+import { Link } from 'react-router-dom'
 interface PreChallengeActionsProps {
   challengeId: string
   systemChecks: {
@@ -13,14 +13,14 @@ export function PreChallengeActions({ challengeId, systemChecks }: PreChallengeA
   return (
     <div className="flex gap-4">
       <Button variant="outline" asChild className="flex-1 bg-transparent">
-        <Link href="/">Cancel</Link>
+        <Link to="/">Cancel</Link>
       </Button>
       <Button
         asChild
         className="flex-1"
         disabled={!isSystemReady}
       >
-        <Link href={`/challenge/${challengeId}`}>Begin Assessment</Link>
+        <Link to={`/challenge/${challengeId}`}>Begin Assessment</Link>
       </Button>
     </div>
   )

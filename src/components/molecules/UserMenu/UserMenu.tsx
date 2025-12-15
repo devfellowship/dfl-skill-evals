@@ -1,7 +1,7 @@
 "use client"
 import { Button } from "@/components/atoms/Button/Button"
 import { User, LogOut } from "lucide-react"
-import Link from "next/link"
+import { Link } from 'react-router-dom'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 interface UserMenuProps {
@@ -14,7 +14,7 @@ export function UserMenu({ user, onSignOut, getUserDisplayName, getUserInitials 
   if (!user) {
     return (
       <Button asChild variant="outline" className="flex items-center gap-2">
-        <Link href="/auth/login">
+        <Link to="/auth/login">
           <User className="w-4 h-4" />
           Login
         </Link>
@@ -40,7 +40,7 @@ export function UserMenu({ user, onSignOut, getUserDisplayName, getUserInitials 
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuItem asChild>
-          <Link href="/profile" className="flex items-center gap-2">
+          <Link to="/profile" className="flex items-center gap-2">
             <User className="w-4 h-4" />
             Meu Perfil
           </Link>

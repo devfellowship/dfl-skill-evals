@@ -1,6 +1,6 @@
 'use client'
 import { ReactNode, useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { useUserRole } from '@/hooks/useUserRole'
 import { Loader2 } from 'lucide-react'
@@ -11,7 +11,7 @@ interface AdminRouteWrapperProps {
 export function AdminRouteWrapper({ children, allowedRoles }: AdminRouteWrapperProps) {
   const { user, loading: authLoading } = useAuth()
   const { role, isLoading: roleLoading } = useUserRole()
-  const router = useRouter()
+  const navigate = useNavigate()
   const [isChecking, setIsChecking] = useState(true)
   useEffect(() => {
     const checkAccess = async () => {
@@ -19,14 +19,14 @@ export function AdminRouteWrapper({ children, allowedRoles }: AdminRouteWrapperP
         return
       }
       if (!user) {
-        router.push('/login')
+        navigate('/login')
         return
       }
       if (!role) {
         return
       }
       if (!allowedRoles.includes(role)) {
-        router.push('/')
+        navigate('/')
         return
       }
       setIsChecking(false)
