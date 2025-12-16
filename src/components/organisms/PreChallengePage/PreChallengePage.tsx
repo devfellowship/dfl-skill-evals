@@ -1,4 +1,3 @@
-"use client"
 import { useState } from "react"
 import { useChallenges } from "@/hooks/useChallenges"
 import { generateSlug } from "@/lib/utils"

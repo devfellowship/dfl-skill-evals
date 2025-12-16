@@ -34,7 +34,12 @@ export function useChallengeDetails(challengeId: string) {
         setLoading(true)
         setError(null)
         const searchTitle = challengeId.replace(/-/g, ' ')
-        const { data, error: fetchError } = await supabase
+
+        console.group('🔍 [useChallengeDetails] Fetching challenge')
+        console.log('challengeId (slug):', challengeId)
+        console.log('searchTitle:', searchTitle)
+
+        const { data: allData, error: fetchError } = await supabase
           .schema('skill_evals')
           .from('challenges')
           .select(`
@@ -56,14 +61,38 @@ export function useChallengeDetails(challengeId: string) {
           `)
           .eq('status', 'approved')
           .eq('is_public', true)
-          .ilike('title', `%${searchTitle}%`)
-          .single()
+
+        console.log('fetchError:', fetchError)
+        console.log('allData length:', allData?.length)
+        console.groupEnd()
+
         if (fetchError) {
           throw fetchError
         }
-        if (!data) {
+
+        if (!allData || allData.length === 0) {
           throw new Error('Challenge não encontrado')
         }
+
+        const generateSlug = (title: string): string => {
+          return title
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, '-')
+            .replace(/[^a-z0-9-]/g, '')
+        }
+
+        const matchedChallenge = allData.find(challenge =>
+          generateSlug(challenge.title) === challengeId.toLowerCase()
+        )
+
+        if (!matchedChallenge) {
+          console.error('No challenge matched slug:', challengeId)
+          console.error('Available titles:', allData.map(c => ({ title: c.title, slug: generateSlug(c.title) })))
+          throw new Error('Challenge não encontrado')
+        }
+
+        const data = matchedChallenge
         setChallenge(data)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Erro desconhecido')

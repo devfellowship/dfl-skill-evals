@@ -1,33 +1,12 @@
-"use client"
-import { useState, useEffect } from 'react'
-import { useChallengeManagement } from '@/hooks/useChallengeManagement'
+import { useChallengeDetails } from '@/hooks/useChallengeDetails'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/atoms/Button/Button'
 import { Badge } from '@/components/atoms/Badge/Badge'
 import { ArrowLeft, XCircle } from "lucide-react"
 import { Link } from 'react-router-dom'
-import { toast } from "sonner"
-import { ChallengeData, ChallengeViewBySlugProps } from '@/interface'
+import { ChallengeViewBySlugProps } from '@/interface'
 export function ChallengeViewBySlug({ slug }: ChallengeViewBySlugProps) {
-  const { getChallengeBySlug, loading, error } = useChallengeManagement()
-  const [challenge, setChallenge] = useState<ChallengeData | null>(null)
-  useEffect(() => {
-    if (slug) {
-      loadChallenge()
-    }
-  }, [slug])
-  const loadChallenge = async () => {
-    try {
-      const challengeData = await getChallengeBySlug(slug)
-      if (challengeData) {
-        setChallenge(challengeData)
-      } else {
-        toast.error("Challenge não encontrada")
-      }
-    } catch (err) {
-      toast.error("Erro ao carregar challenge")
-    }
-  }
+  const { challenge, loading, error } = useChallengeDetails(slug)
   const getDifficultyColor = (difficulty: string) => {
     const colors = {
       easy: "bg-green-100 text-green-800",

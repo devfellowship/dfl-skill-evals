@@ -1,4 +1,3 @@
-"use client"
 import { useState, useEffect } from "react"
 import { useChallengeDetails } from "@/hooks/useChallengeDetails"
 import { useChallengeExecution } from "@/hooks/useChallengeExecution"

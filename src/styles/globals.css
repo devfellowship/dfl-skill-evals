@@ -84,8 +84,9 @@
   }
   /* Não setar background globalmente. O host decide o background. */
   .devshaper-scope {
-    /* No remote/standalone, o “body” efetivo é o nosso escopo */
-    @apply bg-background text-foreground;
+    /* No remote/standalone, o "body" efetivo é o nosso escopo */
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
   }
 }
 
@@ -166,6 +167,7 @@
   .devshaper-scope .aspect-video {
     aspect-ratio: 16 / 9 !important;
     position: relative !important;
+    overflow: hidden !important;
   }
 
   /* Proteção para imagens - garante que apareçam no host */
@@ -177,6 +179,43 @@
 
   .devshaper-scope .object-cover {
     object-fit: cover !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  /* Proteção para posicionamento absoluto */
+  .devshaper-scope .absolute {
+    position: absolute !important;
+  }
+
+  .devshaper-scope .relative {
+    position: relative !important;
+  }
+
+  .devshaper-scope .inset-0 {
+    inset: 0 !important;
+  }
+
+  /* Proteção para overflow */
+  .devshaper-scope .overflow-hidden {
+    overflow: hidden !important;
+  }
+
+  /* Proteção para z-index */
+  .devshaper-scope .z-0 {
+    z-index: 0 !important;
+  }
+
+  .devshaper-scope .z-10 {
+    z-index: 10 !important;
+  }
+
+  .devshaper-scope .z-20 {
+    z-index: 20 !important;
+  }
+
+  .devshaper-scope .z-30 {
+    z-index: 30 !important;
   }
 
   /* Proteção para gap - evita cards colando */
@@ -192,6 +231,92 @@
     gap: 0.25rem !important;
   }
 
+  /* Proteção para flex - evita layout quebrado */
+  .devshaper-scope .flex {
+    display: flex !important;
+  }
+
+  .devshaper-scope .items-center {
+    align-items: center !important;
+  }
+
+  .devshaper-scope .justify-center {
+    justify-content: center !important;
+  }
+
+  .devshaper-scope .justify-between {
+    justify-content: space-between !important;
+  }
+
+  .devshaper-scope .flex-wrap {
+    flex-wrap: wrap !important;
+  }
+
+  /* Proteção para text-align */
+  .devshaper-scope .text-center {
+    text-align: center !important;
+  }
+
+  /* Proteção para width/height */
+  .devshaper-scope .w-full {
+    width: 100% !important;
+  }
+
+  .devshaper-scope .h-full {
+    height: 100% !important;
+  }
+
+  /* Proteção para group hover - caso o host tenha conflitos */
+  .devshaper-scope .group:hover .group-hover\:text-primary {
+    color: hsl(var(--primary)) !important;
+  }
+
+  /* Proteção para cores de texto */
+  .devshaper-scope .text-white {
+    color: rgb(255, 255, 255) !important;
+  }
+
+  .devshaper-scope .text-muted-foreground {
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
+  /* Proteção para backgrounds */
+  .devshaper-scope .bg-background {
+    background-color: hsl(var(--background)) !important;
+  }
+
+  .devshaper-scope .bg-card {
+    background-color: hsl(var(--card)) !important;
+  }
+
+  /* Proteção para borders */
+  .devshaper-scope .border {
+    border-width: 1px !important;
+    border-style: solid !important;
+    border-color: hsl(var(--border)) !important;
+  }
+
+  /* Proteção para spacing (padding/margin) */
+  .devshaper-scope .p-0 {
+    padding: 0 !important;
+  }
+
+  .devshaper-scope .p-4 {
+    padding: 1rem !important;
+  }
+
+  .devshaper-scope .space-y-3 > * + * {
+    margin-top: 0.75rem !important;
+  }
+
+  /* Proteção para line-clamp */
+  .devshaper-scope .line-clamp-2 {
+    overflow: hidden !important;
+    display: -webkit-box !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+  }
+
   /* Isolamento de contexto de empilhamento */
   .devshaper-scope {
     isolation: isolate;
@@ -202,7 +327,8 @@
 /* Custom Assessment Styles */
 @layer components {
   .assessment-container {
-    @apply min-h-screen bg-background;
+    min-height: 100vh;
+    background-color: hsl(var(--background));
   }
 
   .code-editor {
