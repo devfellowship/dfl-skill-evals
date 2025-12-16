@@ -1,9 +1,9 @@
-"use client"
 import * as React from "react"
 import * as SheetPrimitive from "@radix-ui/react-dialog"
 import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { usePortalContainer } from "@/contexts/PortalContainerContext"
 const Sheet = SheetPrimitive.Root
 const SheetTrigger = SheetPrimitive.Trigger
 const SheetClose = SheetPrimitive.Close
@@ -46,8 +46,10 @@ interface SheetContentProps
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   SheetContentProps
->(({ side = "right", className, children, ...props }, ref) => (
-  <SheetPortal>
+>(({ side = "right", className, children, ...props }, ref) => {
+  const portalContainer = usePortalContainer()
+  return (
+  <SheetPortal container={portalContainer ?? undefined}>
     <SheetOverlay />
     <SheetPrimitive.Content
       ref={ref}
@@ -61,7 +63,8 @@ const SheetContent = React.forwardRef<
       </SheetPrimitive.Close>
     </SheetPrimitive.Content>
   </SheetPortal>
-))
+  )
+})
 SheetContent.displayName = SheetPrimitive.Content.displayName
 const SheetHeader = ({
   className,
@@ -122,4 +125,4 @@ export {
   SheetFooter,
   SheetTitle,
   SheetDescription,
-}
+}

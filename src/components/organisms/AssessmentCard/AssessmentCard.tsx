@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { DifficultyIndicator } from "@/components/molecules/DifficultyIndicator/DifficultyIndicator"
 import { ChallengeImage } from "@/components/atoms/ChallengeImage/ChallengeImage"
 import { ChallengeMenu } from "@/components/molecules/ChallengeMenu/ChallengeMenu"
+import { useBasePath } from "@/contexts/BasePathContext"
 import type { AdminChallenge } from "@/types/admin/admin-dashboard"
 import { formatParticipants, generateSlug } from "@/lib/utils"
 interface AssessmentCardProps {
@@ -18,6 +19,7 @@ export const AssessmentCard = React.forwardRef<
   HTMLDivElement,
   AssessmentCardProps
 >(({ assessment, className, isTrending = false, ...props }, ref) => {
+  const { buildRoute } = useBasePath()
   return (
     <Card className="group overflow-hidden border border-border/50 bg-background transition-all duration-200 hover:shadow-md hover:border-border">
       <CardContent className="p-0">
@@ -90,7 +92,7 @@ export const AssessmentCard = React.forwardRef<
               className="w-full"
               variant="outline"
             >
-              <Link to={`/challenge/pre/${generateSlug(assessment.title)}`}>
+              <Link to={buildRoute(`/challenge/pre/${generateSlug(assessment.title)}`)}>
                 Start Challenge
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>

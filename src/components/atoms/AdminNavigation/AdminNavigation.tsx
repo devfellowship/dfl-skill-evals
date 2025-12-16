@@ -1,4 +1,3 @@
-"use client"
 import { ReactNode, useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/atoms/Button/Button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -10,6 +9,7 @@ import { useProfile } from '@/hooks/useProfile'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { getUserDisplayName, getUserInitials } from '@/lib/utils/profile-utils'
+import { useBasePath } from '@/contexts/BasePathContext'
 export interface NavigationItem {
   label: string
   href: string
@@ -47,6 +47,7 @@ export function AdminNavigation({
   const { label: roleLabel, isLoading: roleLoading } = useUserRole()
   const { profile } = useProfile()
   const navigate = useNavigate()
+  const { buildRoute } = useBasePath()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const [displayName, setDisplayName] = useState('')
@@ -70,7 +71,7 @@ export function AdminNavigation({
     try {
       await signOut()
       toast.success('Logout realizado com sucesso!')
-      navigate('/')
+      navigate(buildRoute('/'))
     } catch (error) {
       toast.error('Erro ao fazer logout')
     }
@@ -97,7 +98,7 @@ export function AdminNavigation({
               asChild
               className="hover:bg-primary/5 text-primary font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105"
             >
-              <Link to="/">
+              <Link to={buildRoute('/')}>
                 <Home className="h-4 w-4 mr-2" />
                 Dashboard
               </Link>
@@ -111,7 +112,7 @@ export function AdminNavigation({
                   asChild
                   className="hover:bg-primary/5 text-primary font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105"
                 >
-                  <Link to={item.href}>
+                  <Link to={buildRoute(item.href)}>
                     {item.icon && <span className="mr-2">{item.icon}</span>}
                     {item.label}
                   </Link>
@@ -129,7 +130,7 @@ export function AdminNavigation({
                   asChild
                   className="text-sm rounded-full transition-all duration-200 hover:scale-105 hover:shadow-md"
                 >
-                  <Link to={action.href}>
+                  <Link to={buildRoute(action.href)}>
                     {action.icon && <span className="mr-2">{action.icon}</span>}
                     {action.label}
                   </Link>
@@ -145,7 +146,7 @@ export function AdminNavigation({
                 size="sm"
                 className="rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-md"
               >
-                <Link to={backHref}>
+                <Link to={buildRoute(backHref)}>
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   {backLabel}
                 </Link>
@@ -182,7 +183,7 @@ export function AdminNavigation({
                 </button>
                 {isDropdownOpen && (
                   <div className="absolute right-0 top-full mt-2 w-48 bg-slate-800/95 backdrop-blur border border-slate-700/50 rounded-lg shadow-lg py-2 z-[9999]">
-                    <Link to="/profile"
+                    <Link to={buildRoute('/profile')}
                       className="flex items-center gap-3 px-4 py-2 text-sm text-slate-200 hover:bg-slate-700/50 transition-colors duration-200"
                       onClick={() => setIsDropdownOpen(false)}
                     >
@@ -208,4 +209,4 @@ export function AdminNavigation({
       </div>
     </div>
   )
-}
+}

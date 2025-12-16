@@ -1,4 +1,3 @@
-"use client"
 import { useEffect } from "react"
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from "@/components/providers/AuthProvider"
@@ -10,7 +9,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     if (!loading && !user) {
       navigate(`/login?from=${encodeURIComponent(pathname)}`)
     }
-  }, [loading, user, router, pathname])
+  }, [loading, user, navigate, pathname])
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -23,4 +22,4 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   }
   if (!user) return null
   return <>{children}</>
-}
+}

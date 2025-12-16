@@ -5,6 +5,7 @@ import { SearchButton } from "@/components/atoms/SearchButton/SearchButton"
 import { MainSortButton } from "@/components/atoms/MainSortButton/MainSortButton"
 import { User, LogOut, ArrowUpDown, Hash, Calendar, Zap, Star, Users, ArrowUp, ArrowDown } from "lucide-react"
 import { Link } from 'react-router-dom'
+import { useBasePath } from '@/contexts/BasePathContext'
 import type { MainSortType } from "@/lib/main-challenge-sorter"
 import { useAuth } from "@/components/providers/AuthProvider"
 import { useUserRole } from "@/hooks/useUserRole"
@@ -42,6 +43,7 @@ export function MainHeader({
   const { user, signOut } = useAuth()
   const { isAdmin, isMentor, canCreateChallenges, isLoading: roleLoading } = useUserRole()
   const { profile } = useProfile()
+  const { buildRoute } = useBasePath()
   const currentOption = MAIN_SORT_OPTIONS.find(option => option.value === sortBy) || MAIN_SORT_OPTIONS[0]
   const handleSignOut = async () => {
     try {
@@ -126,7 +128,7 @@ export function MainHeader({
                   variant="outline"
                   className="px-4 py-2 text-sm"
                 >
-                  <Link to="/admin">
+                  <Link to={buildRoute("/admin")}>
                     Admin
                   </Link>
                 </Button>
@@ -137,7 +139,7 @@ export function MainHeader({
                   variant="outline"
                   className="px-4 py-2 text-sm"
                 >
-                  <Link to="/teacher">
+                  <Link to={buildRoute("/teacher")}>
                     Mentor
                   </Link>
                 </Button>
@@ -148,7 +150,7 @@ export function MainHeader({
                   variant="outline"
                   className="px-4 py-2 text-sm"
                 >
-                  <Link to="/create">
+                  <Link to={buildRoute("/create")}>
                     Criar
                   </Link>
                 </Button>
@@ -197,4 +199,4 @@ export function MainHeader({
       </div>
     </header>
   )
-}
+}

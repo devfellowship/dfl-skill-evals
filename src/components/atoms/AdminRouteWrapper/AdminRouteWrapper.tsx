@@ -1,9 +1,9 @@
-'use client'
 import { ReactNode, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { useUserRole } from '@/hooks/useUserRole'
 import { Loader2 } from 'lucide-react'
+import { useBasePath } from '@/contexts/BasePathContext'
 interface AdminRouteWrapperProps {
   children: ReactNode
   allowedRoles: string[]
@@ -12,6 +12,7 @@ export function AdminRouteWrapper({ children, allowedRoles }: AdminRouteWrapperP
   const { user, loading: authLoading } = useAuth()
   const { role, isLoading: roleLoading } = useUserRole()
   const navigate = useNavigate()
+  const { buildRoute } = useBasePath()
   const [isChecking, setIsChecking] = useState(true)
   useEffect(() => {
     const checkAccess = async () => {
@@ -19,20 +20,20 @@ export function AdminRouteWrapper({ children, allowedRoles }: AdminRouteWrapperP
         return
       }
       if (!user) {
-        navigate('/login')
+        navigate(buildRoute('/login'))
         return
       }
       if (!role) {
         return
       }
       if (!allowedRoles.includes(role)) {
-        navigate('/')
+        navigate(buildRoute('/'))
         return
       }
       setIsChecking(false)
     }
     checkAccess()
-  }, [user, role, authLoading, roleLoading, allowedRoles, router])
+  }, [user, role, authLoading, roleLoading, allowedRoles, navigate])
   if (authLoading || roleLoading || isChecking) {
     return (
       <div className="min-h-screen flex items-center justify-center">

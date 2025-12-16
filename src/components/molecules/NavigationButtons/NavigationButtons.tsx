@@ -1,6 +1,7 @@
 "use client"
 import { Button } from "@/components/atoms/Button/Button"
 import { Link } from 'react-router-dom'
+import { useBasePath } from "@/contexts/BasePathContext"
 interface NavigationButtonsProps {
   isAdmin: boolean
   isTeacher: boolean
@@ -13,6 +14,7 @@ export function NavigationButtons({
   canCreateChallenges, 
   roleLoading 
 }: NavigationButtonsProps) {
+  const { buildRoute } = useBasePath()
   if (roleLoading) return null
   return (
     <div className="flex items-center gap-2">
@@ -22,7 +24,7 @@ export function NavigationButtons({
           variant="outline"
           className="px-4 py-2 text-sm"
         >
-          <Link to="/admin">
+          <Link to={buildRoute("/admin")}>
             Admin
           </Link>
         </Button>
@@ -33,7 +35,7 @@ export function NavigationButtons({
           variant="outline"
           className="px-4 py-2 text-sm"
         >
-          <Link to="/teacher">
+          <Link to={buildRoute("/teacher")}>
             Mentor
           </Link>
         </Button>
@@ -44,11 +46,11 @@ export function NavigationButtons({
           variant="outline"
           className="px-4 py-2 text-sm"
         >
-          <Link to="/teacher/create">
+          <Link to={buildRoute("/teacher/create")}>
             Criar
           </Link>
         </Button>
       )}
     </div>
   )
-}
+}

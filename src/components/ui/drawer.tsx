@@ -1,7 +1,7 @@
-"use client"
 import * as React from "react"
 import { Drawer as DrawerPrimitive } from "vaul"
 import { cn } from "@/lib/utils"
+import { usePortalContainer } from "@/contexts/PortalContainerContext"
 const Drawer = ({
   shouldScaleBackground = true,
   ...props
@@ -29,8 +29,10 @@ DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName
 const DrawerContent = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <DrawerPortal>
+>(({ className, children, ...props }, ref) => {
+  const portalContainer = usePortalContainer()
+  return (
+  <DrawerPortal container={portalContainer ?? undefined}>
     <DrawerOverlay />
     <DrawerPrimitive.Content
       ref={ref}
@@ -44,7 +46,8 @@ const DrawerContent = React.forwardRef<
       {children}
     </DrawerPrimitive.Content>
   </DrawerPortal>
-))
+  )
+})
 DrawerContent.displayName = "DrawerContent"
 const DrawerHeader = ({
   className,
@@ -102,4 +105,4 @@ export {
   DrawerFooter,
   DrawerTitle,
   DrawerDescription,
-}
+}

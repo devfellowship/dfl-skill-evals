@@ -1,8 +1,8 @@
-"use client"
 import * as React from "react"
 import * as ContextMenuPrimitive from "@radix-ui/react-context-menu"
 import { Check, ChevronRight, Circle } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { usePortalContainer } from "@/contexts/PortalContainerContext"
 const ContextMenu = ContextMenuPrimitive.Root
 const ContextMenuTrigger = ContextMenuPrimitive.Trigger
 const ContextMenuGroup = ContextMenuPrimitive.Group
@@ -46,8 +46,10 @@ ContextMenuSubContent.displayName = ContextMenuPrimitive.SubContent.displayName
 const ContextMenuContent = React.forwardRef<
   React.ElementRef<typeof ContextMenuPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Content>
->(({ className, ...props }, ref) => (
-  <ContextMenuPrimitive.Portal>
+>(({ className, ...props }, ref) => {
+  const portalContainer = usePortalContainer()
+  return (
+  <ContextMenuPrimitive.Portal container={portalContainer ?? undefined}>
     <ContextMenuPrimitive.Content
       ref={ref}
       className={cn(
@@ -57,7 +59,8 @@ const ContextMenuContent = React.forwardRef<
       {...props}
     />
   </ContextMenuPrimitive.Portal>
-))
+  )
+})
 ContextMenuContent.displayName = ContextMenuPrimitive.Content.displayName
 const ContextMenuItem = React.forwardRef<
   React.ElementRef<typeof ContextMenuPrimitive.Item>,
@@ -179,4 +182,4 @@ export {
   ContextMenuSubContent,
   ContextMenuSubTrigger,
   ContextMenuRadioGroup,
-}
+}

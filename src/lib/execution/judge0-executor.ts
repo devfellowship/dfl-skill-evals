@@ -1,4 +1,4 @@
-import type { TestCase, TestResult, LanguageId } from '@/types/execution'
+import type { ExecutionTestCase as TestCase, TestResult, LanguageId } from '@/types/editor/execution'
 import { executeCode } from '../judge0-config'
 import { checkRateLimit } from './rate-limiter'
 import { getCachedLanguages, isLanguageSupported, getLanguageName } from './language-manager'
@@ -73,4 +73,4 @@ async function executeTestCase(
   }
   const result = await executeCode(payload)
   return parseJudge0Result(result, testCase)
-}
+}

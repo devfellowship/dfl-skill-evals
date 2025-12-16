@@ -1,4 +1,3 @@
-"use client"
 import { useEffect } from "react"
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from "@/components/providers/AuthProvider"
@@ -28,7 +27,7 @@ export function GlobalAuthGuard({ children }: { children: React.ReactNode }) {
     if (!loading && !user && !isPublicRoute(pathname)) {
       navigate(`/auth/login?from=${encodeURIComponent(pathname || '/')}`)
     }
-  }, [loading, user, router, pathname])
+  }, [loading, user, navigate, pathname])
   
   if (loading && !isPublicRoute(pathname)) {
     return (
