@@ -1,7 +1,7 @@
 "use client"
 import { Button } from "@/components/atoms/Button/Button"
 import { Plus } from "lucide-react"
-import Link from "next/link"
+import { Link } from 'react-router-dom'
 interface DashboardHeaderButtonsProps {
   onCreateClick?: () => void
   createButtonText?: string
@@ -24,7 +24,7 @@ export function DashboardHeaderButtons({
     <div className="flex gap-4">
       {createButtonHref ? (
         <Button asChild>
-          <Link href={createButtonHref}>
+          <Link to={createButtonHref}>
             <Plus className="h-4 w-4 mr-2" />
             {createButtonText}
           </Link>
@@ -41,7 +41,7 @@ export function DashboardHeaderButtons({
       )}
       {showHomeButton && (
         <Button variant="outline" asChild>
-          <Link href={homeButtonHref}>
+          <Link to={homeButtonHref}>
             {homeButtonText}
           </Link>
         </Button>

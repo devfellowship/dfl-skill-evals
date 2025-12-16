@@ -1,6 +1,6 @@
-"use client"
 import { useState, useEffect } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useNavigate, useParams } from "react-router-dom"
+import { useBasePath } from "@/contexts/BasePathContext"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -26,7 +26,8 @@ interface TeacherChallengeViewProps {
   challengeId: string
 }
 export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps) {
-  const router = useRouter()
+  const navigate = useNavigate()
+  const { buildRoute } = useBasePath()
   const [challenge, setChallenge] = useState<TeacherChallenge | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -98,7 +99,7 @@ export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps)
           <div className="text-center py-12">
             <h2 className="text-xl font-semibold text-destructive mb-2">Erro</h2>
             <p className="text-muted-foreground">{error || 'Challenge não encontrado'}</p>
-            <Button onClick={() => router.back()} className="mt-4">
+            <Button onClick={() => navigate(-1)} className="mt-4">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Voltar
             </Button>
@@ -111,10 +112,9 @@ export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps)
     <AdminRouteWrapper allowedRoles={['superadmin', 'admin', 'mentor']}>
       <div className="min-h-screen bg-background p-6">
       <div className="max-w-4xl mx-auto space-y-6">
-        {}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="outline" onClick={() => router.back()}>
+            <Button variant="outline" onClick={() => navigate(-1)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               Voltar
             </Button>
@@ -130,12 +130,11 @@ export function TeacherChallengeView({ challengeId }: TeacherChallengeViewProps)
               </div>
             </div>
           </div>
-          <Button onClick={() => router.push(`/edit/${challenge.id}`)}>
+          <Button onClick={() => navigate(buildRoute(`/edit/${challenge.id}`))}>
             <Edit className="w-4 h-4 mr-2" />
             Editar
           </Button>
         </div>
-        {}
         <Tabs defaultValue="description" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="description" className="flex items-center gap-2">

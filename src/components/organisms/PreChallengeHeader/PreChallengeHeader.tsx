@@ -4,7 +4,7 @@ import { Button } from "@/components/atoms/Button/Button"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import { Avatar, AvatarFallback } from "@/components/atoms/Avatar/Avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import Link from "next/link"
+import { Link } from 'react-router-dom'
 import { BREADCRUMB_LABELS } from "@/consts/ui"
 import { useAuth } from "@/components/providers/AuthProvider"
 import { useProfile } from "@/hooks/useProfile"
@@ -19,7 +19,7 @@ export function PreChallengeHeader() {
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
-                  <Link href="/">
+                  <Link to="/">
                     <Home className="h-4 w-4" />
                   </Link>
                 </BreadcrumbLink>
@@ -46,7 +46,7 @@ export function PreChallengeHeader() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem asChild>
-                <Link href="/profile">
+                <Link to="/profile">
                   <User className="mr-2 h-4 w-4" />
                   <span>Perfil</span>
                 </Link>
@@ -59,7 +59,7 @@ export function PreChallengeHeader() {
           </DropdownMenu>
         ) : (
           <Button asChild>
-            <Link href="/login">Entrar</Link>
+            <Link to="/login">Entrar</Link>
           </Button>
         )}
       </div>

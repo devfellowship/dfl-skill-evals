@@ -1,16 +1,15 @@
-"use client"
 import { useEffect } from "react"
-import { useRouter, usePathname } from "next/navigation"
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from "@/components/providers/AuthProvider"
 export function AuthGuard({ children }: { children: React.ReactNode }) {
-  const router = useRouter()
-  const pathname = usePathname()
+  const navigate = useNavigate()
+  const location = useLocation(); const pathname = location.pathname
   const { user, loading } = useAuth()
   useEffect(() => {
     if (!loading && !user) {
-      router.replace(`/login?from=${encodeURIComponent(pathname)}`)
+      navigate(`/login?from=${encodeURIComponent(pathname)}`)
     }
-  }, [loading, user, router, pathname])
+  }, [loading, user, navigate, pathname])
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -23,4 +22,4 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   }
   if (!user) return null
   return <>{children}</>
-}
+}

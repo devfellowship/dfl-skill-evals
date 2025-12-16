@@ -1,8 +1,8 @@
-"use client"
 import * as React from "react"
 import * as MenubarPrimitive from "@radix-ui/react-menubar"
 import { Check, ChevronRight, Circle } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { usePortalContainer } from "@/contexts/PortalContainerContext"
 const MenubarMenu = MenubarPrimitive.Menu
 const MenubarGroup = MenubarPrimitive.Group
 const MenubarPortal = MenubarPrimitive.Portal
@@ -77,8 +77,10 @@ const MenubarContent = React.forwardRef<
   (
     { className, align = "start", alignOffset = -4, sideOffset = 8, ...props },
     ref
-  ) => (
-    <MenubarPrimitive.Portal>
+  ) => {
+    const portalContainer = usePortalContainer()
+    return (
+      <MenubarPrimitive.Portal container={portalContainer ?? undefined}>
       <MenubarPrimitive.Content
         ref={ref}
         align={align}
@@ -91,7 +93,8 @@ const MenubarContent = React.forwardRef<
         {...props}
       />
     </MenubarPrimitive.Portal>
-  )
+    )
+  }
 )
 MenubarContent.displayName = MenubarPrimitive.Content.displayName
 const MenubarItem = React.forwardRef<
@@ -196,7 +199,7 @@ const MenubarShortcut = ({
     />
   )
 }
-MenubarShortcut.displayname = "MenubarShortcut"
+MenubarShortcut.displayName = "MenubarShortcut"
 export {
   Menubar,
   MenubarMenu,
@@ -214,4 +217,4 @@ export {
   MenubarGroup,
   MenubarSub,
   MenubarShortcut,
-}
+}

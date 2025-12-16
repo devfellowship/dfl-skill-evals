@@ -1,33 +1,12 @@
-"use client"
-import { useState, useEffect } from 'react'
-import { useChallengeManagement } from '@/hooks/useChallengeManagement'
+import { useChallengeDetails } from '@/hooks/useChallengeDetails'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/atoms/Button/Button'
 import { Badge } from '@/components/atoms/Badge/Badge'
 import { ArrowLeft, XCircle } from "lucide-react"
-import Link from "next/link"
-import { toast } from "sonner"
-import { ChallengeData, ChallengeViewBySlugProps } from '@/interface'
+import { Link } from 'react-router-dom'
+import { ChallengeViewBySlugProps } from '@/interface'
 export function ChallengeViewBySlug({ slug }: ChallengeViewBySlugProps) {
-  const { getChallengeBySlug, loading, error } = useChallengeManagement()
-  const [challenge, setChallenge] = useState<ChallengeData | null>(null)
-  useEffect(() => {
-    if (slug) {
-      loadChallenge()
-    }
-  }, [slug])
-  const loadChallenge = async () => {
-    try {
-      const challengeData = await getChallengeBySlug(slug)
-      if (challengeData) {
-        setChallenge(challengeData)
-      } else {
-        toast.error("Challenge não encontrada")
-      }
-    } catch (err) {
-      toast.error("Erro ao carregar challenge")
-    }
-  }
+  const { challenge, loading, error } = useChallengeDetails(slug)
   const getDifficultyColor = (difficulty: string) => {
     const colors = {
       easy: "bg-green-100 text-green-800",
@@ -73,7 +52,7 @@ export function ChallengeViewBySlug({ slug }: ChallengeViewBySlugProps) {
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Challenge não encontrada</h1>
           <p className="text-gray-600 mb-6">A challenge que você está procurando não existe ou foi removida.</p>
           <Button asChild>
-            <Link href="/">
+            <Link to="/">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Voltar ao Início
             </Link>
@@ -88,7 +67,7 @@ export function ChallengeViewBySlug({ slug }: ChallengeViewBySlugProps) {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 py-6">
             <Button variant="outline" size="sm" asChild>
-              <Link href="/">
+              <Link to="/">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Voltar
               </Link>

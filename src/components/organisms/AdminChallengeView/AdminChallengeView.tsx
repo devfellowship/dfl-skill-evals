@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect, useRef } from "react"
-import { useRouter } from "next/navigation"
+import { useNavigate } from 'react-router-dom'
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,7 +13,7 @@ import { AdminRouteWrapper } from "@/components/atoms/AdminRouteWrapper/AdminRou
 import { AdminChallengeViewProps } from "@/interface"
 import type { RealtimeChannel } from '@supabase/supabase-js'
 export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
-  const router = useRouter()
+  const navigate = useNavigate()
   const [challenge, setChallenge] = useState<AdminChallenge | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -105,7 +105,7 @@ export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
       })
       .on('broadcast', { event: 'challenge-deleted' }, ({ payload }) => {
         if (payload.challengeId === challengeId) {
-          router.push('/admin')
+          navigate('/admin')
         }
       })
       .subscribe((status) => {
@@ -189,7 +189,7 @@ export function AdminChallengeView({ challengeId }: AdminChallengeViewProps) {
               </div>
             </div>
           </div>
-          <Button onClick={() => router.push(`/admin/edit/${challenge.id}`)}>
+          <Button onClick={() => navigate(`/admin/edit/${challenge.id}`)}>
             <Edit className="w-4 h-4 mr-2" />
             Editar
           </Button>

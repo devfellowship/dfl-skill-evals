@@ -3,7 +3,8 @@ import { useMemo } from "react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { Edit, Trash2, CheckCircle, Plus, Eye, ArrowLeft } from "lucide-react"
-import Link from "next/link"
+import { Link } from 'react-router-dom'
+import { useBasePath } from "@/contexts/BasePathContext"
 interface TeacherChallenge {
   id: string
   title: string
@@ -22,6 +23,7 @@ interface TeacherChallengeListProps {
   searchQuery?: string
 }
 export function TeacherChallengeList({ challenges, onDelete, onSendBackForReview, searchQuery = "" }: TeacherChallengeListProps) {
+  const { buildRoute } = useBasePath()
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'published': return 'bg-blue-100 text-blue-800 hover:bg-blue-200 hover:text-blue-600 transition-colors'
@@ -53,7 +55,7 @@ export function TeacherChallengeList({ challenges, onDelete, onSendBackForReview
       <div className="text-center py-12">
         <div className="text-gray-500 mb-4">Você ainda não criou nenhum challenge</div>
         <Button asChild>
-          <Link href="/teacher/create">
+          <Link to="/teacher/create">
             <Plus className="w-4 h-4 mr-2" />
             Criar Primeiro Challenge
           </Link>
@@ -89,7 +91,7 @@ export function TeacherChallengeList({ challenges, onDelete, onSendBackForReview
               asChild
               className="opacity-70 group-hover:opacity-100 transition-opacity duration-200"
             >
-              <Link href={`/edit/${challenge.id}`}>
+              <Link to={buildRoute(`/edit/${challenge.id}`)}>
                 <Edit className="w-4 h-4" />
               </Link>
             </Button>
@@ -165,4 +167,4 @@ export function TeacherChallengeList({ challenges, onDelete, onSendBackForReview
       ))}
     </div>
   )
-}
+}

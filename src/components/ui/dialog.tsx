@@ -1,8 +1,8 @@
-"use client"
 import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { usePortalContainer } from "@/contexts/PortalContainerContext"
 const Dialog = DialogPrimitive.Root
 const DialogTrigger = DialogPrimitive.Trigger
 const DialogPortal = DialogPrimitive.Portal
@@ -24,8 +24,10 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <DialogPortal>
+>(({ className, children, ...props }, ref) => {
+  const portalContainer = usePortalContainer()
+  return (
+    <DialogPortal container={portalContainer ?? undefined}>
     <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
@@ -41,8 +43,9 @@ const DialogContent = React.forwardRef<
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
-  </DialogPortal>
-))
+      </DialogPortal>
+  )
+})
 DialogContent.displayName = DialogPrimitive.Content.displayName
 const DialogHeader = ({
   className,
@@ -106,4 +109,4 @@ export {
   DialogFooter,
   DialogTitle,
   DialogDescription,
-}
+}

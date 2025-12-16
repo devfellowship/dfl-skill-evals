@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useNavigate } from 'react-router-dom'
+import { useBasePath } from '@/contexts/BasePathContext'
 import { Card, CardContent } from '@/components/ui/card'
 import { toast } from 'sonner'
 import { ResetPasswordHeader } from '@/components/molecules/ResetPasswordHeader/ResetPasswordHeader'
@@ -11,7 +12,8 @@ export function ResetPasswordForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [isEmailSent, setIsEmailSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const router = useRouter()
+  const navigate = useNavigate()
+  const { buildRoute } = useBasePath()
   const { resetPassword } = useAuth()
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -34,7 +36,7 @@ export function ResetPasswordForm() {
     }
   }
   const handleBackToLogin = () => {
-    router.push('/login')
+    navigate(buildRoute('/login'))
   }
   const handleResendEmail = () => {
     setIsEmailSent(false)
@@ -104,4 +106,4 @@ export function ResetPasswordForm() {
       </div>
     </div>
   )
-}
+}

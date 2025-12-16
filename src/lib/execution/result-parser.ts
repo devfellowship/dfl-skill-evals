@@ -1,7 +1,7 @@
-import type { TestCase, TestResult } from '@/types/execution'
+import type { ExecutionTestCase as TestCase, TestResult } from '@/types/editor/execution'
 import type { Judge0Result } from '../judge0-config'
 export function parseJudge0Result(
-  result: Judge0Result, 
+  result: Judge0Result,
   testCase: TestCase
 ): Omit<TestResult, 'executionTime'> {
   if (result.compile_output && result.compile_output.trim()) {
@@ -19,7 +19,7 @@ export function parseJudge0Result(
       input: testCase.input,
       expectedOutput: testCase.expectedOutput,
       actualOutput: null,
-      status: 'error', 
+      status: 'error',
       error: `Runtime Error: ${result.stderr.trim()}`,
       memory: result.memory || 0,
     }
@@ -75,8 +75,8 @@ export function parseJudge0Result(
       memory: result.memory || 0,
     }
   }
-  const expectedStr = Array.isArray(testCase.expectedOutput) 
-    ? JSON.stringify(testCase.expectedOutput) 
+  const expectedStr = Array.isArray(testCase.expectedOutput)
+    ? JSON.stringify(testCase.expectedOutput)
     : String(testCase.expectedOutput)
   const normalizedActual = actualOutput.replace(/\s+/g, '')
   const normalizedExpected = expectedStr.replace(/\s+/g, '')
@@ -88,4 +88,4 @@ export function parseJudge0Result(
     status: passed ? 'passed' : 'failed',
     memory: result.memory || 0,
   }
-}
+}

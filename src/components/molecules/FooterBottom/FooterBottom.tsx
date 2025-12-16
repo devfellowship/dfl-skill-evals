@@ -1,4 +1,4 @@
-import Link from "next/link"
+import { Link } from 'react-router-dom'
 export function FooterBottom() {
   return (
     <div className="border-t border-border/40 mt-6 pt-8">

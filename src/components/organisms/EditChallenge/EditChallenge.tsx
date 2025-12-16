@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useNavigate } from 'react-router-dom'
 import { useChallengeOperations } from '@/hooks/useChallengeOperations'
 import { useUserRole } from '@/hooks/useUserRole'
 import { useChallengeForm } from '@/hooks/challenge/useChallengeForm'
@@ -9,7 +9,7 @@ import { Button } from "@/components/atoms/Button/Button"
 import { LoadingState } from "@/components/molecules/LoadingState/LoadingState"
 import { NotFoundState } from "@/components/molecules/NotFoundState/NotFoundState"
 import { Save, ArrowLeft } from "lucide-react"
-import Link from "next/link"
+import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 
 interface EditChallengeProps {
@@ -17,7 +17,7 @@ interface EditChallengeProps {
 }
 
 export function EditChallenge({ challengeId }: EditChallengeProps) {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { updateChallenge, isApproving } = useChallengeOperations()
   const { role, label, isAdmin } = useUserRole()
   const [isLoading, setIsLoading] = useState(true)
@@ -118,7 +118,7 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
       const result = await updateChallenge(challengeId, updateData)
       if (result) {
         toast.success('Challenge atualizada com sucesso!')
-        router.push(role === 'admin' ? '/admin' : '/teacher')
+        navigate(role === 'admin' ? '/admin' : '/teacher')
       } else {
         toast.error('Erro ao atualizar challenge')
       }
@@ -156,7 +156,7 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
                 Edite as informações da challenge "{challenge.title}"
               </p>
             </div>
-            <Link href={role === 'admin' ? "/admin" : "/teacher"}>
+            <Link to={role === 'admin' ? "/admin" : "/teacher"}>
               <Button variant="outline">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Voltar
@@ -191,7 +191,7 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
 
             {/* Botões de Ação */}
             <div className="flex items-center justify-end gap-4 mt-8 p-6 bg-muted/30 border rounded-lg">
-              <Link href={role === 'admin' ? "/admin" : "/teacher"}>
+              <Link to={role === 'admin' ? "/admin" : "/teacher"}>
                 <Button type="button" variant="outline" disabled={!!isApproving}>
                   Cancelar
                 </Button>

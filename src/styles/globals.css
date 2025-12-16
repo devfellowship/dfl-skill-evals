@@ -3,7 +3,13 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
+  /*
+    IMPORTANTE (Module Federation):
+    Este arquivo não pode alterar :root/body globalmente, senão "vaza" estilos no HOST
+    e pode deixar o layout inteiro branco. Por isso, escopamos tudo em .devshaper-scope.
+  */
+  /* Sem :where() para aumentar a especificidade e vencer resets globais do host */
+  .devshaper-scope {
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
@@ -39,7 +45,7 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
-  .dark {
+  .dark .devshaper-scope {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
     --card: 240 10% 3.9%;
@@ -72,18 +78,257 @@
 }
 
 @layer base {
-  * {
+  /* Sem :where() para vencer resets globais do host (ex: * { border-color: currentColor }) */
+  .devshaper-scope * {
     @apply border-border;
   }
-  body {
-    @apply bg-background text-foreground;
+  /* Não setar background globalmente. O host decide o background. */
+  .devshaper-scope {
+    /* No remote/standalone, o "body" efetivo é o nosso escopo */
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+}
+
+/*
+  HARDENING (Module Federation):
+  Em alguns hosts, existe CSS global que sobrescreve utilitários como `.border` e `.rounded-*`
+  (ex.: definindo `border-color` default, ou zerando `border-radius`).
+  Aqui garantimos, com maior especificidade, que os tokens do mini app mandam *dentro* do escopo.
+*/
+@layer utilities {
+  .devshaper-scope .border {
+    border-color: hsl(var(--border));
+  }
+
+  .devshaper-scope .rounded {
+    border-radius: 0.25rem;
+  }
+
+  .devshaper-scope .rounded-sm {
+    border-radius: calc(var(--radius) - 4px);
+  }
+
+  .devshaper-scope .rounded-md {
+    border-radius: calc(var(--radius) - 2px);
+  }
+
+  .devshaper-scope .rounded-lg {
+    border-radius: var(--radius);
+  }
+
+  .devshaper-scope .rounded-xl {
+    border-radius: 0.75rem;
+  }
+
+  .devshaper-scope .rounded-2xl {
+    border-radius: 1rem;
+  }
+
+  .devshaper-scope .rounded-3xl {
+    border-radius: 1.5rem;
+  }
+
+  .devshaper-scope .rounded-full {
+    border-radius: 9999px;
+  }
+
+  .devshaper-scope .rounded-t-\[10px\] {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+
+  .devshaper-scope .rounded-tl-sm {
+    border-top-left-radius: calc(var(--radius) - 4px);
+  }
+
+  /* Proteção para grid - garante que funcione no host */
+  .devshaper-scope .grid {
+    display: grid !important;
+  }
+
+  .devshaper-scope .grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  }
+
+  .devshaper-scope .grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .devshaper-scope .grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .devshaper-scope .grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  /* Proteção para aspect-ratio - evita cards tremendo no host */
+  .devshaper-scope .aspect-video {
+    aspect-ratio: 16 / 9 !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  /* Proteção para imagens - garante que apareçam no host */
+  .devshaper-scope img {
+    display: block !important;
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  .devshaper-scope .object-cover {
+    object-fit: cover !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  /* Proteção para posicionamento absoluto */
+  .devshaper-scope .absolute {
+    position: absolute !important;
+  }
+
+  .devshaper-scope .relative {
+    position: relative !important;
+  }
+
+  .devshaper-scope .inset-0 {
+    inset: 0 !important;
+  }
+
+  /* Proteção para overflow */
+  .devshaper-scope .overflow-hidden {
+    overflow: hidden !important;
+  }
+
+  /* Proteção para z-index */
+  .devshaper-scope .z-0 {
+    z-index: 0 !important;
+  }
+
+  .devshaper-scope .z-10 {
+    z-index: 10 !important;
+  }
+
+  .devshaper-scope .z-20 {
+    z-index: 20 !important;
+  }
+
+  .devshaper-scope .z-30 {
+    z-index: 30 !important;
+  }
+
+  /* Proteção para gap - evita cards colando */
+  .devshaper-scope .gap-6 {
+    gap: 1.5rem !important;
+  }
+
+  .devshaper-scope .gap-4 {
+    gap: 1rem !important;
+  }
+
+  .devshaper-scope .gap-1 {
+    gap: 0.25rem !important;
+  }
+
+  /* Proteção para flex - evita layout quebrado */
+  .devshaper-scope .flex {
+    display: flex !important;
+  }
+
+  .devshaper-scope .items-center {
+    align-items: center !important;
+  }
+
+  .devshaper-scope .justify-center {
+    justify-content: center !important;
+  }
+
+  .devshaper-scope .justify-between {
+    justify-content: space-between !important;
+  }
+
+  .devshaper-scope .flex-wrap {
+    flex-wrap: wrap !important;
+  }
+
+  /* Proteção para text-align */
+  .devshaper-scope .text-center {
+    text-align: center !important;
+  }
+
+  /* Proteção para width/height */
+  .devshaper-scope .w-full {
+    width: 100% !important;
+  }
+
+  .devshaper-scope .h-full {
+    height: 100% !important;
+  }
+
+  /* Proteção para group hover - caso o host tenha conflitos */
+  .devshaper-scope .group:hover .group-hover\:text-primary {
+    color: hsl(var(--primary)) !important;
+  }
+
+  /* Proteção para cores de texto */
+  .devshaper-scope .text-white {
+    color: rgb(255, 255, 255) !important;
+  }
+
+  .devshaper-scope .text-muted-foreground {
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
+  /* Proteção para backgrounds */
+  .devshaper-scope .bg-background {
+    background-color: hsl(var(--background)) !important;
+  }
+
+  .devshaper-scope .bg-card {
+    background-color: hsl(var(--card)) !important;
+  }
+
+  /* Proteção para borders */
+  .devshaper-scope .border {
+    border-width: 1px !important;
+    border-style: solid !important;
+    border-color: hsl(var(--border)) !important;
+  }
+
+  /* Proteção para spacing (padding/margin) */
+  .devshaper-scope .p-0 {
+    padding: 0 !important;
+  }
+
+  .devshaper-scope .p-4 {
+    padding: 1rem !important;
+  }
+
+  .devshaper-scope .space-y-3 > * + * {
+    margin-top: 0.75rem !important;
+  }
+
+  /* Proteção para line-clamp */
+  .devshaper-scope .line-clamp-2 {
+    overflow: hidden !important;
+    display: -webkit-box !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+  }
+
+  /* Isolamento de contexto de empilhamento */
+  .devshaper-scope {
+    isolation: isolate;
+    position: relative;
   }
 }
 
 /* Custom Assessment Styles */
 @layer components {
   .assessment-container {
-    @apply min-h-screen bg-background;
+    min-height: 100vh;
+    background-color: hsl(var(--background));
   }
 
   .code-editor {

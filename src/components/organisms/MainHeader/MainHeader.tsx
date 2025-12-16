@@ -4,7 +4,8 @@ import { Button } from "@/components/atoms/Button/Button"
 import { SearchButton } from "@/components/atoms/SearchButton/SearchButton"
 import { MainSortButton } from "@/components/atoms/MainSortButton/MainSortButton"
 import { User, LogOut, ArrowUpDown, Hash, Calendar, Zap, Star, Users, ArrowUp, ArrowDown } from "lucide-react"
-import Link from "next/link"
+import { Link } from 'react-router-dom'
+import { useBasePath } from '@/contexts/BasePathContext'
 import type { MainSortType } from "@/lib/main-challenge-sorter"
 import { useAuth } from "@/components/providers/AuthProvider"
 import { useUserRole } from "@/hooks/useUserRole"
@@ -42,6 +43,7 @@ export function MainHeader({
   const { user, signOut } = useAuth()
   const { isAdmin, isMentor, canCreateChallenges, isLoading: roleLoading } = useUserRole()
   const { profile } = useProfile()
+  const { buildRoute } = useBasePath()
   const currentOption = MAIN_SORT_OPTIONS.find(option => option.value === sortBy) || MAIN_SORT_OPTIONS[0]
   const handleSignOut = async () => {
     try {
@@ -72,7 +74,7 @@ export function MainHeader({
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center gap-4 px-6">
         <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+          <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <BrandLogo />
             <span className="text-foreground font-bold text-xl">Devfellowship</span>
           </Link>
@@ -126,7 +128,7 @@ export function MainHeader({
                   variant="outline"
                   className="px-4 py-2 text-sm"
                 >
-                  <Link href="/admin">
+                  <Link to={buildRoute("/admin")}>
                     Admin
                   </Link>
                 </Button>
@@ -137,7 +139,7 @@ export function MainHeader({
                   variant="outline"
                   className="px-4 py-2 text-sm"
                 >
-                  <Link href="/teacher">
+                  <Link to={buildRoute("/teacher")}>
                     Mentor
                   </Link>
                 </Button>
@@ -148,7 +150,7 @@ export function MainHeader({
                   variant="outline"
                   className="px-4 py-2 text-sm"
                 >
-                  <Link href="/create">
+                  <Link to={buildRoute("/create")}>
                     Criar
                   </Link>
                 </Button>
@@ -174,7 +176,7 @@ export function MainHeader({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem asChild>
-                  <Link href="/profile" className="flex items-center gap-2">
+                  <Link to="/profile" className="flex items-center gap-2">
                     <User className="w-4 h-4" />
                     Meu Perfil
                   </Link>
@@ -187,7 +189,7 @@ export function MainHeader({
             </DropdownMenu>
           ) : (
             <Button asChild variant="outline" className="flex items-center gap-2">
-              <Link href="/auth/login">
+              <Link to="/auth/login">
                 <User className="w-4 h-4" />
                 Login
               </Link>
@@ -197,4 +199,4 @@ export function MainHeader({
       </div>
     </header>
   )
-}
+}

@@ -37,10 +37,10 @@ export const JUDGE0_CONFIG = {
     MEMORY_LIMIT: 128000,
     TIMEOUT_MS: 5000,
   } as const,
-  API_URL: (process.env.JUDGE0_API_URL || 'https://judge0.devfellowship.com').replace(/\/$/, ''),
-  API_KEY: process.env.JUDGE0_API_KEY,
+  API_URL: (import.meta.env.VITE_JUDGE0_API_URL || 'https://judge0.devfellowship.com').replace(/\/$/, ''),
+  API_KEY: import.meta.env.VITE_JUDGE0_API_KEY,
   FALLBACK_URLS: [
-    process.env.JUDGE0_API_URL || 'https://judge0.devfellowship.com',
+    import.meta.env.VITE_JUDGE0_API_URL || 'https://judge0.devfellowship.com',
     'http://judge0-ce:2358',
     'https://judge0-ce.p.rapidapi.com'
   ] as const,

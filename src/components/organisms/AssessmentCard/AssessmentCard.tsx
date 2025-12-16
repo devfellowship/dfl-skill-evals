@@ -1,5 +1,5 @@
-import React from "react"
-import Link from "next/link"
+import React, { useEffect } from "react"
+import { Link } from 'react-router-dom'
 import { ArrowRight, Code, Star, Users } from "lucide-react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
@@ -7,6 +7,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { DifficultyIndicator } from "@/components/molecules/DifficultyIndicator/DifficultyIndicator"
 import { ChallengeImage } from "@/components/atoms/ChallengeImage/ChallengeImage"
 import { ChallengeMenu } from "@/components/molecules/ChallengeMenu/ChallengeMenu"
+import { useBasePath } from "@/contexts/BasePathContext"
+import { useModuleFederation } from "@/remote-exports/shared-providers"
 import type { AdminChallenge } from "@/types/admin/admin-dashboard"
 import { formatParticipants, generateSlug } from "@/lib/utils"
 interface AssessmentCardProps {
@@ -18,12 +20,32 @@ export const AssessmentCard = React.forwardRef<
   HTMLDivElement,
   AssessmentCardProps
 >(({ assessment, className, isTrending = false, ...props }, ref) => {
+  const { buildRoute } = useBasePath()
+  const isInHost = useModuleFederation()
+
+  useEffect(() => {
+    if (isInHost) {
+      console.group('🎴 [HOST DEBUG] AssessmentCard Renderizado:', assessment.title)
+      console.log('📦 id:', assessment.id)
+      console.log('📦 title:', assessment.title)
+      console.log('📦 image:', assessment.image)
+      console.log('📦 category:', assessment.category)
+      console.log('📦 difficulty:', assessment.difficulty)
+      console.log('📦 isTrending:', isTrending)
+      console.log('🔗 basePath:', buildRoute(''))
+      console.log('🔗 challengeRoute:', buildRoute(`/challenge/pre/${generateSlug(assessment.title)}`))
+      console.groupEnd()
+    }
+  }, [assessment, isInHost, buildRoute, isTrending])
+
+  const imageUrl = assessment.image?.includes('/defaults/Default.jpg') ? undefined : assessment.image
+
   return (
     <Card className="group overflow-hidden border border-border/50 bg-background transition-all duration-200 hover:shadow-md hover:border-border">
       <CardContent className="p-0">
-        <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-primary/5 to-primary/10">
+        <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-primary/5 to-primary/10" style={{ width: '100%', aspectRatio: '16/9', position: 'relative', overflow: 'hidden' }}>
           <ChallengeImage
-            imageUrl={assessment.image}
+            imageUrl={imageUrl}
             category={assessment.category}
             difficulty={assessment.difficulty}
             title={assessment.title}
@@ -90,7 +112,7 @@ export const AssessmentCard = React.forwardRef<
               className="w-full"
               variant="outline"
             >
-              <Link href={`/challenge/pre/${generateSlug(assessment.title)}`}>
+              <Link to={buildRoute(`/challenge/pre/${generateSlug(assessment.title)}`)}>
                 Start Challenge
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>

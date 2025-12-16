@@ -51,6 +51,8 @@ export const DeletedChallengesPanel: React.FC<DeletedChallengesPanelProps> = ({
       await restoreChallenge(challenge.id)
       await fetchDeletedChallenges()
     } catch (error) {
+      console.error('Error restoring challenge:', error)
+    }
   }
 
   const handlePermanentDelete = async (challenge: DeletedChallenge) => {
