@@ -1,5 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next";
+import Script from "next/script";
 import "../styles/globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider"
 import { AuthProvider } from "@/components/providers/AuthProvider"
@@ -16,6 +17,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <Script
+          src="https://analytics.devfellowship.com/script.js"
+          data-website-id="769427a4-fb9a-46af-bfa0-7f828b5491bc"
+          strategy="afterInteractive"
+        />
+      </head>
       <body className="min-h-screen bg-background font-sans antialiased">
         <ThemeProvider
           attribute="class"
