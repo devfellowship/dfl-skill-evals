@@ -11,12 +11,10 @@ export async function PATCH(
     if (authError || !user) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
-    const { data: profile, error: profileError } = await supabase
-      .from('users_with_roles')
-      .select('roles')
-      .eq('id', user.id)
-      .single()
-    if (profileError || !profile?.roles?.includes('admin')) {
+    const { data: iamData, error: iamError } = await supabase.rpc('get_my_iam_role')
+    const iamRoles = (iamData as { role_id: string; level: number }[] | null) || []
+    const iamRole = iamRoles[0]
+    if (iamError || !iamRole || iamRole.level < 80) {
       return NextResponse.json({ error: 'Acesso negado. Apenas administradores podem atualizar credenciais.' }, { status: 403 })
     }
     const { id: userId } = params
@@ -28,7 +26,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Email ou senha deve ser fornecido' }, { status: 400 })
     }
     const { data: before, error: beforeError } = await supabase
-      .from('users_with_roles')
+      .from('profiles')
       .select('email')
       .eq('id', userId)
       .single()
@@ -52,7 +50,7 @@ export async function PATCH(
     }
     if (email && email !== before.email) {
       await supabase
-        .from('users_with_roles')
+        .from('profiles')
         .update({ email, updated_at: new Date().toISOString() })
         .eq('id', userId)
     }

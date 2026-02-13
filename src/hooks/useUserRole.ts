@@ -45,17 +45,16 @@ export function useUserRole(): UserRoleInfo {
         if (alive) setInfo(getUnauthenticatedRoleInfo())
         return
       }
-      const { data: rolesData, error: rolesError } = await supabase
-        .from('users_with_roles')
-        .select('roles')
-        .eq('id', userId)
-        .maybeSingle()
-      if (rolesError || !rolesData) {
+      const { data: iamData, error: iamError } = await supabase
+        .rpc('get_my_iam_role')
+      if (iamError || !iamData) {
         if (alive) setInfo(getDefaultRoleInfo())
         return
       }
-      const highest = pickHighestRole(rolesData?.roles as string[] | undefined)
-      const appRole = mapSupabaseToAppRole(highest)
+      const roles = (iamData as { role_id: string; level: number }[] | null) || []
+      const iamRole = roles[0]
+      // Map IAM level to app role: level >= 80 = admin, else community_member
+      const appRole: AppRole = iamRole && iamRole.level >= 80 ? 'admin' : 'community_member'
       if (alive) setInfo(getRoleInfo(appRole as unknown as UserRole))
     }
     run()

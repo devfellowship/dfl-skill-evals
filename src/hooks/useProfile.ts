@@ -26,28 +26,26 @@ export const useProfile = () => {
     try {
       setLoading(true)
       setError(null)
-      const [profileResult, userRolesResult] = await Promise.all([
+      const [profileResult, iamResult] = await Promise.all([
         supabase
           .from('profiles')
           .select('*')
           .eq('id', user.id)
           .maybeSingle(),
-        supabase
-          .from('users_with_roles')
-          .select('name, roles')
-          .eq('id', user.id)
-          .maybeSingle()
+        supabase.rpc('get_my_iam_role')
       ])
       const profileData = profileResult.data
-      const userRolesData = userRolesResult.data
       if (profileResult.error && !profileData) {
         throw profileResult.error
       }
+      const iamRoles = (iamResult.data as { role_id: string; level: number }[] | null) || []
+      const iamRole = iamRoles[0]
+      const mappedRole: UserRole = iamRole && iamRole.level >= 80 ? 'admin' : 'community_member'
       const mapped: Profile = {
         id: user.id,
         email: profileData?.email || user.email || '',
-        full_name: profileData?.full_name || userRolesData?.name || user.user_metadata?.full_name || '',
-        role: (profileData?.role as UserRole) || 'community_member',
+        full_name: profileData?.full_name || profileData?.name || user.user_metadata?.full_name || '',
+        role: mappedRole,
         is_active: profileData?.is_active !== false,
         created_at: profileData?.created_at || new Date().toISOString(),
         updated_at: profileData?.updated_at || new Date().toISOString(),
