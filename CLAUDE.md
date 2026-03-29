@@ -67,3 +67,31 @@ src/
 - Soft delete pattern for challenges — preserve `deleted_at` column logic
 - Rate limiting on code execution — respect `lib/execution/rate-limiter.ts`
 - Role checks: use `RoleGuard` component or `useUserRole` hook
+
+## Post-Sprint Updates
+
+> Added by dev-dfl agent — reflects post-sprint reality (CI, contracts, Infisical, agent context).
+
+### Testing
+- No test framework currently configured
+- If adding tests, prefer **Vitest** for consistency with the DFL ecosystem
+
+### CI / Continuous Integration
+- CI runs **build + test + verify-docs** via the `dfl-ci` reusable workflow
+- Workflow file: `.github/workflows/` — uses `devfellowship/dfl-ci/.github/workflows/ci.yml@main`
+- PRs must pass CI before merge
+
+### Contracts
+- `repo-contract.yaml` exists at repo root — defines the repo's role, ownership, and integration points
+- Keep this file in sync when changing the repo's scope or dependencies
+
+### Agent Context
+- `AGENTS.md` — instructions for AI agents working in this repo
+- `AGENT-PROGRESS.md` — tracks agent task progress and status
+- Update these files when making significant architectural changes
+
+### Secrets & Configuration (Infisical)
+- Secrets are managed via **Infisical** at `infisical.devfellowship.com`
+- Shared secrets path: `/shared/`
+- Do NOT commit secrets to the repo — use Infisical for environment variables
+- Check `repo-contract.yaml` for required environment variables
