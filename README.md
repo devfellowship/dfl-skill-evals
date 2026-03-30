@@ -83,6 +83,18 @@ Infra: Docker, SSH Deploy, Traefik (VPS)
 
 CI/CD: GitHub Actions
 
+⚙️ Configuração Local
+
+1. Instale as dependências com `npm install`
+2. Copie `.env.example` para `.env.local`
+3. Preencha as variáveis obrigatórias:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `JUDGE0_API_URL`
+   - `JUDGE0_API_KEY`
+4. Rode `npm run dev` para subir a aplicação
+
 🗂️ Estrutura de Pastas (Resumo)
 devsharper-app/
  ├── src/
