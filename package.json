@@ -15,7 +15,9 @@
     "migrate:prod": "node docs/migrations/apply-migrations.js --env=production",
     "migrate:status": "node docs/migrations/check-migration-status.js",
     "migrate:status:dev": "node docs/migrations/check-migration-status.js --env=development",
-    "migrate:status:prod": "node docs/migrations/check-migration-status.js --env=production"
+    "migrate:status:prod": "node docs/migrations/check-migration-status.js --env=production",
+    "test": "node --test scripts/aqs-docs.test.mjs",
+    "verify:docs": "node --test scripts/aqs-docs.test.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
