@@ -1,0 +1,740 @@
+openapi: 3.1.0
+info:
+  title: DevSharper — Skill Evaluations API
+  description: >
+    REST API for the dfl-skill-evals coding challenge platform (DevSharper).
+    Provides challenge CRUD, code execution proxying through Judge0, and admin
+    user management. All routes require a valid Supabase session cookie unless
+    marked public.
+  version: 0.1.0
+  contact:
+    name: DevFellowship
+    url: https://devfellowship.com
+
+servers:
+  - url: https://skill-evals.devfellowship.com
+    description: Production
+  - url: http://localhost:3000
+    description: Local development
+
+# ─── Security ────────────────────────────────────────────────────────────────
+
+components:
+  securitySchemes:
+    supabaseSession:
+      type: apiKey
+      in: cookie
+      name: sb-yoojxnggaxcqtsyjdrdx-auth-token
+      description: Supabase session cookie — set automatically on login
+
+  parameters:
+    challengeId:
+      name: id
+      in: path
+      required: true
+      description: UUID of the challenge
+      schema:
+        type: string
+        format: uuid
+    userId:
+      name: id
+      in: path
+      required: true
+      description: UUID of the user
+      schema:
+        type: string
+        format: uuid
+
+  schemas:
+    Challenge:
+      type: object
+      required: [id, title, description, difficulty, language, status, created_by, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          maxLength: 255
+        slug:
+          type: string
+          description: URL-safe identifier derived from title
+        description:
+          type: string
+        difficulty:
+          type: string
+          enum: [easy, medium, hard, expert]
+        language:
+          type: string
+          enum: [typescript, javascript, python, java, cpp, csharp]
+        starter_code:
+          type: string
+          description: Boilerplate code shown to student on challenge start
+        solution_code:
+          type: string
+          description: Hidden reference solution (teacher/admin only)
+        hints:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [to_approve, approved, rejected, archived]
+        created_by:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Soft-delete timestamp — null means active
+        deletion_reason:
+          type: string
+          nullable: true
+
+    TestCase:
+      type: object
+      required: [id, challenge_id, input, expected_output, is_hidden, order_index]
+      properties:
+        id:
+          type: string
+          format: uuid
+        challenge_id:
+          type: string
+          format: uuid
+        input:
+          type: string
+        expected_output:
+          type: string
+        is_hidden:
+          type: boolean
+          description: Hidden test cases are not shown to students
+        order_index:
+          type: integer
+          minimum: 0
+
+    EvaluationLog:
+      type: object
+      required: [id, challenge_id, user_id, code, language, status, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        challenge_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        language:
+          type: string
+          enum: [typescript, javascript, python, java, cpp, csharp]
+        status:
+          type: string
+          enum: [pending, running, accepted, wrong_answer, runtime_error, time_limit_exceeded, compile_error]
+        result:
+          type: object
+          nullable: true
+          description: Raw Judge0 result payload
+        execution_time_ms:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    UserProfile:
+      type: object
+      required: [id, email, full_name, role, is_active]
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        full_name:
+          type: string
+        avatar_url:
+          type: string
+          format: uri
+          nullable: true
+        role:
+          type: string
+          enum: [admin, mentor, community_member]
+        institution:
+          type: string
+          nullable: true
+        bio:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    ExecutionRequest:
+      type: object
+      required: [challenge_id, code, language]
+      properties:
+        challenge_id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          description: Student-submitted source code
+        language:
+          type: string
+          enum: [typescript, javascript, python, java, cpp, csharp]
+
+    ExecutionResult:
+      type: object
+      required: [status, tests_passed, total_tests]
+      properties:
+        status:
+          type: string
+          enum: [accepted, wrong_answer, runtime_error, time_limit_exceeded, compile_error]
+        tests_passed:
+          type: integer
+        total_tests:
+          type: integer
+        execution_time_ms:
+          type: integer
+        compile_error:
+          type: string
+          nullable: true
+        test_results:
+          type: array
+          items:
+            type: object
+            properties:
+              test_case_id:
+                type: string
+                format: uuid
+              passed:
+                type: boolean
+              actual_output:
+                type: string
+              execution_time_ms:
+                type: integer
+
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+        details:
+          type: string
+          nullable: true
+
+    PaginatedChallenges:
+      type: object
+      required: [data, count]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Challenge'
+        count:
+          type: integer
+          description: Total matching records (for pagination)
+
+# ─── Paths ────────────────────────────────────────────────────────────────────
+
+security:
+  - supabaseSession: []
+
+paths:
+
+  # ── Challenges ────────────────────────────────────────────────────────────
+
+  /api/challenges:
+    get:
+      operationId: listChallenges
+      summary: List challenges
+      description: >
+        Returns paginated list of challenges. Students see only approved
+        public challenges. Teachers see their own challenges in any status.
+        Admins see all.
+      tags: [challenges]
+      parameters:
+        - name: status
+          in: query
+          description: Filter by challenge status
+          schema:
+            type: string
+            enum: [to_approve, approved, rejected, archived]
+        - name: difficulty
+          in: query
+          schema:
+            type: string
+            enum: [easy, medium, hard, expert]
+        - name: language
+          in: query
+          schema:
+            type: string
+            enum: [typescript, javascript, python, java, cpp, csharp]
+        - name: search
+          in: query
+          description: Full-text search on title and description
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Paginated list of challenges
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedChallenges'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      operationId: createChallenge
+      summary: Create a challenge
+      description: >
+        Creates a new challenge with status 'to_approve'. Only teachers and
+        admins may call this endpoint.
+      tags: [challenges]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, description, difficulty, language, starter_code]
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                difficulty:
+                  type: string
+                  enum: [easy, medium, hard, expert]
+                language:
+                  type: string
+                  enum: [typescript, javascript, python, java, cpp, csharp]
+                starter_code:
+                  type: string
+                hints:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '201':
+          description: Challenge created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Challenge'
+        '403':
+          description: Forbidden — requires teacher or admin role
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/challenges/{id}:
+    get:
+      operationId: getChallenge
+      summary: Get a single challenge
+      tags: [challenges]
+      parameters:
+        - $ref: '#/components/parameters/challengeId'
+      responses:
+        '200':
+          description: Challenge details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Challenge'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      operationId: updateChallenge
+      summary: Update a challenge
+      description: >
+        Teachers may update their own challenges. Admins may update any.
+        Status transitions are validated server-side.
+      tags: [challenges]
+      parameters:
+        - $ref: '#/components/parameters/challengeId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                difficulty:
+                  type: string
+                  enum: [easy, medium, hard, expert]
+                language:
+                  type: string
+                  enum: [typescript, javascript, python, java, cpp, csharp]
+                starter_code:
+                  type: string
+                status:
+                  type: string
+                  enum: [to_approve, approved, rejected, archived]
+                hints:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Updated challenge
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Challenge'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      operationId: softDeleteChallenge
+      summary: Soft-delete a challenge
+      description: >
+        Sets deleted_at timestamp. Does NOT hard-delete. Admin only.
+        Requires deletion_reason in body.
+      tags: [challenges]
+      parameters:
+        - $ref: '#/components/parameters/challengeId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [deletion_reason]
+              properties:
+                deletion_reason:
+                  type: string
+                  minLength: 10
+      responses:
+        '200':
+          description: Challenge soft-deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Challenge'
+        '403':
+          description: Forbidden — admin only
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ── Code Execution ────────────────────────────────────────────────────────
+
+  /api/execute-code:
+    post:
+      operationId: executeCode
+      summary: Execute code against challenge test cases
+      description: >
+        Proxies code execution through the lib/execution/ pipeline to Judge0.
+        Rate limited to 100 requests/hour per user. Returns test pass/fail
+        results and execution metadata.
+      tags: [execution]
+      x-rate-limit: 100/hour per user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecutionRequest'
+      responses:
+        '200':
+          description: Execution result with test outcomes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionResult'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              headers:
+                X-RateLimit-Reset:
+                  description: Unix timestamp when rate limit resets
+                  schema:
+                    type: integer
+        '503':
+          description: Judge0 service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ── Admin — Users ─────────────────────────────────────────────────────────
+
+  /api/admin/users:
+    get:
+      operationId: adminListUsers
+      summary: List all users (admin only)
+      tags: [admin]
+      parameters:
+        - name: role
+          in: query
+          schema:
+            type: string
+            enum: [admin, mentor, community_member]
+        - name: is_active
+          in: query
+          schema:
+            type: boolean
+        - name: search
+          in: query
+          description: Filter by email or name
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: List of user profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserProfile'
+        '403':
+          description: Forbidden — admin role required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      operationId: adminCreateUser
+      summary: Create a new user (admin only)
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, full_name, role]
+              properties:
+                email:
+                  type: string
+                  format: email
+                full_name:
+                  type: string
+                role:
+                  type: string
+                  enum: [admin, mentor, community_member]
+                institution:
+                  type: string
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      operationId: adminUpdateUser
+      summary: Update a user profile (admin only)
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                full_name:
+                  type: string
+                role:
+                  type: string
+                  enum: [admin, mentor, community_member]
+                is_active:
+                  type: boolean
+                institution:
+                  type: string
+      responses:
+        '200':
+          description: Updated user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+
+    delete:
+      operationId: adminDeleteUser
+      summary: Deactivate a user (admin only)
+      description: Sets is_active=false. Does not delete the auth account.
+      tags: [admin]
+      responses:
+        '200':
+          description: User deactivated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+
+  /api/admin/users/{id}/credentials:
+    get:
+      operationId: adminGetCredentials
+      summary: View user credentials (admin only)
+      tags: [admin]
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '200':
+          description: User credential details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  email:
+                    type: string
+                  role:
+                    type: string
+                  last_sign_in_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+
+    patch:
+      operationId: adminUpdateCredentials
+      summary: Update user credentials (admin only)
+      description: Update email or trigger password reset. Logs to apps.app_logs.
+      tags: [admin]
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                trigger_password_reset:
+                  type: boolean
+      responses:
+        '200':
+          description: Credentials updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+
+  /api/admin/create-profile:
+    post:
+      operationId: adminCreateProfile
+      summary: Create a user profile with role assignment (admin only)
+      description: >
+        Creates the public.profiles record for a new auth user and assigns
+        their initial role. Used after Supabase Auth user creation.
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [user_id, email, full_name, role]
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                email:
+                  type: string
+                  format: email
+                full_name:
+                  type: string
+                role:
+                  type: string
+                  enum: [admin, mentor, community_member]
+                institution:
+                  type: string
+      responses:
+        '201':
+          description: Profile created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '409':
+          description: Profile already exists for this user_id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+# ─── Tags ─────────────────────────────────────────────────────────────────────
+
+tags:
+  - name: challenges
+    description: Challenge CRUD — browsing, creation, updates, soft-delete
+  - name: execution
+    description: Code execution pipeline — proxied through Judge0
+  - name: admin
+    description: Admin-only endpoints — user management and credential operations
