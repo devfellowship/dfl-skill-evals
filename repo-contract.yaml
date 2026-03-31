@@ -1,9 +1,14 @@
+# Managed merge scaffold for dfl-skill-evals/repo-contract.yaml
+# Human edits belong only inside MANUAL blocks.
+
+<!-- BEGIN GENERATED:repo-contract/base -->
+<!-- render-meta: repo=dfl-skill-evals; mode=merge; hash=e7a56517d4d9a16423af633cdcfcd5fe0a403d427cb0f310ab86529581deb8ed -->
 # repo-contract.yaml — Machine-readable contract for dfl-skill-evals
 
 name: dfl-skill-evals
-description: {{One-line description}}
+description: Generated contract scaffold for dfl-skill-evals
 
-type: {{infrastructure|platform|application|library|content}}
+type: platform
 
 provides:
   # - type: api|package|webhook|ui
@@ -27,3 +32,8 @@ health_check:
   command: npm run build
 
 agent_entry_point: CLAUDE.md
+<!-- END GENERATED:repo-contract/base -->
+
+<!-- BEGIN MANUAL:repo-contract/local -->
+<!-- repo-specific notes live here -->
+<!-- END MANUAL:repo-contract/local -->
