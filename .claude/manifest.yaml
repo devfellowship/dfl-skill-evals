@@ -1,2 +1,49 @@
-# Placeholder for dfl-skill-evals/.claude/manifest.yaml
-# Assumption: canonical source is not available yet in dfl-hq.
+# .claude/manifest.yaml — dfl-skill-evals
+# Structured repo metadata for AI context distribution.
+
+repo: dfl-skill-evals
+display_name: DevSharper — Skill Evaluations
+description: >
+  Coding challenge and technical assessment platform. Students solve
+  challenges in-browser with live Judge0 code execution. Teachers author
+  challenges with test cases. Admins manage content and users.
+
+type: platform
+status: active
+
+stack:
+  framework: Next.js 15 (App Router)
+  runtime: Node.js
+  language: TypeScript
+  ui: React 19 + shadcn/ui + Radix + Tailwind CSS
+  database: Supabase (shared instance)
+  code_execution: Judge0 (self-hosted Docker)
+  testing: Vitest + node:test
+  components: Storybook 9
+
+schemas:
+  owns: [skill_evals]
+  reads: [public]
+
+roles:
+  - student   # Solve challenges, view results
+  - teacher   # Create and edit own challenges
+  - admin     # Full management of challenges and users
+
+key_paths:
+  entry: CLAUDE.md
+  contract: repo-contract.yaml
+  components: src/components/
+  api_routes: src/app/api/
+  execution_pipeline: src/lib/execution/
+  supabase_clients: src/lib/supabase/
+  types: src/interface/
+  ci: .github/workflows/
+
+cross_repo_links:
+  - dfl-learn        # Challenges complement LMS courses
+  - dfl-reviews      # Shared approval/rejection patterns
+  - dfl-schema       # Schema DDL ownership
+  - dfl-iam          # Role hierarchy dependency
+
+env_file: .env.example

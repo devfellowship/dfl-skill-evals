@@ -1,39 +1,170 @@
-# Managed merge scaffold for dfl-skill-evals/repo-contract.yaml
-# Human edits belong only inside MANUAL blocks.
-
-<!-- BEGIN GENERATED:repo-contract/base -->
-<!-- render-meta: repo=dfl-skill-evals; mode=merge; hash=e7a56517d4d9a16423af633cdcfcd5fe0a403d427cb0f310ab86529581deb8ed -->
 # repo-contract.yaml — Machine-readable contract for dfl-skill-evals
+# Defines public interfaces, dependencies, environment, and agent guidelines.
 
 name: dfl-skill-evals
-description: Generated contract scaffold for dfl-skill-evals
-
+description: >
+  Coding challenge and technical assessment platform (DevSharper).
+  Students solve challenges in-browser with live code execution via Judge0.
+  Teachers create and manage challenges. Admins oversee all content and users.
 type: platform
+stack: Next.js 15 (App Router) + React 19 + TypeScript + Supabase + Judge0
 
+# ─── Schema Ownership ───────────────────────────────────────────────
+schema_ownership:
+  primary_schema: skill_evals
+  tables:
+    - skill_evals.challenges        # Challenge definitions, soft-delete via deleted_at
+    - skill_evals.test_cases        # Per-challenge test cases for Judge0 evaluation
+    - skill_evals.evaluation_logs   # Submission results and execution history
+  shared_schemas:
+    - public                        # profiles, members, roles (read-only consumer)
+
+# ─── Provides ───────────────────────────────────────────────────────
 provides:
-  # - type: api|package|webhook|ui
-  #   name: auth-endpoints
-  #   description: Authentication and session management
-  []
+  - type: ui
+    name: challenge-platform
+    description: Full challenge browsing, execution, and management UI
+    routes:
+      - /                           # Home — challenge grid
+      - /challenge/[id]             # Challenge execution page (code editor + Judge0)
+      - /challenge/pre/[id]         # Pre-challenge info and instructions
+      - /teacher                    # Teacher dashboard — create/edit challenges
+      - /admin                      # Admin dashboard — manage challenges and users
 
+  - type: api
+    name: challenge-crud
+    description: CRUD endpoints for challenge management
+    routes:
+      - /api/challenges             # GET (list), POST (create)
+      - /api/challenges/[id]        # GET, PATCH, DELETE (soft delete)
+
+  - type: api
+    name: code-execution
+    description: Proxied code execution through Judge0
+    routes:
+      - /api/execute-code           # POST — submit code, return results
+
+  - type: api
+    name: admin-users
+    description: Admin user management endpoints
+    routes:
+      - /api/admin/users            # User role and profile management
+
+# ─── Consumes ───────────────────────────────────────────────────────
 consumes:
-  # - repo: dfl-schema
-  #   resource: supabase-tables
-  #   tables: [users, courses]
-  # - external: true
-  #   name: stripe
-  []
+  - repo: dfl-schema
+    resource: supabase-tables
+    schemas: [skill_evals, public]
+    description: All DDL managed via dfl-schema migrations
 
+  - repo: dfl-iam
+    resource: role-model
+    description: >
+      Role hierarchy (student/teacher/admin) enforced via RoleGuard component
+      and useUserRole hook. Maps to IAM role levels.
+
+  - repo: dfl-learn
+    resource: cross-repo-integration
+    description: >
+      Skill assessments complement LMS course content. dfl-learn links to
+      challenge pages; shared user profiles in public schema.
+
+  - external: true
+    name: judge0
+    description: >
+      Docker-based code execution engine. Self-hosted at judge0.devfellowship.com.
+      Setup: src/Judge0/docker-compose.yml + setup-judge0.sh.
+
+  - external: true
+    name: supabase-auth
+    description: Authentication and session management via Supabase Auth
+
+# ─── Environment ────────────────────────────────────────────────────
 environment:
-  required: []
+  required:
+    - name: NEXT_PUBLIC_SUPABASE_URL
+      description: Supabase project URL
+      example: https://yoojxnggaxcqtsyjdrdx.supabase.co
+    - name: NEXT_PUBLIC_SUPABASE_ANON_KEY
+      description: Supabase anonymous/public API key
+    - name: SUPABASE_SERVICE_ROLE_KEY
+      description: Supabase service role key (server-side only, never expose to client)
+    - name: JUDGE0_API_URL
+      description: Judge0 code execution API endpoint
+      example: https://judge0.devfellowship.com
+    - name: JUDGE0_API_KEY
+      description: API key for Judge0 authentication
+
   optional: []
 
+  env_file: .env.example
+
+# ─── Testing ────────────────────────────────────────────────────────
+testing:
+  unit:
+    runner: vitest
+    command: npm run test:unit
+    config: vitest.config.ts
+  docs:
+    runner: node --test
+    command: npm run verify:docs
+    description: AQS documentation verification tests
+  storybook:
+    command: npm run storybook
+    description: Component explorer on port 6006
+
+# ─── Health Check ───────────────────────────────────────────────────
 health_check:
   command: npm run build
+  lint: npm run lint
+  test: npm run test:unit
 
-agent_entry_point: CLAUDE.md
-<!-- END GENERATED:repo-contract/base -->
+# ─── CI/CD ──────────────────────────────────────────────────────────
+ci:
+  workflows:
+    - .github/workflows/ci.yml         # Lint + build + test on PR
+    - .github/workflows/deploy.yml     # Production deployment
+    - .github/workflows/auto-assign.yml # PR auto-assign
 
-<!-- BEGIN MANUAL:repo-contract/local -->
-<!-- repo-specific notes live here -->
-<!-- END MANUAL:repo-contract/local -->
+# ─── Cross-Repo Integration Points ─────────────────────────────────
+cross_repo:
+  - target: dfl-learn
+    relationship: complementary
+    description: >
+      dfl-learn links students to skill challenges. Shared user identity
+      via public.profiles. Assessment results may feed into learning progress.
+
+  - target: dfl-reviews
+    relationship: pattern-shared
+    description: >
+      Challenge approval/rejection flow mirrors dfl-reviews patterns.
+      Both use status-based workflows with role-gated transitions.
+
+  - target: dfl-schema
+    relationship: dependency
+    description: >
+      All skill_evals schema DDL (CREATE, ALTER, DROP) goes through
+      dfl-schema PRs. Never apply DDL directly.
+
+# ─── Agent Guidelines ──────────────────────────────────────────────
+agent_guidelines:
+  entry_point: CLAUDE.md
+  key_rules:
+    - Atomic design hierarchy: atoms → molecules → organisms (each in own folder)
+    - All code execution routes through lib/execution/ pipeline — never call Judge0 directly
+    - Server-side Supabase client for API routes via lib/supabase/server-clients.ts
+    - Soft delete for challenges — preserve deleted_at column logic, never hard delete
+    - Rate limiting on code execution — respect lib/execution/rate-limiter.ts
+    - Role checks via RoleGuard component or useUserRole hook
+  file_conventions:
+    components: src/components/{atoms,molecules,organisms}/
+    hooks: src/hooks/
+    types: src/interface/ and src/types/
+    api_routes: src/app/api/
+    supabase_clients: src/lib/supabase/
+    execution_pipeline: src/lib/execution/
+  do_not:
+    - Run DDL on production — all schema changes go through dfl-schema
+    - Bypass rate limiter in lib/execution/rate-limiter.ts
+    - Expose SUPABASE_SERVICE_ROLE_KEY to client-side code
+    - Hard-delete challenges — always use soft delete via deleted_at
