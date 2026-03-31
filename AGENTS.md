@@ -1,3 +1,8 @@
+# Managed merge scaffold for dfl-skill-evals/AGENTS.md
+# Human edits belong only inside MANUAL blocks.
+
+<!-- BEGIN GENERATED:agents/base -->
+<!-- render-meta: repo=dfl-skill-evals; mode=merge; hash=aa664dcbdd77205a6d912208ee741445c4b19b1951050667bf99c6df032511b5 -->
 # AGENTS.md — Rules for AI Agents in dfl-skill-evals
 
 > Read this before touching anything. Non-negotiable.
@@ -34,3 +39,8 @@
 2. Check dfl-hq for ADRs
 3. Look at similar DFL repos
 4. If still stuck, say so clearly — don't guess and ship
+<!-- END GENERATED:agents/base -->
+
+<!-- BEGIN MANUAL:repo/agent-notes -->
+<!-- repo-specific notes live here -->
+<!-- END MANUAL:repo/agent-notes -->
