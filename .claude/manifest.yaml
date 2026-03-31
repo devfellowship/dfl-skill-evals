@@ -10,40 +10,94 @@ description: >
 
 type: platform
 status: active
+version: 0.1.0
 
 stack:
   framework: Next.js 15 (App Router)
-  runtime: Node.js
-  language: TypeScript
+  runtime: Node.js 20
+  language: TypeScript 5.x
   ui: React 19 + shadcn/ui + Radix + Tailwind CSS
   database: Supabase (shared instance)
   code_execution: Judge0 (self-hosted Docker)
-  testing: Vitest + node:test
+  testing: Vitest + Playwright + node:test
   components: Storybook 9
+  auth: Supabase Auth + RoleGuard
 
 schemas:
   owns: [skill_evals]
-  reads: [public]
+  reads: [public, apps]
+  tables:
+    - skill_evals.challenges
+    - skill_evals.test_cases
+    - skill_evals.evaluation_logs
+  views:
+    - public.users_with_roles
+  rpc:
+    - get_deletion_stats
 
 roles:
-  - student   # Solve challenges, view results
-  - teacher   # Create and edit own challenges
-  - admin     # Full management of challenges and users
+  - name: student
+    level: 50
+    capabilities: [solve_challenges, view_results, view_hints]
+  - name: teacher
+    level: 80
+    capabilities: [create_challenges, edit_own_challenges, manage_test_cases, view_submissions]
+  - name: admin
+    level: 100
+    capabilities: [manage_all_challenges, manage_users, view_audit_logs, soft_delete_restore]
+
+api_surface:
+  routes:
+    - path: /api/challenges
+      methods: [GET, POST]
+    - path: /api/challenges/[id]
+      methods: [GET, PATCH, DELETE]
+    - path: /api/execute-code
+      methods: [POST]
+    - path: /api/admin/users
+      methods: [GET, POST, PATCH, DELETE]
+    - path: /api/admin/users/[id]/credentials
+      methods: [GET, PATCH]
+    - path: /api/admin/create-profile
+      methods: [POST]
+  hooks:
+    - useChallenges
+    - useChallengesGlobal
+    - useChallengeDetails
+    - useChallengeExecution
+    - useChallengeOperations
+    - useTrendingChallenges
+    - useTestRunner
+    - useUserRole
+    - useProfile
+    - useAuth
+    - useSoftDeleteAudit
+    - useDashboardAdmin
 
 key_paths:
   entry: CLAUDE.md
   contract: repo-contract.yaml
+  changelog: CHANGELOG.md
   components: src/components/
   api_routes: src/app/api/
   execution_pipeline: src/lib/execution/
   supabase_clients: src/lib/supabase/
   types: src/interface/
   ci: .github/workflows/
+  e2e: e2e/
 
 cross_repo_links:
-  - dfl-learn        # Challenges complement LMS courses
-  - dfl-reviews      # Shared approval/rejection patterns
-  - dfl-schema       # Schema DDL ownership
-  - dfl-iam          # Role hierarchy dependency
+  - repo: dfl-learn
+    relationship: complementary
+    description: Challenges complement LMS courses
+  - repo: dfl-reviews
+    relationship: pattern-shared
+    description: Shared approval/rejection patterns
+  - repo: dfl-schema
+    relationship: dependency
+    description: Schema DDL ownership
+  - repo: dfl-iam
+    relationship: dependency
+    description: Role hierarchy dependency
 
 env_file: .env.example

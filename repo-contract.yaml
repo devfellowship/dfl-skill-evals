@@ -13,11 +13,43 @@ stack: Next.js 15 (App Router) + React 19 + TypeScript + Supabase + Judge0
 schema_ownership:
   primary_schema: skill_evals
   tables:
-    - skill_evals.challenges        # Challenge definitions, soft-delete via deleted_at
-    - skill_evals.test_cases        # Per-challenge test cases for Judge0 evaluation
-    - skill_evals.evaluation_logs   # Submission results and execution history
+    - name: skill_evals.challenges
+      description: Challenge definitions with soft-delete via deleted_at
+      columns: [id, title, slug, description, difficulty, language, starter_code, solution_code, hints, status, created_by, created_at, updated_at, deleted_at, deletion_reason]
+      rls: true
+      soft_delete: true
+
+    - name: skill_evals.test_cases
+      description: Per-challenge test cases for Judge0 evaluation
+      columns: [id, challenge_id, input, expected_output, is_hidden, order_index]
+      rls: true
+
+    - name: skill_evals.evaluation_logs
+      description: Submission results and execution history
+      columns: [id, challenge_id, user_id, code, language, status, result, execution_time_ms, created_at]
+      rls: true
+
+  views:
+    - name: users_with_roles
+      schema: public
+      description: Joined view of auth.users + profiles + role assignments
+      usage: Role resolution for RoleGuard and admin endpoints
+
+  rpc_functions:
+    - name: get_deletion_stats
+      description: Aggregated soft-delete statistics for admin audit dashboard
+      called_from: useSoftDeleteAudit hook
+
   shared_schemas:
-    - public                        # profiles, members, roles (read-only consumer)
+    - schema: public
+      tables_read: [profiles]
+      views_read: [users_with_roles]
+      tables_write: [profiles]
+      description: User profiles and role views (read/write for profile setup)
+
+    - schema: apps
+      tables_write: [app_logs]
+      description: Audit logging for admin credential operations
 
 # ─── Provides ───────────────────────────────────────────────────────
 provides:
@@ -25,30 +57,87 @@ provides:
     name: challenge-platform
     description: Full challenge browsing, execution, and management UI
     routes:
-      - /                           # Home — challenge grid
-      - /challenge/[id]             # Challenge execution page (code editor + Judge0)
-      - /challenge/pre/[id]         # Pre-challenge info and instructions
-      - /teacher                    # Teacher dashboard — create/edit challenges
-      - /admin                      # Admin dashboard — manage challenges and users
+      - path: /
+        description: Home — challenge grid with filtering and search
+      - path: /challenge/[id]
+        description: Challenge execution page (code editor + Judge0 runner)
+      - path: /challenge/pre/[id]
+        description: Pre-challenge info, instructions, and difficulty display
+      - path: /teacher
+        description: Teacher dashboard — create/edit own challenges
+      - path: /admin
+        description: Admin dashboard — manage all challenges, users, soft-delete audit
+      - path: /auth
+        description: Login and password reset flows
 
   - type: api
     name: challenge-crud
     description: CRUD endpoints for challenge management
+    auth: supabase-session
     routes:
-      - /api/challenges             # GET (list), POST (create)
-      - /api/challenges/[id]        # GET, PATCH, DELETE (soft delete)
+      - path: /api/challenges
+        methods: [GET, POST]
+        description: List challenges (with filters) or create new challenge
+      - path: /api/challenges/[id]
+        methods: [GET, PATCH, DELETE]
+        description: Read, update, or soft-delete a single challenge
 
   - type: api
     name: code-execution
     description: Proxied code execution through Judge0
+    auth: supabase-session
+    rate_limited: true
+    rate_limit: 100 requests/hour per user
     routes:
-      - /api/execute-code           # POST — submit code, return results
+      - path: /api/execute-code
+        methods: [POST]
+        description: Submit code for execution, returns test results
 
   - type: api
     name: admin-users
-    description: Admin user management endpoints
+    description: Admin user and profile management endpoints
+    auth: supabase-session + admin role
     routes:
-      - /api/admin/users            # User role and profile management
+      - path: /api/admin/users
+        methods: [GET, POST, PATCH, DELETE]
+        description: List, create, update, or remove users
+      - path: /api/admin/users/[id]/credentials
+        methods: [GET, PATCH]
+        description: View or update user credentials and roles
+      - path: /api/admin/create-profile
+        methods: [POST]
+        description: Create a new user profile with role assignment
+
+  - type: hooks
+    name: react-hooks
+    description: Reusable React hooks for challenge and user operations
+    exports:
+      - useChallenges          # CRUD operations on challenges list
+      - useChallengesGlobal    # Global challenge state (cross-page)
+      - useChallengeDetails    # Single challenge data fetching
+      - useChallengeExecution  # Code editor + execution state
+      - useChallengeOperations # Create, update, delete challenge mutations
+      - useTrendingChallenges  # Trending/popular challenge queries
+      - useTestRunner          # Judge0 test case execution
+      - useUserRole            # Current user role resolution
+      - useProfile             # User profile data
+      - useAuth                # Auth state and session
+      - useSoftDeleteAudit     # Soft-delete audit trail and stats
+      - useDashboardAdmin      # Admin dashboard data aggregation
+      - useUserOutputExecution # User code output state
+      - useUserValidation      # Input validation utilities
+
+  - type: types
+    name: type-exports
+    description: Core TypeScript interfaces
+    path: src/interface/
+    exports:
+      - Challenge              # Challenge entity
+      - Assessment             # Assessment/evaluation result
+      - Execution              # Code execution request/response
+      - User                   # User profile with role
+      - Stats                  # Dashboard statistics
+      - Component              # UI component prop types
 
 # ─── Consumes ───────────────────────────────────────────────────────
 consumes:
@@ -74,6 +163,7 @@ consumes:
     description: >
       Docker-based code execution engine. Self-hosted at judge0.devfellowship.com.
       Setup: src/Judge0/docker-compose.yml + setup-judge0.sh.
+    health_check: GET {JUDGE0_API_URL}/about
 
   - external: true
     name: supabase-auth
@@ -85,17 +175,32 @@ environment:
     - name: NEXT_PUBLIC_SUPABASE_URL
       description: Supabase project URL
       example: https://yoojxnggaxcqtsyjdrdx.supabase.co
+      sensitive: false
     - name: NEXT_PUBLIC_SUPABASE_ANON_KEY
       description: Supabase anonymous/public API key
+      sensitive: false
     - name: SUPABASE_SERVICE_ROLE_KEY
       description: Supabase service role key (server-side only, never expose to client)
+      sensitive: true
+      server_only: true
     - name: JUDGE0_API_URL
       description: Judge0 code execution API endpoint
       example: https://judge0.devfellowship.com
+      sensitive: false
     - name: JUDGE0_API_KEY
       description: API key for Judge0 authentication
+      sensitive: true
+      server_only: true
 
-  optional: []
+  optional:
+    - name: JUDGE0_CALLBACK_URL
+      description: Webhook URL for async Judge0 result callbacks
+    - name: NEXT_PUBLIC_APP_URL
+      description: Public-facing app URL for link generation
+      example: https://skill-evals.devfellowship.com
+    - name: RATE_LIMIT_MAX_PER_HOUR
+      description: Override default rate limit (100/hour) for code execution
+      default: "100"
 
   env_file: .env.example
 
@@ -105,10 +210,16 @@ testing:
     runner: vitest
     command: npm run test:unit
     config: vitest.config.ts
+    coverage: "@vitest/coverage-v8"
   docs:
     runner: node --test
     command: npm run verify:docs
     description: AQS documentation verification tests
+  e2e:
+    runner: playwright
+    command: npx playwright test
+    config: playwright.config.ts
+    description: Smoke tests for critical user paths
   storybook:
     command: npm run storybook
     description: Component explorer on port 6006
@@ -118,6 +229,7 @@ health_check:
   command: npm run build
   lint: npm run lint
   test: npm run test:unit
+  e2e: npx playwright test
 
 # ─── CI/CD ──────────────────────────────────────────────────────────
 ci:
@@ -146,11 +258,35 @@ cross_repo:
       All skill_evals schema DDL (CREATE, ALTER, DROP) goes through
       dfl-schema PRs. Never apply DDL directly.
 
+  - target: dfl-iam
+    relationship: dependency
+    description: >
+      Consumes IAM role hierarchy for authorization. RoleGuard component
+      maps student/teacher/admin to IAM role levels.
+
+# ─── Change Risk ────────────────────────────────────────────────────
+change_risk:
+  high_risk_paths:
+    - src/lib/execution/          # Code execution pipeline — security critical
+    - src/lib/supabase/           # Auth clients — credential handling
+    - src/app/api/execute-code/   # Code execution endpoint — rate limiting + sandboxing
+    - src/app/api/admin/          # Admin endpoints — privilege escalation surface
+  medium_risk_paths:
+    - src/app/api/challenges/     # CRUD — data integrity, soft-delete logic
+    - src/hooks/useChallengeOperations.ts  # Mutation logic
+    - src/components/providers/   # Auth + role providers
+  low_risk_paths:
+    - src/components/atoms/       # Presentational components
+    - src/components/ui/          # shadcn/ui primitives
+    - src/consts/                 # Static constants
+    - src/types/                  # Type definitions only
+  migration_notes: CHANGELOG.md
+
 # ─── Agent Guidelines ──────────────────────────────────────────────
 agent_guidelines:
   entry_point: CLAUDE.md
   key_rules:
-    - Atomic design hierarchy: atoms → molecules → organisms (each in own folder)
+    - Atomic design hierarchy: atoms -> molecules -> organisms (each in own folder)
     - All code execution routes through lib/execution/ pipeline — never call Judge0 directly
     - Server-side Supabase client for API routes via lib/supabase/server-clients.ts
     - Soft delete for challenges — preserve deleted_at column logic, never hard delete
@@ -168,3 +304,5 @@ agent_guidelines:
     - Bypass rate limiter in lib/execution/rate-limiter.ts
     - Expose SUPABASE_SERVICE_ROLE_KEY to client-side code
     - Hard-delete challenges — always use soft delete via deleted_at
+    - Call Judge0 directly — always use lib/execution/ pipeline
+    - Skip RoleGuard on admin/teacher routes
