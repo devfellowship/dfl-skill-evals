@@ -306,3 +306,6 @@ agent_guidelines:
     - Hard-delete challenges — always use soft delete via deleted_at
     - Call Judge0 directly — always use lib/execution/ pipeline
     - Skip RoleGuard on admin/teacher routes
+
+# ── Agent Entry Point ──────────────────────────────────────────────────────
+agent_entry_point: CLAUDE.md
