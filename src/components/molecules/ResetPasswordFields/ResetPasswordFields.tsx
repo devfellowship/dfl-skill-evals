@@ -1,6 +1,6 @@
 import { Button } from '@/components/atoms/Button/Button'
 import { Input } from '@/components/atoms/Input/Input'
-import { Label } from '@/components/ui/label'
+import { Label } from '@devfellowship/components';
 import { Mail, ArrowLeft, Send } from 'lucide-react'
 interface ResetPasswordFieldsProps {
   email: string
@@ -76,4 +76,4 @@ export function ResetPasswordFields({
       </Button>
     </form>
   )
-}
+}

@@ -3,8 +3,7 @@ import { useState } from "react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { ArrowUpDown, ArrowUp, ArrowDown, Calendar, Zap } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-export type SortOption = {
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@devfellowship/components";export type SortOption = {
   value: string
   label: string
   icon: React.ReactNode
@@ -83,4 +82,4 @@ export function SortButton({ currentSort, onSortChange, className = "" }: SortBu
       </DropdownMenuContent>
     </DropdownMenu>
   )
-}
+}

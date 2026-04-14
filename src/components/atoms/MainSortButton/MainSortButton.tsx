@@ -2,7 +2,7 @@
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { ArrowUpDown, ArrowUp, ArrowDown, Calendar, Zap, Star, Users, Hash } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@devfellowship/components";
 import { MainSortType } from "@/lib/main-challenge-sorter"
 export interface MainSortButtonProps {
   currentSort: MainSortType
@@ -81,4 +81,4 @@ export function MainSortButton({ currentSort, onSortChange, className = "" }: Ma
       </DropdownMenuContent>
     </DropdownMenu>
   )
-}
+}

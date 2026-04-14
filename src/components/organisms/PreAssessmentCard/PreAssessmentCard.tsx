@@ -1,8 +1,8 @@
 "use client"
 import { Star } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@devfellowship/components";
 import { Badge } from "@/components/atoms/Badge/Badge"
-import { Separator } from "@/components/ui/separator"
+import { Separator } from "@devfellowship/components";
 import { DifficultyIndicator } from "@/components/molecules/DifficultyIndicator/DifficultyIndicator"
 interface Challenge {
   title: string
@@ -53,4 +53,4 @@ export function PreAssessmentCard({ assessment }: PreAssessmentCardProps) {
       </CardContent>
     </Card>
   )
-}
+}

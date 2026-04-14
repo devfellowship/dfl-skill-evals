@@ -1,6 +1,5 @@
 import { CheckCircle, Target } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
-interface TestResult {
+import { Card, CardContent } from "@devfellowship/components";interface TestResult {
   status: 'passed' | 'failed' | 'error'
   input: string
   expectedOutput: string
@@ -103,4 +102,4 @@ export function TestResultCard({ result, index, isHidden = false }: TestResultCa
       </CardContent>
     </Card>
   )
-}
+}

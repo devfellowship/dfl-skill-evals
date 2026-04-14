@@ -1,9 +1,9 @@
 "use client"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@devfellowship/components";
 import { Input } from "@/components/atoms/Input/Input"
 import { Textarea } from "@/components/atoms/Textarea/Textarea"
 import { Label } from "@/components/atoms/Label/Label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@devfellowship/components";
 import { Button } from "@/components/atoms/Button/Button"
 import { Plus, Trash2 } from "lucide-react"
 import { DIFFICULTY_OPTIONS } from "@/types/admin/admin-dashboard"

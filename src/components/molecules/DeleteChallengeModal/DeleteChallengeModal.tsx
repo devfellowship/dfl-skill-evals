@@ -2,8 +2,7 @@ import React, { useState } from 'react'
 import { Button } from '@/components/atoms/Button/Button'
 import { Textarea } from '@/components/atoms/Textarea/Textarea'
 import { Label } from '@/components/atoms/Label/Label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-interface DeleteChallengeModalProps {
+import { Card, CardContent, CardHeader, CardTitle } from '@devfellowship/components';interface DeleteChallengeModalProps {
   isOpen: boolean
   onClose: () => void
   onConfirm: (reason: string) => void
@@ -110,4 +109,4 @@ export const DeleteChallengeModal: React.FC<DeleteChallengeModalProps> = ({
       </Card>
     </div>
   )
-}
+}

@@ -2,9 +2,8 @@
 import { Button } from "@/components/atoms/Button/Button"
 import { User, LogOut } from "lucide-react"
 import Link from "next/link"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-interface UserMenuProps {
+import { Avatar, AvatarFallback, AvatarImage } from "@devfellowship/components";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@devfellowship/components";interface UserMenuProps {
   user: any
   onSignOut: () => void
   getUserDisplayName: () => string
@@ -52,4 +51,4 @@ export function UserMenu({ user, onSignOut, getUserDisplayName, getUserInitials 
       </DropdownMenuContent>
     </DropdownMenu>
   )
-}
+}

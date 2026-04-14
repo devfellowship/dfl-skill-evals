@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent } from '@devfellowship/components';
 import { toast } from 'sonner'
 import { LoginHeader } from '@/components/molecules/LoginHeader/LoginHeader'
 import { LoginFormFields } from '@/components/molecules/LoginFormFields/LoginFormFields'
@@ -83,4 +83,4 @@ export function LoginForm() {
       </div>
     </div>
   )
-}
+}

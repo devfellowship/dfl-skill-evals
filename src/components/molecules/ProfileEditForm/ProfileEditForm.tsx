@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent } from '@devfellowship/components';
 import { useProfile } from '@/hooks/useProfile'
 import { toast } from 'sonner'
 import { AlertCircle } from 'lucide-react'
@@ -177,4 +177,4 @@ export function ProfileEditForm({ onClose }: ProfileEditFormProps) {
       />
     </div>
   )
-}
+}

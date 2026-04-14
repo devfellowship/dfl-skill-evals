@@ -46,4 +46,4 @@ export function PreChallengePage({ challengeId }: PreChallengePageProps) {
       </div>
     </div>
   )
-}
+}

@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@devfellowship/components";
 import { Button } from "@/components/atoms/Button/Button"
 import { Input } from "@/components/atoms/Input/Input"
 import { Textarea } from "@/components/atoms/Textarea/Textarea"
@@ -90,4 +90,4 @@ export function TestCaseManager({ testCases, onAdd, onRemove }: TestCaseManagerP
       </CardContent>
     </Card>
   )
-}
+}

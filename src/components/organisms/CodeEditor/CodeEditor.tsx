@@ -1,8 +1,8 @@
 "use client"
 import { useState, useEffect } from "react"
 import { Code, Play } from "lucide-react"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@devfellowship/components";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@devfellowship/components";
 import { Button } from "@/components/atoms/Button/Button"
 import { LANGUAGES, EDITOR_CONFIG } from "@/consts/editor"
 interface CodeEditorProps {
@@ -99,4 +99,4 @@ export function CodeEditor({ value, onChange, language, onLanguageChange, onRun,
       </div>
     </div>
   )
-}
+}

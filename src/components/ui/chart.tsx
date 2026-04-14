@@ -6,7 +6,7 @@ import {
   Payload,
   ValueType,
 } from "recharts/types/component/DefaultTooltipContent"
-import { cn } from "@/lib/utils"
+import { cn } from "@devfellowship/components"
 const THEMES = { light: "", dark: ".dark" } as const
 export type ChartConfig = {
   [k in string]: {
@@ -325,4 +325,4 @@ export {
   ChartLegend,
   ChartLegendContent,
   ChartStyle,
-}
+}

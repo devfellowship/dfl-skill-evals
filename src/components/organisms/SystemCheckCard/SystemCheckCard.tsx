@@ -1,6 +1,6 @@
 "use client"
 import { CheckCircle, AlertCircle, Monitor, Wifi } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@devfellowship/components";
 import { UI_MESSAGES } from "@/consts/ui"
 interface SystemChecks {
   browser: boolean
@@ -42,4 +42,4 @@ export function SystemCheckCard({ systemChecks }: SystemCheckCardProps) {
       </CardContent>
     </Card>
   )
-}
+}

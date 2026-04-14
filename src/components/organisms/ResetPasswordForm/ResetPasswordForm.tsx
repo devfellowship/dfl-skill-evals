@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent } from '@devfellowship/components';
 import { toast } from 'sonner'
 import { ResetPasswordHeader } from '@/components/molecules/ResetPasswordHeader/ResetPasswordHeader'
 import { ResetPasswordFields } from '@/components/molecules/ResetPasswordFields/ResetPasswordFields'
@@ -104,4 +104,4 @@ export function ResetPasswordForm() {
       </div>
     </div>
   )
-}
+}

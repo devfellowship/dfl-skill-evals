@@ -2,9 +2,9 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@devfellowship/components";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@devfellowship/components";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@devfellowship/components";
 import { X, CheckCircle, XCircle, AlertTriangle, Code, TestTube, BookOpen, FileText } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 interface ChallengeComparisonModalProps {
@@ -325,4 +325,4 @@ export function ChallengeComparisonModal({
       </DialogContent>
     </Dialog>
   )
-}
+}

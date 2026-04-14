@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@devfellowship/components";
 import { Button } from "@/components/atoms/Button/Button"
 import { Textarea } from "@/components/atoms/Textarea/Textarea"
 import { Label } from "@/components/atoms/Label/Label"
@@ -111,4 +111,4 @@ export function ExampleManager({ examples, onAdd, onRemove }: ExampleManagerProp
       </CardContent>
     </Card>
   )
-}
+}

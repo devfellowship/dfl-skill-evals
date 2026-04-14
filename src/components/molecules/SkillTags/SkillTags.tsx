@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Badge } from "../../atoms/Badge/Badge"
-import { cn } from "@/lib/utils"
+import { cn } from "@devfellowship/components"
 interface SkillTagsProps {
   skills: string[]
   maxVisible?: number

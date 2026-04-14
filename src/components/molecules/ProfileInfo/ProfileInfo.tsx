@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "../../atoms/Avatar/Avatar"
 import type { User } from "@/types"
-import { cn } from "@/lib/utils"
+import { cn } from "@devfellowship/components"
 interface ProfileInfoProps {
   user: User
   size?: "sm" | "md" | "lg"

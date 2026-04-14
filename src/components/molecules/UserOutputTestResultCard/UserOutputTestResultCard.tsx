@@ -1,5 +1,5 @@
 import { CheckCircle, Target, User, Shuffle } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent } from "@devfellowship/components";
 import { Badge } from "@/components/atoms/Badge/Badge"
 interface UserOutputTestResult {
   status: 'passed' | 'failed' | 'error'
@@ -137,4 +137,4 @@ export function UserOutputTestResultCard({ result, index, isHidden = false }: Us
       </CardContent>
     </Card>
   )
-}
+}

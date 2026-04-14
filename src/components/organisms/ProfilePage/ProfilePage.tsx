@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useUserRole } from '@/hooks/useUserRole'
 import { useProfile } from '@/hooks/useProfile'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Card, CardContent, CardHeader, CardTitle } from '@devfellowship/components';
+import { Avatar, AvatarFallback, AvatarImage } from '@devfellowship/components';
 import { Button } from '@/components/atoms/Button/Button'
 import { Badge } from '@/components/atoms/Badge/Badge'
 import { ProfileEditForm } from '@/components/molecules/ProfileEditForm/ProfileEditForm'
@@ -157,4 +157,4 @@ export function ProfilePage() {
       </div>
     </div>
   )
-}
+}

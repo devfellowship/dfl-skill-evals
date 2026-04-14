@@ -1,5 +1,4 @@
-import { Card, CardContent } from "@/components/ui/card"
-interface ChallengeRightSidebarProps {
+import { Card, CardContent } from "@devfellowship/components";interface ChallengeRightSidebarProps {
   problem: any
 }
 export function ChallengeRightSidebar({ problem }: ChallengeRightSidebarProps) {
@@ -72,4 +71,4 @@ export function ChallengeRightSidebar({ problem }: ChallengeRightSidebarProps) {
       </Card>
     </div>
   )
-}
+}

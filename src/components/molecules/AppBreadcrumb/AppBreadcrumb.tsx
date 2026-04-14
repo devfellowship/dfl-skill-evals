@@ -6,7 +6,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+} from "@devfellowship/components";
 import { BREADCRUMB_LABELS } from "@/consts/ui";
 interface BreadcrumbItem {
   href?: string;
@@ -51,4 +51,4 @@ export function createChallengeBreadcrumb(challengeId: string): BreadcrumbItem[]
       isCurrentPage: true,
     },
   ];
-}
+}

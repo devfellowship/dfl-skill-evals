@@ -1,6 +1,6 @@
 "use client"
 import { Badge } from "@/components/atoms/Badge/Badge"
-import { Separator } from "@/components/ui/separator"
+import { Separator } from "@devfellowship/components";
 import { ProblemExamples } from "@/components/molecules/ProblemExamples/ProblemExamples"
 import type { Problem } from "@/types/challenges/problems"
 interface ProblemPanelProps {
@@ -24,4 +24,4 @@ export function ProblemPanel({ problem }: ProblemPanelProps) {
       </div>
     </div>
   )
-}
+}

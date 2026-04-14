@@ -1,7 +1,6 @@
 "use client"
 import Link from "next/link"
-import { Separator } from "@/components/ui/separator"
-interface ChallengeHeaderProps {
+import { Separator } from "@devfellowship/components";interface ChallengeHeaderProps {
   title: string
   backHref?: string
 }

@@ -1,5 +1,5 @@
 "use client"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@devfellowship/components";
 import { BookOpen, CheckCircle, TrendingUp, XCircle } from "lucide-react"
 interface TeacherStats {
   totalChallenges: number

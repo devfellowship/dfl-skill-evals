@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/atoms/Button/Button'
 import { Input } from '@/components/atoms/Input/Input'
-import { Label } from '@/components/ui/label'
+import { Label } from '@devfellowship/components';
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react'
 interface LoginFormFieldsProps {
   email: string
@@ -109,4 +109,4 @@ export function LoginFormFields({
        </Button>
     </form>
   )
-}
+}
