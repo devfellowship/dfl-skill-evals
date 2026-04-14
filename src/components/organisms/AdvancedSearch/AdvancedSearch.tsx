@@ -1,12 +1,13 @@
 "use client"
+import { Checkbox, Dialog, DialogContent, DialogTrigger, Label } from '@devfellowship/components';
 import { useState, useEffect, useCallback } from "react"
 import { Search } from "lucide-react"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+
 import { Input } from "@/components/atoms/Input/Input"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
+
+
 import { Slider } from "@/components/ui/slider"
 import type { Assessment, SearchFilters } from "@/types"
 import { availableSkills, categories } from "@/consts"

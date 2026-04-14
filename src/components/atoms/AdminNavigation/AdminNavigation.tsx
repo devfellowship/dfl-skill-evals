@@ -1,7 +1,8 @@
 "use client"
+import { Avatar, AvatarFallback, AvatarImage } from '@devfellowship/components';
 import { ReactNode, useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/atoms/Button/Button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+
 import { Home, ChevronRight, ArrowLeft, User, Settings, BarChart3, Users, BookOpen, Plus, LogOut, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'

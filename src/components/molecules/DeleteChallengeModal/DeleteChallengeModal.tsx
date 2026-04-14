@@ -1,8 +1,9 @@
+import { Card, CardContent, CardHeader, CardTitle } from '@devfellowship/components';
 import React, { useState } from 'react'
 import { Button } from '@/components/atoms/Button/Button'
 import { Textarea } from '@/components/atoms/Textarea/Textarea'
 import { Label } from '@/components/atoms/Label/Label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+
 interface DeleteChallengeModalProps {
   isOpen: boolean
   onClose: () => void

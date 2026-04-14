@@ -1,4 +1,4 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@devfellowship/components';
 import { Code, TestTube, CheckCircle, Archive, Trash2, Search } from "lucide-react"
 import { Input } from "@/components/atoms/Input/Input"
 import { ChallengeList } from "./ChallengeList"

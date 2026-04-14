@@ -1,6 +1,7 @@
 "use client"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@devfellowship/components';
 import { CheckCircle, AlertCircle, Monitor, Wifi } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+
 import { UI_MESSAGES } from "@/consts/ui"
 interface SystemChecks {
   browser: boolean

@@ -1,12 +1,9 @@
 'use client'
+import { Card, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@devfellowship/components';
 import { useState, useEffect, useMemo } from 'react'
 import { Button } from '@/components/atoms/Button/Button'
-import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/atoms/Badge/Badge'
 import { Input } from '@/components/atoms/Input/Input'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { UserRole, supabase } from '@/lib/supabase'
 import { Loader2, Users, Search, Pencil } from 'lucide-react'

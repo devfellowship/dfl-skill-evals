@@ -1,7 +1,8 @@
+import { Label } from '@devfellowship/components';
 import { useState } from 'react'
 import { Button } from '@/components/atoms/Button/Button'
 import { Input } from '@/components/atoms/Input/Input'
-import { Label } from '@/components/ui/label'
+
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react'
 interface LoginFormFieldsProps {
   email: string

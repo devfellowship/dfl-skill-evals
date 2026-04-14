@@ -1,6 +1,7 @@
 "use client"
+import { Card, CardContent, CardHeader, CardTitle } from '@devfellowship/components';
 import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
 import { Button } from "@/components/atoms/Button/Button"
 import { Textarea } from "@/components/atoms/Textarea/Textarea"
 import { Label } from "@/components/atoms/Label/Label"

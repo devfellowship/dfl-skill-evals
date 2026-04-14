@@ -1,4 +1,5 @@
 "use client"
+import { Avatar, AvatarFallback, AvatarImage, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@devfellowship/components';
 import { BrandLogo } from "@/components/atoms/Logo/Logo"
 import { Button } from "@/components/atoms/Button/Button"
 import { SearchButton } from "@/components/atoms/SearchButton/SearchButton"
@@ -9,8 +10,8 @@ import type { MainSortType } from "@/lib/main-challenge-sorter"
 import { useAuth } from "@/components/providers/AuthProvider"
 import { useUserRole } from "@/hooks/useUserRole"
 import { useProfile } from "@/hooks/useProfile"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+
+
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { MAIN_SORT_OPTIONS } from "@/consts/main-header"
 const getIcon = (iconName: string) => {

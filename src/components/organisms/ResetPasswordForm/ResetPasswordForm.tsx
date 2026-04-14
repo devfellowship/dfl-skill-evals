@@ -1,7 +1,8 @@
 'use client'
+import { Card, CardContent } from '@devfellowship/components';
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Card, CardContent } from '@/components/ui/card'
+
 import { toast } from 'sonner'
 import { ResetPasswordHeader } from '@/components/molecules/ResetPasswordHeader/ResetPasswordHeader'
 import { ResetPasswordFields } from '@/components/molecules/ResetPasswordFields/ResetPasswordFields'

@@ -1,5 +1,6 @@
+import { Card, CardContent } from '@devfellowship/components';
 import { CheckCircle, Target, User, Shuffle } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
+
 import { Badge } from "@/components/atoms/Badge/Badge"
 interface UserOutputTestResult {
   status: 'passed' | 'failed' | 'error'

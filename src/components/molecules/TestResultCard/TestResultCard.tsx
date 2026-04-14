@@ -1,5 +1,6 @@
+import { Card, CardContent } from '@devfellowship/components';
 import { CheckCircle, Target } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
+
 interface TestResult {
   status: 'passed' | 'failed' | 'error'
   input: string

@@ -1,6 +1,7 @@
 "use client"
+import { Separator } from '@devfellowship/components';
 import { Badge } from "@/components/atoms/Badge/Badge"
-import { Separator } from "@/components/ui/separator"
+
 import { ProblemExamples } from "@/components/molecules/ProblemExamples/ProblemExamples"
 import type { Problem } from "@/types/challenges/problems"
 interface ProblemPanelProps {

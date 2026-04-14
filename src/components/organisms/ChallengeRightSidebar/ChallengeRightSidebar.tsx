@@ -1,4 +1,5 @@
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent } from '@devfellowship/components';
+
 interface ChallengeRightSidebarProps {
   problem: any
 }

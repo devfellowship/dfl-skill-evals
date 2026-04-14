@@ -1,8 +1,8 @@
 "use client"
+import { Card, CardContent, CardHeader, CardTitle } from '@devfellowship/components';
 import { X } from 'lucide-react'
 import { Button } from '@/components/atoms/Button/Button'
 import { Badge } from '@/components/atoms/Badge/Badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/atoms/Separator/Separator'
 
 interface ChallengeData {
