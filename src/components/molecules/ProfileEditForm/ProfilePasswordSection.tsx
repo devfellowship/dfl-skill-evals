@@ -1,9 +1,10 @@
 'use client'
+import { Card, CardContent, CardHeader, CardTitle } from '@devfellowship/components';
 import { useState } from 'react'
 import { Button } from '@/components/atoms/Button/Button'
 import { Input } from '@/components/atoms/Input/Input'
 import { Label } from '@/components/atoms/Label/Label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+
 import { Lock } from 'lucide-react'
 import { PasswordFormData } from '@/types/profile/profile'
 interface ProfilePasswordSectionProps {

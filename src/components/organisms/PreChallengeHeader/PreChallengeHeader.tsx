@@ -1,9 +1,8 @@
 "use client"
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@devfellowship/components';
 import { Home, ChevronRight, LogOut, User } from "lucide-react"
 import { Button } from "@/components/atoms/Button/Button"
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import { Avatar, AvatarFallback } from "@/components/atoms/Avatar/Avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
 import { BREADCRUMB_LABELS } from "@/consts/ui"
 import { useAuth } from "@/components/providers/AuthProvider"

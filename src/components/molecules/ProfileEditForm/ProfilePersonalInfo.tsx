@@ -1,9 +1,10 @@
 'use client'
+import { Card, CardContent, CardHeader, CardTitle } from '@devfellowship/components';
 import { useState } from 'react'
 import { Button } from '@/components/atoms/Button/Button'
 import { Input } from '@/components/atoms/Input/Input'
 import { Label } from '@/components/atoms/Label/Label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+
 import { Badge } from '@/components/atoms/Badge/Badge'
 import { User, Calendar, AlertCircle } from 'lucide-react'
 import { ProfileFormData } from '@/types/profile/profile'

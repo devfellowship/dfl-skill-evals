@@ -1,10 +1,11 @@
 "use client"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Tabs, TabsContent, TabsList, TabsTrigger } from '@devfellowship/components';
 import { useState, useEffect } from "react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+
+
+
 import { X, CheckCircle, XCircle, AlertTriangle, Code, TestTube, BookOpen, FileText } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 interface ChallengeComparisonModalProps {

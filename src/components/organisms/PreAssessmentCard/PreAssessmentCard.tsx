@@ -1,8 +1,9 @@
 "use client"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, Separator } from '@devfellowship/components';
 import { Star } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+
 import { Badge } from "@/components/atoms/Badge/Badge"
-import { Separator } from "@/components/ui/separator"
+
 import { DifficultyIndicator } from "@/components/molecules/DifficultyIndicator/DifficultyIndicator"
 interface Challenge {
   title: string

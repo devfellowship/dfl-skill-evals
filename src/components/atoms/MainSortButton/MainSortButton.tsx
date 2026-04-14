@@ -1,8 +1,9 @@
 "use client"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@devfellowship/components';
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
 import { ArrowUpDown, ArrowUp, ArrowDown, Calendar, Zap, Star, Users, Hash } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+
 import { MainSortType } from "@/lib/main-challenge-sorter"
 export interface MainSortButtonProps {
   currentSort: MainSortType

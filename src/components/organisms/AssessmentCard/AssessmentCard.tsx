@@ -1,9 +1,9 @@
+import { Card, CardContent } from '@devfellowship/components';
 import React from "react"
 import Link from "next/link"
 import { ArrowRight, Code, Star, Users } from "lucide-react"
 import { Button } from "@/components/atoms/Button/Button"
 import { Badge } from "@/components/atoms/Badge/Badge"
-import { Card, CardContent } from "@/components/ui/card"
 import { DifficultyIndicator } from "@/components/molecules/DifficultyIndicator/DifficultyIndicator"
 import { ChallengeImage } from "@/components/atoms/ChallengeImage/ChallengeImage"
 import { ChallengeMenu } from "@/components/molecules/ChallengeMenu/ChallengeMenu"

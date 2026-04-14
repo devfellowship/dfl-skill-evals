@@ -1,6 +1,7 @@
+import { Card, CardContent } from '@devfellowship/components';
 import { useState } from "react"
 import { Button } from "@/components/atoms/Button/Button"
-import { Card, CardContent } from "@/components/ui/card"
+
 import { Check } from "lucide-react"
 interface BackgroundImageSelectorProps {
   currentImage?: string

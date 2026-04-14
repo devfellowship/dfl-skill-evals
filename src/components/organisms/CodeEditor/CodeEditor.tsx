@@ -1,8 +1,9 @@
 "use client"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea } from '@devfellowship/components';
 import { useState, useEffect } from "react"
 import { Code, Play } from "lucide-react"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
+
 import { Button } from "@/components/atoms/Button/Button"
 import { LANGUAGES, EDITOR_CONFIG } from "@/consts/editor"
 interface CodeEditorProps {

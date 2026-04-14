@@ -1,10 +1,9 @@
 "use client"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, Tabs, TabsContent, TabsList, TabsTrigger } from '@devfellowship/components';
 import { useState, useEffect, useMemo } from "react"
 import { useChallengesGlobal } from "@/hooks/useChallengesGlobal"
 import { useChallengeOperations } from "@/hooks/useChallengeOperations"
 import { useAuth } from "@/hooks/useAuth"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Code, CheckCircle, Clock, Archive, XCircle } from "lucide-react"
 import { AdminNavigation } from "@/components/atoms/AdminNavigation/AdminNavigation"
 import { DashboardHeaderButtons } from "@/components/atoms/DashboardHeaderButtons/DashboardHeaderButtons"

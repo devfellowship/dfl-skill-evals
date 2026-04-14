@@ -1,7 +1,8 @@
 "use client"
+import { Card, CardContent, CardHeader, CardTitle } from '@devfellowship/components';
 import { useState, useEffect } from 'react'
 import { useChallengeManagement } from '@/hooks/useChallengeManagement'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+
 import { Button } from '@/components/atoms/Button/Button'
 import { Badge } from '@/components/atoms/Badge/Badge'
 import { ArrowLeft, XCircle } from "lucide-react"
