@@ -9,12 +9,10 @@ export async function POST(request: NextRequest) {
     if (authError || !user) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
-    const { data: profile, error: profileError } = await supabase
-      .from('users_with_roles')
-      .select('roles')
-      .eq('id', user.id)
-      .single()
-    if (profileError || !profile?.roles?.includes('admin')) {
+    const { data: iamData, error: iamError } = await supabase.rpc('get_my_iam_role')
+    const iamRoles = (iamData as { role_id: string; level: number }[] | null) || []
+    const iamRole = iamRoles[0]
+    if (iamError || !iamRole || iamRole.level < 80) {
       return NextResponse.json({ error: 'Acesso negado. Apenas administradores podem criar perfis.' }, { status: 403 })
     }
     const body = await request.json()
@@ -26,8 +24,8 @@ export async function POST(request: NextRequest) {
     if (!validRoles.includes(role)) {
       return NextResponse.json({ error: 'Role inválida' }, { status: 400 })
     }
-    const { data: existingProfile, error: existingError } = await supabase
-      .from('users_with_roles')
+    const { data: existingProfile } = await supabase
+      .from('profiles')
       .select('id')
       .eq('id', userId)
       .single()
@@ -35,12 +33,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Perfil já existe para este usuário' }, { status: 409 })
     }
     const { data: newProfile, error: createError } = await supabase
-      .from('users_with_roles')
+      .from('profiles')
       .insert({
         id: userId,
         email,
-        name: fullName,
-        roles: [role],
+        full_name: fullName,
+        role: role,
         is_active: true,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
@@ -50,7 +48,7 @@ export async function POST(request: NextRequest) {
     if (createError) {
       return NextResponse.json({ error: 'Erro ao criar perfil' }, { status: 500 })
     }
-    return NextResponse.json({ 
+    return NextResponse.json({
       message: 'Perfil criado com sucesso',
       profile: newProfile
     })

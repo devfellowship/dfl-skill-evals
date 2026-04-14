@@ -2,25 +2,15 @@ import { supabase } from '@/lib/supabase'
 
 export const setupUserProfile = async (userId: string, fullName: string, email: string) => {
   try {
-    const [profileResult, userRolesResult] = await Promise.all([
-      supabase
-        .from('profiles')
-        .select('id, full_name')
-        .eq('id', userId)
-        .maybeSingle(),
-      supabase
-        .from('users_with_roles')
-        .select('id, name, roles')
-        .eq('id', userId)
-        .maybeSingle()
-    ])
+    const { data: existingProfile, error: profileError } = await supabase
+      .from('profiles')
+      .select('id, full_name')
+      .eq('id', userId)
+      .maybeSingle()
 
-    if (profileResult.error) {
-      return { success: false, error: profileResult.error.message }
+    if (profileError) {
+      return { success: false, error: profileError.message }
     }
-
-    const existingProfile = profileResult.data
-    const existingUserRoles = userRolesResult.data
 
     if (existingProfile) {
       const { error: updateError } = await supabase
@@ -53,19 +43,6 @@ export const setupUserProfile = async (userId: string, fullName: string, email: 
       }
     }
 
-    if (existingUserRoles) {
-      const { error: updateUserRolesError } = await supabase
-        .from('users_with_roles')
-        .update({
-          name: fullName,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', userId)
-
-      if (updateUserRolesError) {
-      }
-    }
-
     return { success: true, action: existingProfile ? 'updated' : 'created' }
   } catch (error) {
     return { success: false, error: 'Erro interno' }
@@ -90,9 +67,9 @@ export const setupCurrentUserProfile = async () => {
 export const updateUserNameInRoles = async (userId: string, fullName: string) => {
   try {
     const { error } = await supabase
-      .from('users_with_roles')
+      .from('profiles')
       .update({
-        name: fullName,
+        full_name: fullName,
         updated_at: new Date().toISOString()
       })
       .eq('id', userId)

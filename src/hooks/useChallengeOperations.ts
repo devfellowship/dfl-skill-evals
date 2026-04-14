@@ -28,22 +28,15 @@ export function useChallengeOperations() {
   const [isRestoring, setIsRestoring] = useState<string | null>(null)
   const createChallenge = useCallback(async (challengeData: ChallengeOperationData) => {
     const { user } = validateUser()
-    const [profileResult, userRolesResult] = await Promise.all([
-      supabase
-        .from('profiles')
-        .select('full_name')
-        .eq('id', user.id)
-        .maybeSingle(),
-      supabase
-        .from('users_with_roles')
-        .select('name')
-        .eq('id', user.id)
-        .maybeSingle()
-    ])
-    const mentorName = profileResult.data?.full_name || 
-                      userRolesResult.data?.name || 
-                      user.user_metadata?.full_name || 
-                      user.email?.split('@')[0] || 
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('full_name, name')
+      .eq('id', user.id)
+      .maybeSingle()
+    const mentorName = profileData?.full_name ||
+                      profileData?.name ||
+                      user.user_metadata?.full_name ||
+                      user.email?.split('@')[0] ||
                       'Usuário'
     const challengePayload = {
       title: challengeData.title,

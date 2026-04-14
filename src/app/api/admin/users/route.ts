@@ -9,12 +9,13 @@ export async function GET(request: NextRequest) {
     if (authError || !user) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
-    const { data: profile, error: profileError } = await supabase
-      .from('users_with_roles')
-      .select('roles')
-      .eq('id', user.id)
-      .single()
-    if (profileError || !profile?.roles?.includes('admin')) {
+    const { data: iamData, error: iamError } = await supabase.rpc('get_my_iam_role')
+    if (iamError) {
+      return NextResponse.json({ error: 'Erro ao verificar permissões' }, { status: 500 })
+    }
+    const iamRoles = (iamData as { role_id: string; level: number }[] | null) || []
+    const iamRole = iamRoles[0]
+    if (!iamRole || iamRole.level < 80) {
       return NextResponse.json({ error: 'Acesso negado. Apenas administradores podem acessar esta funcionalidade.' }, { status: 403 })
     }
     const { searchParams } = new URL(request.url)
@@ -23,12 +24,12 @@ export async function GET(request: NextRequest) {
     const from = searchParams.get('from')
     const to = searchParams.get('to')
     let query = supabase
-      .from('users_with_roles')
+      .from('profiles')
       .select(`
         id,
         email,
-        name,
-        roles,
+        full_name,
+        role,
         is_active,
         created_at,
         updated_at
@@ -79,17 +80,17 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Role inválida' }, { status: 400 })
     }
     const { data: existingUser, error: userError } = await supabase
-      .from('users_with_roles')
-      .select('id, email, roles')
+      .from('profiles')
+      .select('id, email, role')
       .eq('id', userId)
       .single()
     if (userError || !existingUser) {
       return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 })
     }
     const { data: updatedUser, error: updateError } = await supabase
-      .from('users_with_roles')
-      .update({ 
-        roles: [role],
+      .from('profiles')
+      .update({
+        role: role,
         updated_at: new Date().toISOString()
       })
       .eq('id', userId)
@@ -98,7 +99,7 @@ export async function PATCH(request: NextRequest) {
     if (updateError) {
       return NextResponse.json({ error: 'Erro ao atualizar role do usuário' }, { status: 500 })
     }
-    return NextResponse.json({ 
+    return NextResponse.json({
       message: 'Role atualizada com sucesso',
       user: updatedUser
     })

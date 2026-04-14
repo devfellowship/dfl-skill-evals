@@ -49,17 +49,7 @@ export function DeletedChallengesList({
             }
           })
         }
-        const { data: usersWithRoles, error: rolesError } = await supabase
-          .from('users_with_roles')
-          .select('id, name')
-          .in('id', uniqueUserIds)
-        if (!rolesError && usersWithRoles) {
-          usersWithRoles.forEach(user => {
-            if (user.name && !nameMap[user.id]) {
-              nameMap[user.id] = user.name
-            }
-          })
-        }
+        // profiles already fetched above — no need for additional query
         uniqueUserIds.forEach(id => {
           if (!nameMap[id]) {
             nameMap[id] = 'Usuário'
