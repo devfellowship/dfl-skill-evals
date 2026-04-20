@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -8,24 +9,6 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-        port: '',
-        pathname: '/**',
-      },
-    ],
-  },
-
-  async rewrites() {
-    const judge0Url = process.env.JUDGE0_API_URL || 'https://judge0.devfellowship.com';
-    return [
-      {
-        source: '/api/judge0/:path*',
-        destination: `${judge0Url}/:path*`,
-      },
-    ]
   },
 }
 

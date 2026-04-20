@@ -11,6 +11,7 @@ import { NotFoundState } from "@/components/molecules/NotFoundState/NotFoundStat
 import { Save, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { toast } from 'sonner'
+import { supabase } from "@/lib/supabase"
 
 interface EditChallengeProps {
   challengeId: string
@@ -55,36 +56,46 @@ export function EditChallenge({ challengeId }: EditChallengeProps) {
   const loadChallenge = async () => {
     try {
       setIsLoading(true)
-      const response = await fetch(`/api/challenges/${challengeId}`)
-      const result = await response.json()
-      
-      if (!response.ok) {
-        throw new Error(result.error || 'Erro ao carregar challenge')
+      // Static export: read directly from Supabase.
+      // RLS on `challenges` must allow the current user to read — flagged in PR body.
+      const { data: challengeData, error } = await supabase
+        .schema('skill_evals')
+        .from('challenges')
+        .select(`
+          *,
+          challenge_test_cases(*),
+          challenge_examples(*)
+        `)
+        .eq('id', challengeId)
+        .single()
+
+      if (error) {
+        throw new Error(error.message || 'Erro ao carregar challenge')
       }
 
-      if (result.data) {
-        const challengeData = result.data
-        setChallenge(challengeData)
-        
+      if (challengeData) {
+        const c = challengeData as any
+        setChallenge(c)
+
         loadFormData({
-          title: challengeData.title || '',
-          description: challengeData.description || '',
-          difficulty: challengeData.difficulty === 1 ? 'easy' 
-                     : challengeData.difficulty === 2 ? 'medium'
-                     : challengeData.difficulty === 3 ? 'hard'
-                     : challengeData.difficulty === 4 ? 'expert'
+          title: c.title || '',
+          description: c.description || '',
+          difficulty: c.difficulty === 1 ? 'easy'
+                     : c.difficulty === 2 ? 'medium'
+                     : c.difficulty === 3 ? 'hard'
+                     : c.difficulty === 4 ? 'expert'
                      : 'easy',
-          category: challengeData.category || [],
-          function_name: challengeData.function_name || '',
-          initial_code: challengeData.initial_code || '',
-          skills: challengeData.skills || [],
-          mentor: challengeData.mentor || '',
-          trending: challengeData.trending || false,
-          trending_priority: challengeData.trending_priority || null,
-          test_cases: challengeData.challenge_test_cases || [],
-          examples: challengeData.challenge_examples || [],
-          constraints: challengeData.constraints || [],
-          hints: challengeData.hints || []
+          category: c.category || [],
+          function_name: c.function_name || '',
+          initial_code: c.initial_code || '',
+          skills: c.skills || [],
+          mentor: c.mentor || '',
+          trending: c.trending || false,
+          trending_priority: c.trending_priority || null,
+          test_cases: c.challenge_test_cases || [],
+          examples: c.challenge_examples || [],
+          constraints: c.constraints || [],
+          hints: c.hints || []
         })
       }
     } catch (error) {
