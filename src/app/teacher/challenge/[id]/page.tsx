@@ -1,7 +1,9 @@
-"use client"
-import { useParams } from "next/navigation"
-import { TeacherChallengeView } from "@/components/organisms/TeacherChallengeView/TeacherChallengeView"
+import TeacherChallengeClient from "./teacher-challenge-client"
+
+export function generateStaticParams() {
+  return [{ id: "_" }]
+}
+
 export default function TeacherChallengePage() {
-  const params = useParams()
-  return <TeacherChallengeView challengeId={params.id as string} />
-}
+  return <TeacherChallengeClient />
+}

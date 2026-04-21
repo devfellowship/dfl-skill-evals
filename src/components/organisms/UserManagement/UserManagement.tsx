@@ -40,20 +40,20 @@ export function UserManagement() {
   async function fetchUsers() {
     try {
       setLoading(true)
-      const { data: { session } } = await supabase.auth.getSession()
-      const headers: HeadersInit = {}
-      if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`
-      const sp = new URLSearchParams()
-      if (q) sp.set('q', q)
-      if (from) sp.set('from', from)
-      if (to) sp.set('to', to)
-      const res = await fetch(`/api/admin/users?${sp.toString()}`, { headers })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        throw new Error(err.error || 'Erro ao buscar usuários')
+      // Static export: read directly from Supabase. RLS on `profiles` must
+      // allow admin reads — flagged in PR body.
+      let query = supabase
+        .from('profiles')
+        .select('id, email, full_name, role, is_active, phone, created_at, updated_at')
+        .order('created_at', { ascending: false })
+      if (q) {
+        query = query.or(`full_name.ilike.%${q}%,email.ilike.%${q}%`)
       }
-      const data = await res.json()
-      setUsers(data.users || [])
+      if (from) query = query.gte('created_at', from)
+      if (to) query = query.lte('created_at', to)
+      const { data, error } = await query
+      if (error) throw new Error(error.message || 'Erro ao buscar usuários')
+      setUsers((data as User[]) || [])
     } catch (e: any) {
       toast.error(e.message || 'Erro ao buscar usuários')
     } finally {
@@ -73,27 +73,24 @@ export function UserManagement() {
     if (!selected) return
     try {
       setSaving(true)
-      const { data: { session } } = await supabase.auth.getSession()
-      const headers: HeadersInit = { 'Content-Type': 'application/json' }
-      if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`
-      const res = await fetch(`/api/admin/users`, {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify({
-          userId: selected.id,
-          full_name: formData.full_name,
-          email: formData.email,
-          phone: formData.phone,
-          role: formData.role,
-          is_active: formData.is_active,
-        }),
-      })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        throw new Error(err.error || 'Erro ao salvar perfil')
+      // Static export: update via Supabase client. RLS on `profiles` must
+      // allow admin updates — flagged in PR body.
+      const updatePayload: Record<string, any> = {
+        full_name: formData.full_name,
+        email: formData.email,
+        phone: formData.phone,
+        role: formData.role,
+        is_active: formData.is_active,
+        updated_at: new Date().toISOString(),
       }
-      const data = await res.json()
-      setUsers(prev => prev.map(u => u.id === data.user.id ? data.user : u))
+      const { data, error } = await supabase
+        .from('profiles')
+        .update(updatePayload)
+        .eq('id', selected.id)
+        .select()
+        .single()
+      if (error) throw new Error(error.message || 'Erro ao salvar perfil')
+      setUsers(prev => prev.map(u => u.id === (data as any).id ? (data as User) : u))
       toast.success('Perfil atualizado com sucesso!')
       setSelected(null)
     } catch (e: any) {
@@ -104,30 +101,10 @@ export function UserManagement() {
   }
   async function resetPassword() {
     if (!selected) return
-    try {
-      setCredSaving(true)
-      const { data: { session } } = await supabase.auth.getSession()
-      const headers: HeadersInit = { 'Content-Type': 'application/json' }
-      if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`
-      const tempPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8).toUpperCase() + '!'
-      const res = await fetch(`/api/admin/users/${selected.id}/credentials`, {
-        method: 'PATCH',
-        headers,
-        body: JSON.stringify({
-          password: tempPassword,
-        }),
-      })
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        throw new Error(err.error || 'Erro ao resetar senha')
-      }
-      const result = await res.json()
-      toast.success(`Senha resetada! Nova senha temporária: ${tempPassword}`)
-    } catch (e: any) {
-      toast.error(e.message || 'Erro ao resetar senha')
-    } finally {
-      setCredSaving(false)
-    }
+    // Password reset used `supabase.auth.admin.updateUserById` which requires
+    // the service-role key — not safe to ship client-side. Disable this
+    // action in the static build; a proper solution is an Edge Function.
+    toast.error('Reset de senha temporariamente indisponível (migração Vercel → Dokploy). Use o fluxo "Esqueci minha senha" do próprio usuário.')
   }
   useEffect(() => {
     fetchUsers()

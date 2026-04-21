@@ -1,7 +1,12 @@
-"use client"
-import { useParams } from "next/navigation"
-import { AdminChallengeView } from "@/components/organisms/AdminChallengeView/AdminChallengeView"
+import AdminChallengeClient from "./admin-challenge-client"
+
+// Static export requires generateStaticParams. A single placeholder param
+// is emitted; actual ids are resolved client-side via useParams() and
+// Nginx is expected to fall back to /admin/challenge/_.html for unknown ids.
+export function generateStaticParams() {
+  return [{ id: "_" }]
+}
+
 export default function AdminChallengePage() {
-  const params = useParams()
-  return <AdminChallengeView challengeId={params.id as string} />
+  return <AdminChallengeClient />
 }
